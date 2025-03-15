@@ -1,4 +1,4 @@
-
+import pprint
 from dataclasses import dataclass
 import pathlib
 import json
@@ -23,27 +23,38 @@ class Environment:
     import simplesi as si
     si.environment(env_name='default')  # no path provided
     si.environment(env_name='default', env_path=pathlib.Path('path_to_env_file'))  # path defined
+
+    see the __call__ method for more details.
     """
     base_units: {}
     environment: {} = None
 
-    def __call__(self, env_name: str, env_path: pathlib.Path = None, overload: bool = True, *args, **kwargs):
+    def __call__(self,
+                 env_name: str,
+                 env_path: pathlib.Path = None,
+                 overload: bool = True,  # False: existing units are remoed first
+                 top_level: bool = False
+                 ):
         """
         Loads the environment from a json file.
 
         :param env_name: name of the environment file without the .json extension
-        :param env_path: path to the environment file. If None, the file is assumed to be in the same directory as the module.
-        :param overload: if True, the previously defined environment is overwritten. If False, the new environment is merged with the previous one.
+        :param env_path: path to the environment file. If None, the file is assumed to be in the "environments" subfolder.
+        :param overload: if True, the previously defined environment is left as is, new units are added to it.
+        :param top_level: if True the environment is pushed to the top level namespace. If False, it is pushed to the module namespace.
         :return:
         """
 
+        # no env_path provided: default location
         if env_path is None:
             env_path = pathlib.Path(__file__).parent
-        env_path = env_path / (env_name + ".json")
+        env_path = env_path / 'environments' / (env_name + ".json")
 
+        # check if the file exists
         if not env_path.exists():
             raise ValueError("Environment file not found at {}.".format(env_path))
 
+        # open and load
         with open(env_path, "r", encoding="utf-8") as json_unit_definitions:
             units_environment = json.load(json_unit_definitions)
 
@@ -58,9 +69,26 @@ class Environment:
             units_environment[unit]["Dimension"] = Dimensions(*dimensions)
             units_environment[unit]["Symbol"] = symbol
 
-        # if requested, the old environment is first removed.
+        # deciding which namespace to push the environment to
+        if top_level:
+            import builtins
+            self.push_module = builtins
+
+        else:
+            # get the name of the current package
+            pkg = __name__.split('.')[0]
+            self.push_module = sys.modules[pkg]
+
+        # if overload is False, the old units, if any, are removed first.
         if not overload:
-            pass
+            for key in self.base_units.keys():
+                self.push_module.__dict__.pop(key)
+            for key in self.environment.keys():
+                # some keys may have been removed earlier we jsut try
+                try:
+                    self.push_module.__dict__.pop(key)
+                except KeyError:
+                    pass
 
         self.environment = units_environment
 
@@ -72,10 +100,6 @@ class Environment:
             self._units[unit] = Physical(value=definitions.get('Value', 1),
                                          dimensions=definitions["Dimension"],
                                          precision=PRECISION, )
-
-        # get the name of the current package
-        pkg = __name__.split('.')[0]
-        self.push_module = sys.modules[pkg]
 
         # push
         self._push_vars(self._units, self.push_module)  # from the userdefined environment

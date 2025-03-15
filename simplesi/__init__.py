@@ -60,6 +60,7 @@ class Physical:
 
     def __str__(self):
         return '{} {}'.format(self.value, self.dimensions)
+        # return '{} {}'.format(self.value, self.)
 
     ### "Magic" Methods ###
 

@@ -14,10 +14,12 @@
 
     "m2": {
         "Dimension": [0,2,0,0,0,0,0],
-        "Value": 1},
+        "Value": 1,
+        "Symbol": "m²"},
     "mm2": {
         "Dimension": [0,2,0,0,0,0,0],
-        "Value": 1e-6},
+        "Value": 1e-6,
+        "Symbol": "mm²"},
 
     "N": {
         "Dimension": [1,1,-2,0,0,0,0]},
@@ -42,15 +44,12 @@
         "Value": 1e5},
 
     "Nm": {
-        "Dimension": [1,2,-2,0,0,0,0],
-        "Symbol": "Nm"},
+        "Dimension": [1,2,-2,0,0,0,0]},
     "kNm": {
         "Dimension": [1,2,-2,0,0,0,0],
-        "Symbol": "kNm",
         "Value": 1000},
     "Nmm": {
         "Dimension": [1,2,-2,0,0,0,0],
-        "Symbol": "Nmm",
         "Value": 0.001},
 
     "N_m": {
