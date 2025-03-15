@@ -6,6 +6,7 @@ import sys
 import builtins
 from types import ModuleType
 
+from simplesi import NUMBER
 from simplesi.dimensions import Dimensions
 
 
@@ -28,11 +29,48 @@ class Environment:
     see the __call__ method for more details.
     """
     base_units: {}
+    preferred_units: {}
     environment: {} = None
 
     def __post_init__(self):
         if self.environment is None:
             self.environment = {}
+
+    def _check_environment_definition(self, definitions: dict):
+        """Checks if all units are formally correct"""
+
+        errors = []
+        for k, v in definitions.items():
+            # check if the unit is a string
+            if not isinstance(k, str):
+                errors.append("Unit name must be a string.")
+
+            # check Dimensions are defined
+            if "Dimension" not in v:
+                errors.append(f"Dimension not defined for unit {k}.")
+
+            # check if the dimension has a length of 7
+            if len(v["Dimension"]) != 7:
+                errors.append(f"Dimension must have a length of 7 for unit {k}.")
+
+            # if a symbol is given it must be a string
+            if "Symbol" in v and not isinstance(v["Symbol"], str):
+                errors.append(f"Symbol must be a string for unit {k}.")
+
+            # if a value is given it must be a number
+            if "Value" not in v or not isinstance(v["Value"], NUMBER):
+                errors.append(f"Value must be defined and must be a number for unit {k}.")
+
+            # no dimensionsless units
+            if all(d == 0 for d in v["Dimension"]):
+                errors.append(f"Unit {k} is dimensionless.")
+
+            # value must be positive
+            if v["Value"] <= 0:
+                errors.append(f"Value must be positive for unit {k}.")
+
+        errors = []
+        return errors
 
     def __call__(self,
                  env_name: str,
@@ -62,6 +100,11 @@ class Environment:
         # open and load
         with open(env_path, "r", encoding="utf-8") as json_unit_definitions:
             units_environment = json.load(json_unit_definitions)
+
+        _ret = self._check_environment_definition(units_environment)
+        if _ret:
+            for error in _ret:
+                print(error)
 
         # reading the environment file
         for unit, definitions in units_environment.items():
@@ -103,8 +146,8 @@ class Environment:
             self.environment = {}
         self.environment.update(units_environment)
 
-        # pusing the environment to the global namespace. To do this, first the environment is
-        # used to generate Physical objects, which are then pushed to the global namespace.
+        # pusing the environment to the chosen namespace. To do this, first the environment is
+        # used to generate a dict of Physical objects, which is then pushed to the namespace.
         self._units = {}
         from simplesi import Physical, PRECISION
         for unit, definitions in self.environment.items():
@@ -129,4 +172,3 @@ if __name__ == '__main__':  # pragma: no cover
 
     # the path to the file named environmant.json in the current dir
     jsonpath = "environment.json"
-
