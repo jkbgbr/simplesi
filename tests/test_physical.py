@@ -11,9 +11,15 @@ class TestPhysical(unittest.TestCase):
     # def test_int(self):
     #     self.assertEqual(int(self.physical), 5)
 
-    def test_zerodimension(self):
+    def test_incorrect_init(self):
         with self.assertRaises(ValueError):
             Physical(5.0, Dimensions(0, 0, 0, 0))
+        with self.assertRaises(ValueError):
+            Physical('5.0', Dimensions(1, 0, 0, 0))
+        with self.assertRaises(ValueError):
+            Physical(5.0, Dimensions(1, 0, 0, 0), precision=1.2)
+        with self.assertRaises(ValueError):
+            Physical(5.0, Dimensions(0.1, 0, 0, 0))
 
     def test_neg(self):
         neg_physical = -self.physical
@@ -285,6 +291,113 @@ class TestSubtraction(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.physical1 -= self.physical2
 
+
+class TestMultiplication(unittest.TestCase):
+
+    def setUp(self):
+        self.physical1 = Physical(5.0, Dimensions(1, 0, 0, 0))
+        self.physical2 = Physical(3.0, Dimensions(0, 1, 0, 0))
+        self.physical3 = Physical(2.0, Dimensions(1, 0, 0, 0))
+
+    def test_mul_same_dimensions(self):
+        result = self.physical1 * self.physical3
+        self.assertEqual(result.value, 10.0)
+        self.assertEqual(result.dimensions, Dimensions(2, 0, 0, 0))
+        self.assertEqual(result.precision, self.physical1.precision)
+
+    def test_mul_different_dimensions(self):
+        result = self.physical1 * self.physical2
+        self.assertEqual(result.value, 15.0)
+        self.assertEqual(result.dimensions, Dimensions(1, 1, 0, 0))
+        self.assertEqual(result.precision, self.physical1.precision)
+
+    def test_result_is_dimensionsless(self):
+        pyhsical1 = Physical(5.0, Dimensions(1, 2, 0, 0))
+        physical2 = Physical(3.0, Dimensions(-1, -2, 0, 0))
+        self.assertEqual(pyhsical1 * physical2, 15.0)
+
+    def test_mul_by_scalar(self):
+        result = self.physical1 * 2
+        self.assertEqual(result.value, 10.0)
+        self.assertEqual(result.dimensions, self.physical1.dimensions)
+        self.assertEqual(result.precision, self.physical1.precision)
+
+        result = self.physical1 * -2
+        self.assertEqual(result.value, -10.0)
+        self.assertEqual(result.dimensions, self.physical1.dimensions)
+        self.assertEqual(result.precision, self.physical1.precision)
+
+    def test_mul_non_physical(self):
+        with self.assertRaises(ValueError):
+            self.physical1 * "string"
+
+    def test_rmul(self):
+        result = 2 * self.physical1
+        self.assertEqual(result.value, 10.0)
+        self.assertEqual(result.dimensions, self.physical1.dimensions)
+        self.assertEqual(result.precision, self.physical1.precision)
+
+    def test_imul(self):
+        with self.assertRaises(ValueError):
+            self.physical1 *= self.physical2
+
+
+class TestDivision(unittest.TestCase):
+
+    def setUp(self):
+        self.physical1 = Physical(6.0, Dimensions(1, 0, 0, 0))
+        self.physical2 = Physical(3.0, Dimensions(0, 1, 0, 0))
+        self.physical3 = Physical(2.0, Dimensions(1, 0, 0, 0))
+
+    def test_division_by_zero(self):
+        with self.assertRaises(ZeroDivisionError):
+            self.physical1 / 0
+
+        with self.assertRaises(ZeroDivisionError):
+            self.physical1 / Physical(0, Dimensions(1, 0, 0, 0))
+
+    def test_div_same_dimensions(self):  # same as dimensionsless
+        result = self.physical1 / self.physical3
+        self.assertEqual(result, 3.0)
+
+    def test_div_different_dimensions(self):
+        result = self.physical1 / self.physical2
+        self.assertEqual(result.value, 2.0)
+        self.assertEqual(result.dimensions, Dimensions(1, -1, 0, 0))
+        self.assertEqual(result.precision, self.physical1.precision)
+
+    def test_result_is_dimensionsless(self):
+        physical1 = Physical(6.0, Dimensions(1, 1, 0, 0))
+        physical2 = Physical(3.0, Dimensions(1, 1, 0, 0))
+        self.assertEqual(physical1 / physical2, 2.0)
+
+    def test_div_by_scalar(self):
+        result = self.physical1 / 2
+        self.assertEqual(result.value, 3.0)
+        self.assertEqual(result.dimensions, self.physical1.dimensions)
+        self.assertEqual(result.precision, self.physical1.precision)
+
+        result = self.physical1 / -2
+        self.assertEqual(result.value, -3.0)
+        self.assertEqual(result.dimensions, self.physical1.dimensions)
+        self.assertEqual(result.precision, self.physical1.precision)
+
+    def test_div_non_physical(self):
+        with self.assertRaises(ValueError):
+            self.physical1 / "string"
+
+    # def test_rdiv(self):
+    #     result = 12 / self.physical1
+    #     self.assertEqual(result.value, 2.0)
+    #     self.assertEqual(result.dimensions, Dimensions(-1, 0, 0, 0))
+    #     self.assertEqual(result.precision, self.physical1.precision)
+    #
+    # def test_idiv(self):
+    #     with self.assertRaises(ValueError):
+    #         self.physical1 /= self.physical2
+
+if __name__ == '__main__':
+    unittest.main()
 
 if __name__ == '__main__':
     unittest.main()

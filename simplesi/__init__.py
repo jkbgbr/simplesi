@@ -23,8 +23,7 @@ PRECISION = 1
 
 class Physical:
     """
-    A class that defines any physical quantity that can be described
-    within the BIPM SI unit system.
+    An SI class for representing structural physical quantities.
     """
 
     __slots__ = ("value", "dimensions", "precision", "prefixed")
@@ -37,15 +36,29 @@ class Physical:
         prefixed: Optional[str] = None
     ):
 
+        # being strict about the input makes life easier later
+        if not isinstance(value, NUMBER):
+            raise ValueError("Value must be a number.")
+
+        if not isinstance(precision, int):
+            raise ValueError("Precision must be an integer.")
+
         # use a scalar if you have no dimensions
         if dimensions.dimensionsless:
             raise ValueError("Dimensions must be non-zero. Use a scalar instead.")
+
+        # only integer dimensions are allowed for now
+        if not all(isinstance(x, int) for x in dimensions):
+            raise ValueError("Dimensions must be integers.")
 
         """Constructor"""
         super(Physical, self).__setattr__("value", float(value))
         super(Physical, self).__setattr__("dimensions", dimensions)
         super(Physical, self).__setattr__("precision", precision)
         super(Physical, self).__setattr__("prefixed", prefixed)
+
+    def __str__(self):
+        return '{} {}'.format(self.value, self.dimensions)
 
     ### "Magic" Methods ###
 
@@ -68,6 +81,13 @@ class Physical:
 
     # def __int__(self):
     #     return int(float(self))
+
+    def _check_other(self, other, operation: str):
+
+        if not isinstance(other, Physical):
+            raise ValueError(
+                f"Can only {operation} between Physical instances, these are {type(other)} = {other} and {type(self)} = {self}"
+            )
 
     def __neg__(self):
         return self * -1
@@ -101,8 +121,7 @@ class Physical:
             return math.isclose(self.value, 0, rel_tol=RE_TOL)
 
         # otherwise only compare between Physical instances
-        if not isinstance(other, Physical):
-            raise ValueError('Can only compare between Physical instances, these are {} = {} and {} = {}.'.format(type(other), other, type(self), self))
+        self._check_other(other, "__eq__")
 
         # comparable dimensions
         if self.dimensions == other.dimensions:
@@ -119,11 +138,10 @@ class Physical:
         if isinstance(other, NUMBER) and other == 0:
             return self.value.__gt__(other)
 
-        # otherwise only compare between Physical instances
-        if not isinstance(other, Physical):
-            raise ValueError('Can only compare between Physical instances, these are {} = {} and {} = {}.'.format(type(other), other, type(self), self))
+        # compare only between Physical instances
+        self._check_other(other, "__gt__")
 
-        elif self.dimensions == other.dimensions:
+        if self.dimensions == other.dimensions:
             return self.value > other.value
 
         else:
@@ -137,9 +155,8 @@ class Physical:
         if isinstance(other, NUMBER) and other == 0:
             return self.value.__ge__(other)
 
-        # otherwise only compare between Physical instances
-        if not isinstance(other, Physical):
-            raise ValueError('Can only compare between Physical instances, these are {} = {} and {} = {}.'.format(type(other), other, type(self), self))
+        # compare only between Physical instances
+        self._check_other(other, "__ge__")
 
         if self.dimensions == other.dimensions:
             return self.value >= other.value
@@ -154,9 +171,8 @@ class Physical:
         if isinstance(other, NUMBER) and other == 0:
             return self.value.__lt__(other)
 
-        # otherwise only compare between Physical instances
-        if not isinstance(other, Physical):
-            raise ValueError('Can only compare between Physical instances, these are {} = {} and {} = {}.'.format(type(other), other, type(self), self))
+        # compare only between Physical instances
+        self._check_other(other, "__lt__")
 
         if self.dimensions == other.dimensions:
             return self.value < other.value
@@ -171,9 +187,8 @@ class Physical:
         if isinstance(other, NUMBER) and other == 0:
             return self.value.__le__(other)
 
-        # otherwise only compare between Physical instances
-        if not isinstance(other, Physical):
-            raise ValueError('Can only compare between Physical instances, these are {} = {} and {} = {}.'.format(type(other), other, type(self), self))
+        # compare only between Physical instances
+        self._check_other(other, "__le__")
 
         if self.dimensions == other.dimensions:
             return self.value <= other.value
@@ -190,9 +205,8 @@ class Physical:
         if isinstance(other, NUMBER) and other == 0:
             return self
 
-        # only between Physical instances
-        if not isinstance(other, Physical):
-            raise ValueError('Can only add between Physical instances, these are {} = {} and {} = {}.'.format(type(other), other, type(self), self))
+        # compare only between Physical instances
+        self._check_other(other, "__add__")
 
         # check if dimensions are compatible. If so, add them
         if self.dimensions == other.dimensions:
@@ -206,7 +220,7 @@ class Physical:
         else:
             raise ValueError(
                 f"Cannot add between {self} and {other}: "
-                + ".dimensions attributes are incompatible (not equal)"
+                + ".dimensions attributes are incompatible"
             )
 
     def __radd__(self, other):
@@ -224,8 +238,8 @@ class Physical:
         if isinstance(other, NUMBER) and other == 0:
             return self
 
-        if not isinstance(other, Physical):
-            raise ValueError('Can only subtract between Physical instances, these are {} = {} and {} = {}.'.format(type(other), other, type(self), self))
+        # compare only between Physical instances
+        self._check_other(other, "__sub__")
 
         if self.dimensions == other.dimensions:
 
@@ -238,7 +252,7 @@ class Physical:
         else:
             raise ValueError(
                 f"Cannot subtract between {self} and {other}: "
-                + ".dimensions attributes are incompatible (not equal)"
+                + ".dimensions attributes are incompatible"
             )
 
     def __rsub__(self, other):
@@ -257,12 +271,9 @@ class Physical:
 
         else:
 
-            if not isinstance(other, Physical):
-                raise ValueError(
-                    'Can only subtract between Physical instances, these are {} = {} and {} = {}.'.format(type(other),
-                                                                                                          other,
-                                                                                                          type(self),
-                                                                                                          self))
+            # compare only between Physical instances
+            self._check_other(other, "__rsub__")
+
             return other.__sub__(self)
 
     def __isub__(self, other):
@@ -282,29 +293,19 @@ class Physical:
                 self.prefixed,
             )
 
+        # compare only between Physical instances
+        self._check_other(other, "__mul__")
+
         # multiplying by another Physical instance, e.g. si.N * si.m
-        elif isinstance(other, Physical):
-            new_dims = Dimensions(*[x + y for x, y in zip(self.dimensions, other.dimensions)])
+        new_dims = Dimensions(*[x + y for x, y in zip(self.dimensions, other.dimensions)])
+        new_value = self.value * other.value
+        new_precision = min(self.precision, other.precision)
 
-            try:
-                new_value = self.value * other.value
-            except:
-                raise ValueError(
-                    f"Cannot multiply between {self} and {other}: "
-                    + ".value attributes are incompatible."
-                )
-
-            # if the result is dimensionless, the value is returned
-            if new_dims == Dimensions(0, 0, 0, 0):
-                return new_value
-
-            else:
-                return Physical(new_value, new_dims, self.precision)
+        # if the result is dimensionless, the value is returned
+        if new_dims.dimensionsless:
+            return new_value
         else:
-            raise ValueError(
-                f"Cannot multiply between {self} and {other}: "
-                + ". Only multiplication by a scalar or a Physical is allowed."
-            )
+            return Physical(new_value, new_dims, new_precision)
 
     def __imul__(self, other):
         raise ValueError(
@@ -317,11 +318,11 @@ class Physical:
 
     def __truediv__(self, other):
 
-        if other == 0:
-            raise ValueError("Cannot divide by zero.")
-
-        # division by a number e.g. 5 * si.m / 2 = 2.5 * si.m
         if isinstance(other, NUMBER):
+            if other == 0:
+                raise ZeroDivisionError("Cannot divide by zero.")
+
+            # division by a number e.g. 5 * si.m / 2 = 2.5 * si.m
             return Physical(
                 self.value / other,
                 self.dimensions,
@@ -329,27 +330,21 @@ class Physical:
                 self.prefixed,
             )
 
-        # division by a Physical instance e.g. 5 * si.m / 2 * si.m = 2.5
-        elif isinstance(other, Physical):
-            new_dims = Dimensions(*[x - y for x, y in zip(self.dimensions, other.dimensions)])
-            try:
-                new_value = self.value / other.value
-            except:
-                raise ValueError(
-                    f"Cannot divide between {self} and {other}: "
-                    + ".value attributes are incompatible."
-                )
+        # compare only between Physical instances
+        self._check_other(other, "__truediv__")
 
-            # the result is dimensionless
-            if new_dims == Dimensions(0, 0, 0, 0):
-                return new_value
-            else:
-                return Physical(new_value, new_dims, self.precision)
+        # division by a Physical instance e.g. 5 * si.m / 2 * si.m = 2.5
+        new_dims = Dimensions(*[x - y for x, y in zip(self.dimensions, other.dimensions)])
+        try:
+            new_value = self.value / other.value
+        except ZeroDivisionError:
+            raise ZeroDivisionError("Cannot divide by zero.")
+
+        # the result is dimensionless
+        if new_dims.dimensionsless:
+            return new_value
         else:
-            raise ValueError(
-                f"Cannot divide between {self} and {other}: "
-                + ".Only division by a scalar or another Physical is allowed."
-            )
+            return Physical(new_value, new_dims, self.precision)
 
     def __rtruediv__(self, other):
 
