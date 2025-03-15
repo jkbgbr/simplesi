@@ -10,6 +10,7 @@ from __future__ import annotations
 __version__ = "0.1"
 
 import math
+import pprint
 from typing import Optional
 from simplesi.dimensions import Dimensions
 from simplesi import physical_helper_functions as phf
@@ -18,7 +19,7 @@ RE_TOL = 1e-9
 ABS_TOL = 1e-12
 
 NUMBER = int, float
-PRECISION = 1
+PRECISION = 3
 
 
 class Physical:
@@ -29,11 +30,11 @@ class Physical:
     __slots__ = ("value", "dimensions", "precision", "prefixed")
 
     def __init__(
-        self,
-        value: float,
-        dimensions: Dimensions,
-        precision: int = PRECISION,
-        prefixed: Optional[str] = None
+            self,
+            value: float,
+            dimensions: Dimensions,
+            precision: int = PRECISION,
+            prefixed: Optional[str] = False
     ):
 
         # being strict about the input makes life easier later
@@ -53,7 +54,72 @@ class Physical:
         self.prefixed = prefixed
 
     def __str__(self):
-        return '{} {}'.format(self.value, self.dimensions)
+        """a pretty print of the Physical instance"""
+        unit = environment.preferred_units.get(self.dimensions, None)
+
+        if unit is None:
+            return '{} {}'.format(self.value, self.dimensions)
+        else:
+            return self.to(unit)
+
+    def __repr__(self):
+        """
+        Returns a traditional Python string representation of the Physical instance.
+        """
+        return "Physical(value={}, dimensions={}, precision={}, prefixed={})".format(self.value,
+                                                                                     self.dimensions,
+                                                                                     self.precision,
+                                                                                     self.prefixed)
+
+    def to(self, unit: str = None):
+        """
+        Prints the Physical instance to the specified unit.
+        DOES NOT CHANGE ANYTHING, just prints.
+
+        Does multiple checks to ensure the result is correct:
+        - the requested unit is compatible with the dimensions of the Physical instance
+        - the requested unit is available in the environment
+        - the requested unit has a Value defined
+        Latter two tests check the environment definition.
+
+        """
+        value = self.value
+
+        # looking for the symbol in the environment
+        env = environment.environment
+        possible_units = {k: v for k, v in env.items() if v['Dimension'] == self.dimensions}
+
+        # if the requested unit is not compatible with the dimensions defined in the environment,
+        # the requested unit does not show up in the possible_units dictionary
+        # raise an error
+        if unit is not None:
+            if unit not in possible_units.keys():
+                raise ValueError('The requested unit is not compatible with the dimensions of the Physical instance.')
+
+        # if nothing was found - it is not possible as self must have a unit from the environment but still
+        # check for it
+        if not possible_units:
+            raise ValueError('No units found for the given dimensions. This should not be possible!')
+
+        # finding the requested unit
+        available = {k: v for k, v in possible_units.items() if v.get('Symbol') == unit}
+
+        # is the requested unit available? If not, give the possible alternatives
+        if not available:
+            _list = ', '.join([v.get('Symbol', k) for k, v in possible_units.items()])
+            print('No units found for the given unit "{}". Possible units are: {}'.format(unit, _list))
+            return
+
+        if len(available) > 1:
+            raise ValueError('More than one unit found for the given dimensions.')
+
+        else:
+            # last check: if the unit is found, but the value is missing, raise an error
+            try:
+                new_value = round(value / available[unit].get('Value', 0), self.precision)
+            except ZeroDivisionError as e:
+                raise ValueError('Incorrect unit definition: "Value" missing!')
+            return '{} {}'.format(new_value, available[unit].get('Symbol', ''))
 
     ### "Magic" Methods ###
 
@@ -369,7 +435,7 @@ class Physical:
         if isinstance(other, NUMBER):
             # if self.prefixed:
             #     return float(self) ** other
-            new_value = self.value**other
+            new_value = self.value ** other
 
             new_dimensions = Dimensions(*[x * other for x in self.dimensions])
             if new_dimensions.dimensionsless:
@@ -399,5 +465,16 @@ base_units = {
     "mol": Physical(1, Dimensions(0, 0, 0, 0, 0, 0, 1), PRECISION),
 }
 
+# preferred units
+preferred = {
+    Dimensions(0, 1, 0, 0, 0, 0, 0): 'mm',
+    Dimensions(0, 0, 1, 0, 0, 0, 0): 's',
+    Dimensions(1, 0, 0, 0, 0, 0, 0): 'kg',
+    Dimensions(1, 1, -2, 0, 0, 0, 0): 'kN',
+    Dimensions(1, 2, -2, 0, 0, 0, 0): 'kNm',
+    Dimensions(1, -1, -2, 0, 0, 0, 0): 'MPa',
+}
+
 from simplesi.environment import Environment
-environment = Environment(base_units=base_units)
+
+environment = Environment(base_units=base_units, preferred_units=preferred)
