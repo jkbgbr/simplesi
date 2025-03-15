@@ -1,19 +1,18 @@
 import unittest
-from simplesi.dimensions import Dimensions, DimensionError
+from simplesi.dimensions import Dimensions
 
 
 class TestDimensions(unittest.TestCase):
 
     def test_dimensions_creation(self):
-        dim = Dimensions(kg=1.0, m=2.0, s=3.0, K=4.0)
+        dim = Dimensions(kg=1.0, m=2.0, s=3.0, K=4.0, A=0.0, cd=0.0, mol=0.0)
         self.assertEqual(dim.kg, 1.0)
         self.assertEqual(dim.m, 2.0)
         self.assertEqual(dim.s, 3.0)
         self.assertEqual(dim.K, 4.0)
-
-    def test_dimension_error(self):
-        with self.assertRaises(DimensionError):
-            raise DimensionError("This is a dimension error")
+        self.assertEqual(dim.A, 0.0)
+        self.assertEqual(dim.cd, 0.0)
+        self.assertEqual(dim.mol, 0.0)
 
 
 if __name__ == '__main__':

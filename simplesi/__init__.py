@@ -9,9 +9,10 @@ from __future__ import annotations
 
 __version__ = "0.1"
 
-from typing import Union, Optional
-from simplesi.dimensions import Dimensions
 import math
+from typing import Optional
+from simplesi.dimensions import Dimensions
+from simplesi.environment import Environment
 from simplesi import physical_helper_functions as phf
 
 RE_TOL = 1e-9
@@ -220,7 +221,7 @@ class Physical:
         else:
             raise ValueError(
                 f"Cannot add between {self} and {other}: "
-                + ".dimensions attributes are incompatible"
+                + "dimensions are incompatible"
             )
 
     def __radd__(self, other):
@@ -252,7 +253,7 @@ class Physical:
         else:
             raise ValueError(
                 f"Cannot subtract between {self} and {other}: "
-                + ".dimensions attributes are incompatible"
+                + ".dimensions are incompatible"
             )
 
     def __rsub__(self, other):
@@ -393,10 +394,15 @@ class Physical:
         )
 
 
-# The four SI base units kept
-_the_si_base_units = {
-    "kg": Physical(1, Dimensions(1, 0, 0, 0), PRECISION),
-    "m": Physical(1, Dimensions(0, 1, 0, 0), PRECISION),
-    "s": Physical(1, Dimensions(0, 0, 1, 0), PRECISION),
-    "K": Physical(1, Dimensions(0, 0, 0, 1), PRECISION),
+# The seven SI base units
+base_units = {
+    "kg": Physical(1, Dimensions(1, 0, 0, 0, 0, 0, 0), PRECISION),
+    "m": Physical(1, Dimensions(0, 1, 0, 0, 0, 0, 0), PRECISION),
+    "s": Physical(1, Dimensions(0, 0, 1, 0, 0, 0, 0), PRECISION),
+    "A": Physical(1, Dimensions(0, 0, 0, 1, 0, 0, 0), PRECISION),
+    "cd": Physical(1, Dimensions(0, 0, 0, 0, 1, 0, 0), PRECISION),
+    "K": Physical(1, Dimensions(0, 0, 0, 0, 0, 1, 0), PRECISION),
+    "mol": Physical(1, Dimensions(0, 0, 0, 0, 0, 0, 1), PRECISION),
 }
+
+environment = Environment(base_units=base_units)

@@ -1,8 +1,12 @@
+import pathlib
+import pprint
 
+import simplesi as si
+si.environment(env_name='default', env_path=pathlib.Path('E:/modules/simplesi/simplesi/'))
 
-from simplesi import Physical, Dimensions
+pprint.pprint(si.environment)
 
-a = Physical(1, Dimensions(1, 0, 0, 0))
-b = Physical(2, Dimensions(1, 0, 0, 0))
+print(si.m)
+print(si.mm)
 
-print(a+b)
+print(si.m * si.mm / si.A)
