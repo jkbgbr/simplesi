@@ -2,12 +2,12 @@ import pathlib
 import pprint
 
 import simplesi as si
-si.environment(env_name='default', top_level=True)
+si.environment(env_name='structural', top_level=False)
 
 
 # pprint.pprint(si.environment)
 #
-print(m)
-print(mm)
+print(si.m)
+print(si.mm)
 #
-print(m * mm / A)
+print(si.m * si.mm / si.A)
