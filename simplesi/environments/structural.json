@@ -1,4 +1,14 @@
 {
+    "g": {
+        "Dimension": [1,0,0,0,0,0,0],
+        "Value": 0.001},
+    "kg": {
+        "Dimension": [1,0,0,0,0,0,0],
+        "Value": 1},
+    "t": {
+        "Dimension": [1,0,0,0,0,0,0],
+        "Value": 1000},
+
     "mm": {
         "Dimension": [0,1,0,0,0,0,0],
         "Value": 0.001},
@@ -8,6 +18,9 @@
     "dm": {
         "Dimension": [0,1,0,0,0,0,0],
         "Value": 0.1},
+    "m": {
+        "Dimension": [0,1,0,0,0,0,0],
+        "Value": 1},
     "km": {
         "Dimension": [0,1,0,0,0,0,0],
         "Value": 1000},
@@ -22,13 +35,15 @@
         "Symbol": "mm²"},
 
     "N": {
-        "Dimension": [1,1,-2,0,0,0,0]},
+        "Dimension": [1,1,-2,0,0,0,0],
+        "Value": 1},
     "kN": {
         "Dimension": [1,1,-2,0,0,0,0],
         "Value": 1000},
 
     "Pa": {
         "Dimension": [1,-1,-2,0,0,0,0],
+        "Value": 1,
         "Symbol": "Pa"},
     "kPa": {
         "Dimension": [1,-1,-2,0,0,0,0],
@@ -44,7 +59,8 @@
         "Value": 1e5},
 
     "Nm": {
-        "Dimension": [1,2,-2,0,0,0,0]},
+        "Dimension": [1,2,-2,0,0,0,0],
+        "Value": 1},
     "kNm": {
         "Dimension": [1,2,-2,0,0,0,0],
         "Value": 1000},
@@ -54,6 +70,7 @@
 
     "N_m": {
         "Dimension": [1,0,-2,0,0,0,0],
+        "Value": 1,
         "Symbol": "N/m"},
     "kN_m": {
         "Dimension": [1,0,-2,0,0,0,0],
@@ -62,6 +79,7 @@
 
     "N_m2": {
         "Dimension": [1,-1,-2,0,0,0,0],
+        "Value": 1,
         "Symbol": "N/m²"},
     "kN_m2": {
         "Dimension": [1,-1,-2,0,0,0,0],
@@ -70,16 +88,20 @@
 
     "N_m3": {
         "Dimension": [1,-2,-2,0,0,0,0],
+        "Value": 1,
         "Symbol": "N/m³"},
     "kN_m3": {
         "Dimension": [1,-2,-2,0,0,0,0],
+        "Value": 1000,
         "Symbol": "kN/m³"},
 
     "s": {
         "Dimension": [0,0,1,0,0,0,0],
+        "Value": 1,
         "Symbol": "s"},
     "Hz": {
         "Dimension": [0,0,-1,0,0,0,0],
+        "Value": 1,
         "Symbol": "Hz"}
 
 }
