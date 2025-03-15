@@ -18,8 +18,8 @@ class TestPhysical(unittest.TestCase):
             Physical('5.0', Dimensions(1, 0, 0, 0))
         with self.assertRaises(ValueError):
             Physical(5.0, Dimensions(1, 0, 0, 0), precision=1.2)
-        with self.assertRaises(ValueError):
-            Physical(5.0, Dimensions(0.1, 0, 0, 0))
+        # with self.assertRaises(ValueError):
+        #     Physical(5.0, Dimensions(0.1, 0, 0, 0))
 
     def test_neg(self):
         neg_physical = -self.physical
@@ -349,18 +349,18 @@ class TestDivision(unittest.TestCase):
         self.physical2 = Physical(3.0, Dimensions(0, 1, 0, 0))
         self.physical3 = Physical(2.0, Dimensions(1, 0, 0, 0))
 
-    def test_division_by_zero(self):
+    def test_truedivision_by_zero(self):
         with self.assertRaises(ZeroDivisionError):
             self.physical1 / 0
 
         with self.assertRaises(ZeroDivisionError):
             self.physical1 / Physical(0, Dimensions(1, 0, 0, 0))
 
-    def test_div_same_dimensions(self):  # same as dimensionsless
+    def test_truediv_same_dimensions(self):  # same as dimensionsless
         result = self.physical1 / self.physical3
         self.assertEqual(result, 3.0)
 
-    def test_div_different_dimensions(self):
+    def test_truediv_different_dimensions(self):
         result = self.physical1 / self.physical2
         self.assertEqual(result.value, 2.0)
         self.assertEqual(result.dimensions, Dimensions(1, -1, 0, 0))
@@ -371,7 +371,7 @@ class TestDivision(unittest.TestCase):
         physical2 = Physical(3.0, Dimensions(1, 1, 0, 0))
         self.assertEqual(physical1 / physical2, 2.0)
 
-    def test_div_by_scalar(self):
+    def test_truediv_by_scalar(self):
         result = self.physical1 / 2
         self.assertEqual(result.value, 3.0)
         self.assertEqual(result.dimensions, self.physical1.dimensions)
@@ -382,22 +382,70 @@ class TestDivision(unittest.TestCase):
         self.assertEqual(result.dimensions, self.physical1.dimensions)
         self.assertEqual(result.precision, self.physical1.precision)
 
-    def test_div_non_physical(self):
+    def test_truediv_non_physical(self):
         with self.assertRaises(ValueError):
             self.physical1 / "string"
 
-    # def test_rdiv(self):
-    #     result = 12 / self.physical1
-    #     self.assertEqual(result.value, 2.0)
-    #     self.assertEqual(result.dimensions, Dimensions(-1, 0, 0, 0))
-    #     self.assertEqual(result.precision, self.physical1.precision)
-    #
-    # def test_idiv(self):
-    #     with self.assertRaises(ValueError):
-    #         self.physical1 /= self.physical2
+    def test_rtruediv(self):
+        result = 0 / self.physical1
+        self.assertEqual(result.value, 0.0)
+        self.assertEqual(result.dimensions, Dimensions(1, 0, 0, 0))
+        self.assertEqual(result.precision, self.physical1.precision)
 
-if __name__ == '__main__':
-    unittest.main()
+        with self.assertRaises(ValueError):
+            5 / self.physical1
+
+        result = self.physical1 / self.physical3
+        self.assertEqual(result, 3.0)
+
+    def test_idiv(self):
+        with self.assertRaises(ValueError):
+            self.physical1 /= self.physical2
+
+
+class TestPower(unittest.TestCase):
+
+    def setUp(self):
+        self.physical1 = Physical(2.0, Dimensions(1, 0, 0, 0))
+        self.physical2 = Physical(3.0, Dimensions(0, 1, 0, 0))
+
+    def test_pow_integer(self):
+        result = self.physical1 ** 3
+        self.assertEqual(result.value, 8.0)
+        self.assertEqual(result.dimensions, Dimensions(3, 0, 0, 0))
+        self.assertEqual(result.precision, self.physical1.precision)
+
+    def test_pow_fraction(self):
+        result = self.physical1 ** 0.5
+        self.assertEqual(result.value, 2.0 ** 0.5)
+        self.assertEqual(result.dimensions, Dimensions(0.5, 0, 0, 0))
+        self.assertEqual(result.precision, self.physical1.precision)
+
+    def test_pow_zero(self):
+        result = self.physical1 ** 0
+        self.assertEqual(result, 1.0)
+
+    def test_pow_negative(self):
+        result = self.physical1 ** -1
+        self.assertEqual(result.value, 0.5)
+        self.assertEqual(result.dimensions, Dimensions(-1, 0, 0, 0))
+        self.assertEqual(result.precision, self.physical1.precision)
+
+        result = self.physical1 ** -2
+        self.assertEqual(result.value, 0.25)
+        self.assertEqual(result.dimensions, Dimensions(-2, 0, 0, 0))
+        self.assertEqual(result.precision, self.physical1.precision)
+
+    def test_pow_non_number(self):
+
+        with self.assertRaises(ValueError):
+            self.physical1 ** self.physical2
+
+        with self.assertRaises(ValueError):
+            2 ** self.physical2
+
+
+
 
 if __name__ == '__main__':
     unittest.main()

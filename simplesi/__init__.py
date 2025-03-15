@@ -47,9 +47,9 @@ class Physical:
         if dimensions.dimensionsless:
             raise ValueError("Dimensions must be non-zero. Use a scalar instead.")
 
-        # only integer dimensions are allowed for now
-        if not all(isinstance(x, int) for x in dimensions):
-            raise ValueError("Dimensions must be integers.")
+        # # only integer dimensions are allowed for now
+        # if not all(isinstance(x, int) for x in dimensions):
+        #     raise ValueError("Dimensions must be integers.")
 
         """Constructor"""
         super(Physical, self).__setattr__("value", float(value))
@@ -270,10 +270,8 @@ class Physical:
                 raise ValueError('Can subtract a Physical instance only from zero.')
 
         else:
-
             # compare only between Physical instances
             self._check_other(other, "__rsub__")
-
             return other.__sub__(self)
 
     def __isub__(self, other):
@@ -348,27 +346,22 @@ class Physical:
 
     def __rtruediv__(self, other):
 
+        # only zero can be divided by a Physical.
         if isinstance(other, NUMBER):
-            new_value = other / self.value
-            new_dimensions = Dimensions(*[-x for x in self.dimensions])
-
-            return Physical(
-                new_value,
-                new_dimensions,
-                self.precision,
-            )
-        else:
-            try:
+            if other == 0:
                 return Physical(
-                    other / self.value,
-                    Dimensions(*[-x for x in self.dimensions]),
-                    self.precision,
+                    0,
+                    self.dimensions,
+                    self.precision,  # the lower precision is kept
+                    self.prefixed,
                 )
-            except:
-                raise ValueError(
-                    f"Cannot divide between {other} and {self}: "
-                    + ".value attributes are incompatible."
-                )
+            else:
+                raise ValueError('Can divide with a Physical only zero.')
+
+        else:
+            # compare only between Physical instances
+            self._check_other(other, "__rtruediv__")
+            return other.__truediv__(self)
 
     def __itruediv__(self, other):
         raise ValueError(
@@ -379,15 +372,25 @@ class Physical:
     def __pow__(self, other):
 
         if isinstance(other, NUMBER):
-            if self.prefixed:
-                return float(self) ** other
+            # if self.prefixed:
+            #     return float(self) ** other
             new_value = self.value**other
+
             new_dimensions = Dimensions(*[x * other for x in self.dimensions])
+            if new_dimensions.dimensionsless:
+                return new_value
+
             return Physical(new_value, new_dimensions, self.precision)
+
         else:
             raise ValueError(
-                "Cannot raise a Physical to the power of another Physical -> ({}**{})".format(self, other)
+                "Cannot raise a Physical to the power of another Physical -> ({}**{})".format(other, self)
             )
+
+    def __rpow__(self, other):
+        raise ValueError(
+            "Cannot raise a Physical to the power of another Physical -> ({}**{})".format(other, self)
+        )
 
 
 # The four SI base units kept
