@@ -1,6 +1,6 @@
 import unittest
 from simplesi.dimensions import Dimensions
-from simplesi import Physical
+from simplesi import Physical, PRECISION
 
 
 class TestPhysical(unittest.TestCase):
@@ -43,7 +43,7 @@ class TestPhysical(unittest.TestCase):
         self.assertTrue(bool(self.physical))
 
     def test_hash(self):
-        self.assertEqual(hash(self.physical), hash((5.2, Dimensions(1, 0, 0, 0, 0, 0, 0), 1, None)))
+        self.assertEqual(hash(self.physical), hash((5.2, Dimensions(1, 0, 0, 0, 0, 0, 0), PRECISION, False)))
 
     def test_round(self):
 

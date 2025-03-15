@@ -1,3 +1,4 @@
+import functools
 from typing import NamedTuple
 
 
@@ -11,6 +12,7 @@ class Dimensions(NamedTuple):
     mol: float
 
     @property
+    @functools.lru_cache(maxsize=None)
     def dimensionsless(self):
         return all(x == 0 for x in self)
 
