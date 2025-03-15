@@ -26,13 +26,20 @@ print(si.environment.number_defined_units)
 # # print('{} = {}'.format((2.5 * si.m).to('m'), (2.5 * si.m).to('mm')))
 # #
 # #
-# import simplesi as sit
-# sit.environment(env_name='structural', top_level=True)
-#
-# F = 3000 * N
-# h = 256 * mm
-# print(F * h)
-# print('{} x {} = {}'.format(F, h, F * h))
+import simplesi as sit
+sit.environment(env_name='structural', top_level=True)
+
+F1 = 3000 * N
+F2 = 3 * si.kN
+
+print(F1 == F2)
+print(F1 / F2)
+print(type(F1 / F2))
+
+exit()
+
+h = 0.256 * m
+print('{} x {} = {}'.format(F, h.to('cm'), F * h))
 #
 #
 # print('{} = {}'.format(m.to('m'), m.to('mm')))
