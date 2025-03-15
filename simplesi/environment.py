@@ -41,6 +41,11 @@ class Environment:
         """Checks if all unit definitions are formally correct"""
 
         errors = []
+
+        # check unit uniqueness
+        if not len(definitions) == len(set(definitions.keys())):
+            errors.append("Unit names must be unique.")
+
         for k, v in definitions.items():
 
             # check if the unit is a string
@@ -110,7 +115,7 @@ class Environment:
         if _ret:
             for error in _ret:
                 print(error)
-            raise ValueError("Errors in the environment file.")
+            raise ValueError("Errors in the environment file at {}.".format(env_path))
 
         # reading the environment file
         for unit, definitions in units_environment.items():
