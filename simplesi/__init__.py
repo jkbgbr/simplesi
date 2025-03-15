@@ -466,6 +466,7 @@ base_units = {
 }
 
 # preferred units
+# the preferred units are used to print the Physical instances so usually the most common units are used
 preferred = {
     Dimensions(0, 1, 0, 0, 0, 0, 0): 'mm',
     Dimensions(0, 0, 1, 0, 0, 0, 0): 's',

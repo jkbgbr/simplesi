@@ -36,11 +36,13 @@ class Environment:
         if self.environment is None:
             self.environment = {}
 
-    def _check_environment_definition(self, definitions: dict):
-        """Checks if all units are formally correct"""
+    @classmethod
+    def _check_environment_definition(cls, definitions: dict):
+        """Checks if all unit definitions are formally correct"""
 
         errors = []
         for k, v in definitions.items():
+
             # check if the unit is a string
             if not isinstance(k, str):
                 errors.append("Unit name must be a string.")
@@ -58,18 +60,21 @@ class Environment:
                 errors.append(f"Symbol must be a string for unit {k}.")
 
             # if a value is given it must be a number
-            if "Value" not in v or not isinstance(v["Value"], NUMBER):
-                errors.append(f"Value must be defined and must be a number for unit {k}.")
+            if v.get("Value", None) is None:
+                errors.append(f"Value must be defined for unit {k}.")
+
+            else:
+                if not isinstance(v["Value"], NUMBER):
+                    errors.append(f"Value must be defined and must be a number for unit {k}.")
+
+                # value must be positive
+                elif v["Value"] <= 0:
+                    errors.append(f"Value must be positive for unit {k}.")
 
             # no dimensionsless units
             if all(d == 0 for d in v["Dimension"]):
                 errors.append(f"Unit {k} is dimensionless.")
 
-            # value must be positive
-            if v["Value"] <= 0:
-                errors.append(f"Value must be positive for unit {k}.")
-
-        errors = []
         return errors
 
     def __call__(self,
@@ -105,6 +110,7 @@ class Environment:
         if _ret:
             for error in _ret:
                 print(error)
+            raise ValueError("Errors in the environment file.")
 
         # reading the environment file
         for unit, definitions in units_environment.items():

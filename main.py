@@ -2,8 +2,18 @@
 # # import pprint
 # #
 # #
-# # import simplesi as si
-# # si.environment('structural', top_level=False)
+import simplesi as si
+si.environment('structural', top_level=False)
+print(si.environment.number_defined_units)
+# si.environment('thermal', top_level=False, replace=False)
+# print(si.environment.number_defined_units)
+# si.environment('electrical', top_level=False, replace=False)
+# print(si.environment.number_defined_units)
+# si.environment('default', top_level=False, replace=False)
+# print(si.environment.number_defined_units)
+
+# exit()
+
 # # #
 # # F = 3000 * si.N
 # # h = 256 * si.mm
