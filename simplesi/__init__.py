@@ -12,7 +12,6 @@ __version__ = "0.1"
 import math
 from typing import Optional
 from simplesi.dimensions import Dimensions
-from simplesi.environment import Environment
 from simplesi import physical_helper_functions as phf
 
 RE_TOL = 1e-9
@@ -48,19 +47,13 @@ class Physical:
         if dimensions.dimensionsless:
             raise ValueError("Dimensions must be non-zero. Use a scalar instead.")
 
-        # # only integer dimensions are allowed for now
-        # if not all(isinstance(x, int) for x in dimensions):
-        #     raise ValueError("Dimensions must be integers.")
-
-        """Constructor"""
-        super(Physical, self).__setattr__("value", float(value))
-        super(Physical, self).__setattr__("dimensions", dimensions)
-        super(Physical, self).__setattr__("precision", precision)
-        super(Physical, self).__setattr__("prefixed", prefixed)
+        self.value = value
+        self.dimensions = dimensions
+        self.precision = precision
+        self.prefixed = prefixed
 
     def __str__(self):
         return '{} {}'.format(self.value, self.dimensions)
-        # return '{} {}'.format(self.value, self.)
 
     ### "Magic" Methods ###
 
@@ -406,4 +399,5 @@ base_units = {
     "mol": Physical(1, Dimensions(0, 0, 0, 0, 0, 0, 1), PRECISION),
 }
 
+from simplesi.environment import Environment
 environment = Environment(base_units=base_units)

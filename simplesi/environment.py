@@ -3,6 +3,7 @@ from dataclasses import dataclass
 import pathlib
 import json
 import sys
+import builtins
 from types import ModuleType
 
 from simplesi.dimensions import Dimensions
@@ -29,10 +30,14 @@ class Environment:
     base_units: {}
     environment: {} = None
 
+    def __post_init__(self):
+        if self.environment is None:
+            self.environment = {}
+
     def __call__(self,
                  env_name: str,
                  env_path: pathlib.Path = None,
-                 overload: bool = True,  # False: existing units are remoed first
+                 replace: bool = False,  # True: existing units are removed first
                  top_level: bool = False
                  ):
         """
@@ -40,15 +45,15 @@ class Environment:
 
         :param env_name: name of the environment file without the .json extension
         :param env_path: path to the environment file. If None, the file is assumed to be in the "environments" subfolder.
-        :param overload: if True, the previously defined environment is left as is, new units are added to it.
+        :param replace: if True, the previously defined environment is removed first.
         :param top_level: if True the environment is pushed to the top level namespace. If False, it is pushed to the module namespace.
         :return:
         """
 
         # no env_path provided: default location
         if env_path is None:
-            env_path = pathlib.Path(__file__).parent
-        env_path = env_path / 'environments' / (env_name + ".json")
+            env_path = pathlib.Path(__file__).parent / 'environments'
+        env_path = env_path / (env_name + ".json")
 
         # check if the file exists
         if not env_path.exists():
@@ -70,46 +75,57 @@ class Environment:
             units_environment[unit]["Symbol"] = symbol
 
         # deciding which namespace to push the environment to
+        # top level -> builtins. In this case the units are available simply by name, e.g. "m" or "kg"
         if top_level:
-            import builtins
-            self.push_module = builtins
+            self.namespace_module = builtins
 
+        # module. The units are available by e.g. "si.m" or "si.kg"
         else:
             # get the name of the current package
             pkg = __name__.split('.')[0]
-            self.push_module = sys.modules[pkg]
+            self.namespace_module = sys.modules[pkg]
 
-        # if overload is False, the old units, if any, are removed first.
-        if not overload:
+        # if replace is True, the old units, if any, are removed first.
+        if replace:
             for key in self.base_units.keys():
-                self.push_module.__dict__.pop(key)
+                self.namespace_module.__dict__.pop(key)
             for key in self.environment.keys():
                 # some keys may have been removed earlier we jsut try
                 try:
-                    self.push_module.__dict__.pop(key)
+                    self.namespace_module.__dict__.pop(key)
                 except KeyError:
                     pass
+            # to be synced, the environment is also emptied
+            self.environment = None
 
-        self.environment = units_environment
+        # updating the environment
+        if self.environment is None:
+            self.environment = {}
+        self.environment.update(units_environment)
 
         # pusing the environment to the global namespace. To do this, first the environment is
         # used to generate Physical objects, which are then pushed to the global namespace.
         self._units = {}
         from simplesi import Physical, PRECISION
-        for unit, definitions in units_environment.items():
+        for unit, definitions in self.environment.items():
             self._units[unit] = Physical(value=definitions.get('Value', 1),
                                          dimensions=definitions["Dimension"],
                                          precision=PRECISION, )
 
         # push
-        self._push_vars(self._units, self.push_module)  # from the userdefined environment
-        self._push_vars(self.base_units, self.push_module)  # base units
+        self._push_vars(self._units, self.namespace_module)  # from the userdefined environment
+        self._push_vars(self.base_units, self.namespace_module)  # base units
 
     def _push_vars(self, units_dict: dict, module: ModuleType) -> None:
         module.__dict__.update(units_dict)
 
+    @property
+    def number_defined_units(self):
+        from simplesi import Physical
+        return len({k: v for k, v in self.namespace_module.__dict__.items() if isinstance(v, Physical)})
 
-if __name__ == '__main__':
+
+if __name__ == '__main__':  # pragma: no cover
 
     # the path to the file named environmant.json in the current dir
     jsonpath = "environment.json"
