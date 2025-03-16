@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import pathlib
 import json
 import sys
@@ -30,6 +30,7 @@ class Environment:
     si_base_units: {}
     preferred_units: {}
     environment: {} = None
+    settings: dict = field(default_factory=lambda: {'print_unit': 'smallest'})
 
     def __post_init__(self):
         if self.environment is None:

@@ -21,7 +21,7 @@ F = 3000 * si.N
 
 # print(F.to(si.N))
 print(F.to('kN'))
-print()
+print(2 * si.m)
 print()
 print()
 print(F.to('kN'))
