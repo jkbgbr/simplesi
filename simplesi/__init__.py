@@ -1,7 +1,7 @@
 """
 The SI Units: "For all people, for all time"
 
-A module to model four SI base units needed in structural engineering: kg, m, s, K.
+A module to simply model SI base units.
 
 """
 
@@ -13,7 +13,6 @@ import math
 import pprint
 from typing import Optional
 from simplesi.dimensions import Dimensions
-from simplesi import physical_helper_functions as phf
 
 RE_TOL = 1e-9
 ABS_TOL = 1e-12
@@ -122,26 +121,6 @@ class Physical:
             return '{} {}'.format(new_value, available[unit].get('Symbol', ''))
 
     ### "Magic" Methods ###
-
-    # def __float__(self):
-    #     value = self.value
-    #
-    #     kg_bool = False
-    #     dims = self.dimensions
-    #     env_dims = environment.units_by_dimension or dict()
-    #     power, _ = phf._powers_of_derived(dims, env_dims)
-    #     dim_components = phf._get_unit_components_from_dims(dims)
-    #     if len(dim_components) == 1 and dim_components[0][0] == "kg":
-    #         kg_bool = True
-    #     if self.prefixed:
-    #         prefix = self.prefixed
-    #     else:
-    #         prefix = phf._auto_prefix(value, power, kg_bool)
-    #     float_value = phf._auto_prefix_value(value, power, prefix, kg_bool)
-    #     return float_value
-
-    # def __int__(self):
-    #     return int(float(self))
 
     def _check_other(self, other, operation: str):
 
