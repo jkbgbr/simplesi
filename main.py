@@ -16,8 +16,15 @@ print(si.environment.number_defined_units)
 
 # # #
 F = 3000 * si.N
-h = 256 * si.mm
-print(F * h)
+# h = 256 * si.mm
+# print(F * h)
+
+# print(F.to(si.N))
+print(F.to('kN'))
+print()
+print()
+print()
+print(F.to('kN'))
 
 
 exit()
