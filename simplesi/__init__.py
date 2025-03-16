@@ -36,10 +36,24 @@ class Physical:
             precision: int = PRECISION,
             conv_factor: float = 1.0,
     ):
+        """
+
+
+        :param value: How many pieces of this unit
+        :param dimensions: dimensionality
+        :param precision:
+        :param conv_factor: number of base SI units in this unit. e.g. 1 ft = 0.3048 m -> conv_factor = 0.3048
+        """
 
         # being strict about the input makes life easier later
         if not isinstance(value, NUMBER):
             raise ValueError("Value must be a number.")
+
+        if not isinstance(conv_factor, NUMBER):
+            raise ValueError("Conversion factor must be a number.")
+
+        if any(x <= 0 for x in (value, conv_factor)):
+            raise ValueError("Value and conversion factor must be positive.")
 
         if not isinstance(precision, int):
             raise ValueError("Precision must be an integer.")
@@ -127,8 +141,12 @@ class Physical:
 
         else:
             # last check: if the unit is found, but the value is missing, raise an error
+            # this should not happen as we check for the existence of the value in the environment but still
             try:
-                new_value = round(value / available[unit].get('Value', 0), self.precision)
+
+                divisor = available[unit].get('Value', 0)  #  * available[unit].get('Factor')
+
+                new_value = round(value / divisor, self.precision)
             except ZeroDivisionError as e:
                 raise ValueError('Incorrect unit definition: "Value" missing!')
             return '{} {}'.format(new_value, available[unit].get('Symbol', ''))
@@ -171,14 +189,14 @@ class Physical:
 
         # comparison between Physical and a zero
         if isinstance(other, NUMBER) and other == 0:
-            return math.isclose(self.value, 0, rel_tol=RE_TOL)
+            return math.isclose(self.value, 0, rel_tol=RE_TOL, abs_tol=ABS_TOL)
 
         # otherwise only compare between Physical instances
         self._check_other(other, "__eq__")
 
         # comparable dimensions
         if self.dimensions == other.dimensions:
-            return math.isclose(self.value, other.value)
+            return math.isclose(self.value * self.conv_factor, other.value * other.conv_factor, rel_tol=RE_TOL, abs_tol=ABS_TOL)
 
         else:
             raise ValueError(
@@ -195,7 +213,7 @@ class Physical:
         self._check_other(other, "__gt__")
 
         if self.dimensions == other.dimensions:
-            return self.value > other.value
+            return self.value * self.conv_factor > other.value * other.conv_factor
 
         else:
             raise ValueError(
@@ -212,7 +230,7 @@ class Physical:
         self._check_other(other, "__ge__")
 
         if self.dimensions == other.dimensions:
-            return self.value >= other.value
+            return self.value * self.conv_factor >= other.value * other.conv_factor
         else:
             raise ValueError(
                 "Can only compare between Physical instances of equal dimension."
@@ -228,7 +246,7 @@ class Physical:
         self._check_other(other, "__lt__")
 
         if self.dimensions == other.dimensions:
-            return self.value < other.value
+            return self.value * self.conv_factor < other.value * other.conv_factor
         else:
             raise ValueError(
                 "Can only compare between Physical instances of equal dimension."
@@ -244,7 +262,7 @@ class Physical:
         self._check_other(other, "__le__")
 
         if self.dimensions == other.dimensions:
-            return self.value <= other.value
+            return self.value * self.conv_factor <= other.value * other.conv_factor
         else:
             raise ValueError(
                 "Can only compare between Physical instances of equal dimension."
@@ -473,7 +491,10 @@ preferred = {
 # with open('preferred_units.json', 'w', encoding='utf-8') as f:
 #     json.dump(preferred, f, ensure_ascii=True)
 
-environment_settings = {'print_unit': 'smallest'}
+environment_settings = {
+    'print_unit': 'smallest',  # smallest, largest
+    'keep_SI': True,  # if True, operations on SI and non-SI units return the result to SI units
+}
 
 from simplesi.environment import Environment
 

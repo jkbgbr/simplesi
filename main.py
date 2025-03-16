@@ -10,6 +10,14 @@ print(si.environment.number_defined_units)
 pprint.pprint(si.environment.environment)
 
 
+a = 1 * si.ft
+b = 1 * si.m
+
+print('==', a == b)
+print('!=', a != b)
+print('<=', a <= b)
+print('>=', a >= b)
+
 
 
 

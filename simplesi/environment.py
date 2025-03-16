@@ -1,3 +1,4 @@
+import pprint
 from dataclasses import dataclass, field
 import pathlib
 import json
@@ -51,6 +52,18 @@ class Environment:
         # check unit uniqueness
         if not len(definitions) == len(set(definitions.keys())):
             errors.append("Unit names must be unique.")
+
+        # an environment must be either pure SI or pure non-SI
+        # SI units either have all their Factors equal to 1 or have none defined
+        factors = {v.get("Factor", 1) for v in definitions.values()}  # if SI: factor_ones = {1}
+
+        # one of these must be True:
+        # factors = {1} -> all SI
+        # factors = {...} -> all are different as all units must be different
+        if factors == {1} or len(factors) == len(definitions):
+           pass
+        else:
+            errors.append("Factors are not correctly defined. An environment must be either pure SI or pure non-SI. Non-SI environments must have all factors different.")
 
         for k, v in definitions.items():
 
@@ -131,12 +144,14 @@ class Environment:
         for unit, definitions in units_environment.items():
             dimensions = definitions.get("Dimension", ())
             symbol = definitions.get("Symbol", unit)
+            conv_factor = definitions.get("Factor", 1)
 
             if not dimensions:
                 raise ValueError("Dimension not defined for unit {}.".format(unit))
 
             units_environment[unit]["Dimension"] = Dimensions(*dimensions)
             units_environment[unit]["Symbol"] = symbol
+            units_environment[unit]["Factor"] = conv_factor
 
         # deciding which namespace to push the environment to
         # top level -> builtins. In this case the units are available simply by name, e.g. "m" or "kg"
@@ -173,6 +188,7 @@ class Environment:
         from simplesi import Physical, PRECISION
         for unit, definitions in self.environment.items():
             self._units[unit] = Physical(value=definitions.get('Value', 1),
+                                         conv_factor=definitions.get('Factor', 1),
                                          dimensions=definitions["Dimension"],
                                          precision=PRECISION, )
 
