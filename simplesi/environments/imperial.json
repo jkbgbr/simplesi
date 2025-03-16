@@ -1,0 +1,15 @@
+{
+    "ft": {
+        "Dimension": [0,1,0,0,0,0,0],
+        "Symbol": "ft",
+        "Value": 1,
+        "Factor": "1/0.3048"},
+    "inch": {
+        "Dimension": [0,1,0,0,0,0,0],
+        "Symbol": "inch",
+        "Value": 1,
+        "Factor": "12/0.3048"},
+    "m": {
+        "Dimension": [0,1,0,0,0,0,0],
+        "Value": 1}
+}

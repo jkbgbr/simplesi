@@ -116,7 +116,10 @@ class Environment:
 
         # open and load
         with open(env_path, "r", encoding="utf-8") as json_unit_definitions:
-            units_environment = json.load(json_unit_definitions)
+            try:
+                units_environment = json.load(json_unit_definitions)
+            except json.decoder.JSONDecodeError as e:
+                raise ValueError("Error decoding the environment file at {}. Problem: {}".format(env_path, *e.args)) from None
 
         _ret = self._check_environment_definition(units_environment)
         if _ret:
