@@ -1,10 +1,11 @@
 {
     "ft": {
         "Dimension": [0,1,0,0,0,0,0],
-        "Value": 1,
         "Factor": 0.3048},
     "inch": {
         "Dimension": [0,1,0,0,0,0,0],
-        "Value": 1,
-        "Factor": 0.0254}
+        "Factor": 0.0254},
+    "yard": {
+        "Dimension": [0,1,0,0,0,0,0],
+        "Factor": 0.9144}
 }

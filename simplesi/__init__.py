@@ -39,7 +39,8 @@ class Physical:
         """
 
 
-        :param value: How many pieces of this unit
+        :param value: How many pieces of this unit. Non-SI units are converted to the SI unit of the same dimensionality when instantiated.
+        e.g. 1 ft = 0.3048 m -> value = n x 0.3048
         :param dimensions: dimensionality
         :param precision:
         :param conv_factor: number of base SI units in this unit. e.g. 1 ft = 0.3048 m -> conv_factor = 0.3048
@@ -76,10 +77,12 @@ class Physical:
 
         # if there is no preferred unit, use the smallest available from the environment
         if unit is None:
-            unit = tuple(k for k, v in sorted(self.all_units.items(), key=lambda x: x[1].get('Value')) if
+            # possible units, ascending order
+            unit = tuple(k for k, v in sorted(self.all_units.items(), key=lambda x: x[1].get('Value', 1) * x[1].get('Factor', 1)) if
                          v.get('Dimension') == self.dimensions)
             # using the unit as set
             printsetting = environment.settings.get('print_unit', None)
+
             if printsetting == 'smallest':
                 unit = unit[0]
             elif printsetting == 'largest':
@@ -162,19 +165,16 @@ class Physical:
             raise ValueError('More than one unit found for the given dimensions.')
 
         # finally, the unit is found and we are sure there is only one
-        # the requested unit may be the same as the current one
-        if self.conv_factor == available[unit].get('Factor'):
-            return '{} {}'.format(self.value, available[unit].get('Symbol', ''))
 
         # last check: if the unit is found, but the value is missing, raise an error
         # this should not happen as we check for the existence of the value in the environment but still
-        try:
-            # converting to the requested unit using value and factor
-            divisor = available[unit].get('Value', 0) * available[unit].get('Factor')
-            new_value = round(value / divisor, self.precision)
-        except ZeroDivisionError as e:
-            raise ValueError('Incorrect unit definition: "Value" missing!')
-        return '{} {}'.format(new_value, available[unit].get('Symbol', ''))
+        _value = available[unit].get('Value', 1)
+        _factor = available[unit].get('Factor', 1)
+        _symbol = available[unit].get('Symbol', '')
+
+        divider = _value * _factor
+        new_value = round(value / divider, self.precision)
+        return '{} {}'.format(new_value, _symbol)
 
     ### "Magic" Methods ###
 
@@ -221,8 +221,7 @@ class Physical:
 
         # comparable dimensions
         if self.dimensions == other.dimensions:
-            return math.isclose(self.value * self.conv_factor, other.value * other.conv_factor, rel_tol=RE_TOL,
-                                abs_tol=ABS_TOL)
+            return math.isclose(self.value, other.value, rel_tol=RE_TOL, abs_tol=ABS_TOL)
 
         else:
             raise ValueError(
@@ -308,35 +307,39 @@ class Physical:
         # check if dimensions are compatible. If so, add them
         if self.dimensions == other.dimensions:
 
-            # factors may or may not be different and the environment setting keep_SI tells us which to keep
-            # both are the same, e.g. m + m or ft + ft
-            if self.conv_factor == other.conv_factor:
-                new_value = self.value + other.value
-                new_factor = self.conv_factor
+            new_value = self.value + other.value
+            new_factor = self.conv_factor
 
-            # one of them is SI, e.g. m + ft
-            elif any(x == 1 for x in (self.conv_factor, other.conv_factor)):
 
-                if self.keep_SI:  # SI is kept, other is converted
-                    # due to the definition of conv_factor simply
-                    new_value = self.value * self.conv_factor + other.value * other.conv_factor
-                    new_factor = 1.0
-
-                else:  # keeping the other
-                    # finding out which is the non-SI
-                    nonSI = self if self.conv_factor != 1 else other
-                    if nonSI == self:
-                        new_value = self.value + other.value / self.conv_factor
-                        new_factor = self.conv_factor
-                    else:
-                        new_value = other.value + self.value / other.conv_factor
-                        new_factor = other.conv_factor
-
-            # none of them is SI but different e.g. ft + inch
-            # self will determine the unit of the result
-            else:
-                new_value = self.value * self.conv_factor + other.value * other.conv_factor
-                new_factor = self.conv_factor
+            # # factors may or may not be different and the environment setting keep_SI tells us which to keep
+            # # both are the same, e.g. m + m or ft + ft
+            # if self.conv_factor == other.conv_factor:
+            #     new_value = self.value + other.value
+            #     new_factor = self.conv_factor
+            #
+            # # one of them is SI, e.g. m + ft
+            # elif any(x == 1 for x in (self.conv_factor, other.conv_factor)):
+            #
+            #     if self.keep_SI:  # SI is kept, other is converted
+            #         # due to the definition of conv_factor simply
+            #         new_value = self.value * self.conv_factor + other.value * other.conv_factor
+            #         new_factor = 1.0
+            #
+            #     else:  # keeping the other
+            #         # finding out which is the non-SI
+            #         nonSI = self if self.conv_factor != 1 else other
+            #         if nonSI == self:
+            #             new_value = self.value + other.value / self.conv_factor
+            #             new_factor = self.conv_factor
+            #         else:
+            #             new_value = other.value + self.value / other.conv_factor
+            #             new_factor = other.conv_factor
+            #
+            # # none of them is SI but different e.g. ft + inch
+            # # self will determine the unit of the result
+            # else:
+            #     new_value = self.value + other.value * other.conv_factor / self.conv_factor
+            #     new_factor = self.conv_factor
 
             return Physical(
                 new_value,
@@ -570,12 +573,12 @@ base_units = {
 # the preferred units are used to print the Physical instances so usually the most common units are used
 # the VALUES must beunique, but this is checked for in the environment file
 preferred = {
-    # 'mm': Dimensions(0, 1, 0, 0, 0, 0, 0),
-    # 's': Dimensions(0, 0, 1, 0, 0, 0, 0),
-    # 'kg': Dimensions(1, 0, 0, 0, 0, 0, 0),
-    # 'kN': Dimensions(1, 1, -2, 0, 0, 0, 0),
-    # 'kNm': Dimensions(1, 2, -2, 0, 0, 0, 0),
-    # 'MPa': Dimensions(1, -1, -2, 0, 0, 0, 0),
+    'mm': Dimensions(0, 1, 0, 0, 0, 0, 0),
+    's': Dimensions(0, 0, 1, 0, 0, 0, 0),
+    'kg': Dimensions(1, 0, 0, 0, 0, 0, 0),
+    'kN': Dimensions(1, 1, -2, 0, 0, 0, 0),
+    'kNm': Dimensions(1, 2, -2, 0, 0, 0, 0),
+    'MPa': Dimensions(1, -1, -2, 0, 0, 0, 0),
 }
 
 # # dump the perferred units in an utf-8 json file

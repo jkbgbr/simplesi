@@ -1,54 +1,55 @@
 import pathlib
 import pprint
-import unittest
-from os import environ
-
-import simplesi
 import sys
+import unittest
+from simplesi.dimensions import Dimensions
+from simplesi import Physical, PRECISION
+import simplesi as si
+si.environment('imperial')
 
 
-class TestEnvironmentCreation(unittest.TestCase):
+class TestPhysicalNonSI(unittest.TestCase):
 
-    def test_environment_module_level(self):
-        # no environment loaded yet
-        # by importing the basic units are loaded
-        self.assertTrue(len(simplesi.environment.si_base_units) == 7)
-        # no environment yet
-        self.assertFalse(simplesi.environment.environment)
-        with self.assertRaises(AttributeError):
-            simplesi.environment.number_defined_units
+    def setUp(self):
+        self.physical = Physical(5, Dimensions(1, 0, 0, 0, 0, 0, 0))
+        self.nonsi_physical1 = Physical(2.5, Dimensions(1, 0, 0, 0, 0, 0, 0))
+        self.nonsi_physical2 = Physical(2.5, Dimensions(1, 0, 0, 0, 0, 0, 0))
+        self.nonsi_physical3 = Physical(0.5, Dimensions(1, 0, 0, 0, 0, 0, 0))
+        self.nonsi_physical4 = Physical(10.1, Dimensions(1, 0, 0, 0, 0, 0, 0))
 
-        # loading an environment
-        simplesi.environment(env_name='default')
-        self.assertTrue(len(simplesi.environment.si_base_units) == 7)  # still the same
-        self.assertTrue(simplesi.environment.environment)
-        self.assertTrue(len(simplesi.environment.environment) > 0)
-        environment_length = simplesi.environment.number_defined_units
+    def test_relation_between_nonsi(self):
+        self.assertTrue(self.nonsi_physical1 == self.nonsi_physical2)
+        self.assertTrue(self.nonsi_physical1 != self.nonsi_physical3)
+        self.assertTrue(self.nonsi_physical1 <= self.nonsi_physical2)
+        self.assertTrue(self.nonsi_physical1 >= self.nonsi_physical3)
+        self.assertTrue(self.nonsi_physical1 > self.nonsi_physical3)
+        self.assertTrue(self.nonsi_physical3 < self.nonsi_physical2)
 
-        # loading a new, smaller environment, REPLACING the old one
-        envpath = pathlib.Path(__file__).parent
-        simplesi.environment(env_name='test_definitions', env_path=envpath, replace=True)
-        # overloading (adding) an environment, should not change the number of base units
-        self.assertTrue(len(simplesi.environment.si_base_units) == 7)  # still the same
-        self.assertGreaterEqual(environment_length, len(simplesi.environment.environment))  # added some units
-        environment_length = len(simplesi.environment.environment)
+    def test_si_to_nonsi(self):
+        self.assertTrue(self.physical > self.nonsi_physical1)
+        self.assertTrue(self.physical < self.nonsi_physical4)
 
-        # trying to load one but bad name
-        with self.assertRaises(ValueError):
-            simplesi.environment(env_name='whatever', replace=False)
+        self.assertTrue(self.physical != self.nonsi_physical1)
+        self.assertTrue(self.physical == 2 * self.nonsi_physical3)
 
-        # loading a new, ADDING TO the old one
-        simplesi.environment(env_name='default', replace=False)
+    def test_to(self):
+        si.environment('structural', replace=False)
+        self.assertEqual((1 * si.inch).to('inch'), '1.0 inch')
+        self.assertEqual((1 * si.ft).to('inch'), '12.0 inch')
+        self.assertEqual((1 * si.m).to('m'), '1.0 m')
+        self.assertEqual((12 * si.inch).to('ft'), '1.0 ft')
+        self.assertEqual((1 * si.yard).to('ft'), '3.0 ft')
 
-        # overloading (adding) an environment, should not change the number of base units
-        self.assertTrue(len(simplesi.environment.si_base_units) == 7)  # still the same
-        self.assertGreaterEqual(len(simplesi.environment.environment), environment_length)  # added some units
-        environment_length = len(simplesi.environment.environment)
+        self.assertEqual((1 * si.m).to('inch'), '39.37 inch')
+        self.assertEqual((1 * si.m).to('ft'), '3.281 ft')
 
-        # units are in the namespace
-        self.assertTrue('m' in simplesi.environment.namespace_module.__dict__)
-        self.assertTrue('kg' in simplesi.environment.namespace_module.__dict__)
-        self.assertFalse('whatever' in simplesi.environment.namespace_module.__dict__)
+        self.assertEqual((10 * si.inch).to('m'), '0.254 m')
+        self.assertEqual((1 * si.ft).to('cm'), '30.48 cm')
+        self.assertEqual((1 * si.ft).to('mm'), '304.8 mm')
+        self.assertEqual((2 * si.yard).to('mm'), '1828.8 mm')
+
+        self.assertEqual(12 * si.inch + 2 * si.ft, 1 * si.yard)
+        self.assertEqual(12 * si.cm + 2 * si.m, 2120 * si.mm)
 
 
 if __name__ == '__main__':

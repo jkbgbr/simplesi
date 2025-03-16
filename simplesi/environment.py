@@ -1,3 +1,4 @@
+import math
 import pprint
 from dataclasses import dataclass, field
 import pathlib
@@ -53,18 +54,6 @@ class Environment:
         if not len(definitions) == len(set(definitions.keys())):
             errors.append("Unit names must be unique.")
 
-        # an environment must be either pure SI or pure non-SI
-        # SI units either have all their Factors equal to 1 or have none defined
-        factors = {v.get("Factor", 1) for v in definitions.values()}  # if SI: factor_ones = {1}
-
-        # one of these must be True:
-        # factors = {1} -> all SI
-        # factors = {...} -> all are different as all units must be different
-        if factors == {1} or len(factors) == len(definitions):
-           pass
-        else:
-            errors.append("Factors are not correctly defined. An environment must be either pure SI or pure non-SI. Non-SI environments must have all factors different.")
-
         for k, v in definitions.items():
 
             # check if the unit is a string
@@ -82,18 +71,6 @@ class Environment:
             # if a symbol is given it must be a string
             if "Symbol" in v and not isinstance(v["Symbol"], str):
                 errors.append(f"Symbol must be a string for unit {k}.")
-
-            # if a value is given it must be a number
-            if v.get("Value", None) is None:
-                errors.append(f"Value must be defined for unit {k}.")
-
-            else:
-                if not isinstance(v["Value"], NUMBER):
-                    errors.append(f"Value must be defined and must be a number for unit {k}.")
-
-                # value must be positive
-                elif v["Value"] <= 0:
-                    errors.append(f"Value must be positive for unit {k}.")
 
             # no dimensionsless units
             if all(d == 0 for d in v["Dimension"]):
@@ -187,7 +164,14 @@ class Environment:
         self._units = {}
         from simplesi import Physical, PRECISION
         for unit, definitions in self.environment.items():
-            self._units[unit] = Physical(value=definitions.get('Value', 1),
+
+            # Physical holds:
+            # - the value of the unit. The value of non-SI units is the value in SI units.
+            # - the conversion factor to SI units for further use
+            # - the dimensions of the unit as a Dimensions object
+            # - the precision of the unit for displaying
+
+            self._units[unit] = Physical(value=definitions.get('Value', 1) * definitions.get('Factor', 1),
                                          conv_factor=definitions.get('Factor', 1),
                                          dimensions=definitions["Dimension"],
                                          precision=PRECISION, )

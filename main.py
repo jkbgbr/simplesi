@@ -7,13 +7,13 @@ import pprint
 import simplesi as si
 si.environment('imperial')
 si.environment('structural', replace=False)
-print(si.environment.number_defined_units)
-pprint.pprint(si.environment.environment)
+# pprint.pprint(si.environment.environment)
+
 
 
 a = 1 * si.ft
 b = 1 * si.m
-c = 5 * si.inch
+c = 1 * si.inch
 
 print('==', a == b)
 print('!=', a != b)
@@ -33,6 +33,13 @@ print()
 print('ADDITION')
 print()
 print((a+b))
+print((a+0))
+print((0+b))
+print()
+print((0+c))
+print(c)
+print((c+0))
+
 print((a+b).to())
 print((a+b+c).to('m'))
 print((a+b+c).to('ft'))
@@ -46,6 +53,8 @@ print()
 print('SUBSTRACTION')
 print()
 print((a-b))
+print((a-0))
+print((0-c))
 print((a-b).to())
 print((a-b+c).to('m'))
 print((a+b-c).to('ft'))
