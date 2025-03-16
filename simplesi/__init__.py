@@ -12,6 +12,7 @@ __version__ = "0.1"
 import math
 import pprint
 from typing import Optional
+
 from simplesi.dimensions import Dimensions
 
 RE_TOL = 1e-9
@@ -26,14 +27,14 @@ class Physical:
     An SI class for representing structural physical quantities.
     """
 
-    __slots__ = ("value", "dimensions", "precision", "factor")
+    __slots__ = ("value", "dimensions", "precision", "conv_factor")
 
     def __init__(
             self,
             value: float,
             dimensions: Dimensions,
             precision: int = PRECISION,
-            factor: float = 1.0,
+            conv_factor: float = 1.0,
     ):
 
         # being strict about the input makes life easier later
@@ -50,11 +51,12 @@ class Physical:
         self.value = value
         self.dimensions = dimensions
         self.precision = precision
-        self.factor = factor
+        self.conv_factor = conv_factor
 
     def __str__(self):
         """a pretty print of the Physical instance"""
-        unit = environment.preferred_units.get(self.dimensions, None)
+        unit = {k for k, v in environment.preferred_units.items() if v == self.dimensions}
+        unit = unit.pop() if unit else None
 
         if unit is None:
             return '{} {}'.format(self.value, self.dimensions)
@@ -65,10 +67,10 @@ class Physical:
         """
         Returns a traditional Python string representation of the Physical instance.
         """
-        return "Physical(value={}, dimensions={}, precision={}, factor={})".format(self.value,
+        return "Physical(value={}, dimensions={}, precision={}, conv_factor={})".format(self.value,
                                                                                      self.dimensions,
                                                                                      self.precision,
-                                                                                   self.factor)
+                                                                                   self.conv_factor)
 
     def to(self, unit: str = None):
         """
@@ -142,11 +144,11 @@ class Physical:
 
     def __hash__(self):
         return hash(
-            (self.value, self.dimensions, self.precision, self.factor)
+            (self.value, self.dimensions, self.precision, self.conv_factor)
         )
 
     def __round__(self, n=0):
-        return Physical(round(self.value, n), self.dimensions, n, self.factor)
+        return Physical(round(self.value, n), self.dimensions, n, self.conv_factor)
 
     def __contains__(self, other):
         return False
@@ -254,7 +256,7 @@ class Physical:
                 self.value + other.value,
                 self.dimensions,
                 min(self.precision, other.precision),  # the lower precision is kept
-                self.factor,
+                self.conv_factor,
             )
         # dimensions are not compatible
         else:
@@ -287,7 +289,7 @@ class Physical:
                 self.value - other.value,
                 self.dimensions,
                 min(self.precision, other.precision),  # the lower precision is kept
-                self.factor,
+                self.conv_factor,
             )
         else:
             raise ValueError(
@@ -304,7 +306,7 @@ class Physical:
                     -self.value,
                     self.dimensions,
                     self.precision,  # the lower precision is kept
-                    self.factor,
+                    self.conv_factor,
                 )
             else:
                 raise ValueError('Can subtract a Physical instance only from zero.')
@@ -328,7 +330,7 @@ class Physical:
                 self.value * other,
                 self.dimensions,
                 self.precision,
-                self.factor,
+                self.conv_factor,
             )
 
         # compare only between Physical instances
@@ -365,7 +367,7 @@ class Physical:
                 self.value / other,
                 self.dimensions,
                 self.precision,
-                self.factor,
+                self.conv_factor,
             )
 
         # compare only between Physical instances
@@ -393,7 +395,7 @@ class Physical:
                     0,
                     self.dimensions,
                     self.precision,  # the lower precision is kept
-                    self.factor,
+                    self.conv_factor,
                 )
             else:
                 raise ValueError('Can divide with a Physical only zero.')
@@ -445,14 +447,22 @@ base_units = {
 
 # preferred units
 # the preferred units are used to print the Physical instances so usually the most common units are used
+# the VALUES must beunique, but this is checked for in the environment file
 preferred = {
-    Dimensions(0, 1, 0, 0, 0, 0, 0): 'mm',
-    Dimensions(0, 0, 1, 0, 0, 0, 0): 's',
-    Dimensions(1, 0, 0, 0, 0, 0, 0): 'kg',
-    Dimensions(1, 1, -2, 0, 0, 0, 0): 'kN',
-    Dimensions(1, 2, -2, 0, 0, 0, 0): 'kNm',
-    Dimensions(1, -1, -2, 0, 0, 0, 0): 'MPa',
+    'mm': Dimensions(0, 1, 0, 0, 0, 0, 0),
+    's': Dimensions(0, 0, 1, 0, 0, 0, 0),
+    'kg': Dimensions(1, 0, 0, 0, 0, 0, 0),
+    'kN': Dimensions(1, 1, -2, 0, 0, 0, 0),
+    'kNm': Dimensions(1, 2, -2, 0, 0, 0, 0),
+    'MPa': Dimensions(1, -1, -2, 0, 0, 0, 0),
 }
+
+# # dump the perferred units in an utf-8 json file
+# import json
+# with open('preferred_units.json', 'w', encoding='utf-8') as f:
+#     json.dump(preferred, f, ensure_ascii=True)
+
+
 
 from simplesi.environment import Environment
 

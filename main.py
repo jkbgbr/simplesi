@@ -15,9 +15,13 @@ print(si.environment.number_defined_units)
 # exit()
 
 # # #
-# # F = 3000 * si.N
-# # h = 256 * si.mm
-# # print(F * h)
+F = 3000 * si.N
+h = 256 * si.mm
+print(F * h)
+
+
+exit()
+
 # # print(F.to('kN'), 'x', h.to('m'), '=', (F * h).to('kNm'))
 # #
 # # print('{} = {}'.format(si.m.to('m'), si.m.to('mm')))

@@ -35,6 +35,12 @@ class Environment:
         if self.environment is None:
             self.environment = {}
 
+        # checking preferred units: all values must be unique.
+        # This is so when printing the Physical in preferred units the choice is unambiguous.
+        if self.preferred_units:
+            if not len(self.preferred_units) == len(set(self.preferred_units.values())):
+                raise ValueError("Preferred unit values must be unique.")
+
     @classmethod
     def _check_environment_definition(cls, definitions: dict):
         """Checks if all unit definitions are formally correct"""
@@ -85,7 +91,8 @@ class Environment:
                  env_name: str,
                  env_path: pathlib.Path = None,
                  replace: bool = False,  # True: existing units are removed first
-                 top_level: bool = False
+                 top_level: bool = False,
+                 preferred_units: dict = None,
                  ):
         """
         Loads the environment from a json file.
