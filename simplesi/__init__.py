@@ -76,7 +76,7 @@ class Physical:
 
         # if there is no preferred unit, use the smallest available from the environment
         if unit is None:
-            unit = tuple(k for k, v in sorted(environment.environment.items(), key=lambda x: x[1].get('Value')) if v.get('Dimension') == self.dimensions)
+            unit = tuple(k for k, v in sorted(self.all_units.items(), key=lambda x: x[1].get('Value')) if v.get('Dimension') == self.dimensions)
             # using the unit as set
             printsetting = environment.settings.get('print_unit', None)
             if printsetting == 'smallest':
@@ -157,10 +157,10 @@ class Physical:
         if len(available) > 1:
             raise ValueError('More than one unit found for the given dimensions.')
 
-
-        # the requested unit may
-
         # finally, the unit is found and we are sure there is only one
+        # the requested unit may be the same as the current one
+        if self.conv_factor == available[unit].get('Factor'):
+            return '{} {}'.format(self.value, available[unit].get('Symbol', ''))
 
         # last check: if the unit is found, but the value is missing, raise an error
         # this should not happen as we check for the existence of the value in the environment but still

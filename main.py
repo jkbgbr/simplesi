@@ -20,6 +20,14 @@ print('!=', a != b)
 print('<=', a <= b)
 print('>=', a >= b)
 
+print((1 * si.inch).to('inch'))
+print((1 * si.inch).to('m'))
+print((1 * si.m).to('m'))
+print((3 * si.mol).to('mol'))
+print(3 * si.mol)
+print(3 * si.ft)
+# exit()
+
 print((a+b))
 print((a+b).to())
 print((a+b+c).to('m'))
@@ -28,7 +36,7 @@ print((a+b).to('inch'))
 print((a+b+c).to('inch'))
 
 print(c.to('inch'))
-print((1 * si.inch).to('inch'))
+
 
 exit()
 print((a+b).to('m'))
