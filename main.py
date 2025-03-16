@@ -5,20 +5,34 @@
 import pprint
 
 import simplesi as si
-si.environment('imperial', top_level=False)
-print(si.environment.number_defined_units)
-pprint.pprint(si.environment.environment)
+si.environment('imperial')
+# si.environment('structural', replace=False)
+# print(si.environment.number_defined_units)
+# pprint.pprint(si.environment.environment)
 
 
 a = 1 * si.ft
 b = 1 * si.m
+c = 5 * si.inch
 
 print('==', a == b)
 print('!=', a != b)
 print('<=', a <= b)
 print('>=', a >= b)
 
+print((a+b))
+print((a+b).to())
+print((a+b+c).to('m'))
+print((a+b+c).to('ft'))
+print((a+b).to('inch'))
+print((a+b+c).to('inch'))
 
+print(c.to('inch'))
+print((1 * si.inch).to('inch'))
+
+exit()
+print((a+b).to('m'))
+print((b+a).value)
 
 
 

@@ -102,6 +102,18 @@ class Physical:
         """shortcut to the environment setting"""
         return environment.settings.get('keep_SI', True)
 
+    @property
+    def is_SI(self):
+        """True, if the unit is an SI unit"""
+        return self.conv_factor == 1.0
+
+    @property
+    def all_units(self):
+        """Returns an environment-lke dict made from environment.environment and the base si units"""
+        env = {k: {'Dimension': v.dimensions, 'Factor': v.conv_factor, 'Symbol': k, "Value": v.value} for k, v in environment.si_base_units.items()}
+        env.update(environment.environment)
+        return env
+
     def to(self, unit: str = None):
         """
         Prints the Physical instance to the specified unit.
@@ -117,7 +129,7 @@ class Physical:
         value = self.value
 
         # looking for the symbol in the environment
-        env = environment.environment
+        env = self.all_units
         possible_units = {k: v for k, v in env.items() if v['Dimension'] == self.dimensions}
 
         # if the requested unit is not compatible with the dimensions defined in the environment,
@@ -125,7 +137,7 @@ class Physical:
         # raise an error
         if unit is not None:
             if unit not in possible_units.keys():
-                raise ValueError('The requested unit is not compatible with the dimensions of the Physical instance.')
+                raise ValueError('The requested unit is not compatible with the dimensions of the Physical instance or not defined in this environment.')
 
         # if nothing was found - it is not possible as self must have a unit from the environment but still
         # check for it
@@ -137,24 +149,28 @@ class Physical:
 
         # is the requested unit available? If not, give the possible alternatives
         if not available:
-            _list = ', '.join([v.get('Symbol', k) for k, v in possible_units.items()])
-            print('No units found for the given unit "{}". Possible units are: {}'.format(unit, _list))
+            _list = ', '.join(['"{}"'.format(v.get('Symbol', k)) for k, v in possible_units.items()])
+            print('No unit for conversion defined. Compatible units are: {}'.format(_list))
             return
 
+        # this should not be possible for many reasons but still
         if len(available) > 1:
             raise ValueError('More than one unit found for the given dimensions.')
 
-        else:
-            # last check: if the unit is found, but the value is missing, raise an error
-            # this should not happen as we check for the existence of the value in the environment but still
-            try:
 
-                divisor = available[unit].get('Value', 0)  #  * available[unit].get('Factor')
+        # the requested unit may
 
-                new_value = round(value / divisor, self.precision)
-            except ZeroDivisionError as e:
-                raise ValueError('Incorrect unit definition: "Value" missing!')
-            return '{} {}'.format(new_value, available[unit].get('Symbol', ''))
+        # finally, the unit is found and we are sure there is only one
+
+        # last check: if the unit is found, but the value is missing, raise an error
+        # this should not happen as we check for the existence of the value in the environment but still
+        try:
+            # converting to the requested unit using value and factor
+            divisor = available[unit].get('Value', 0) * available[unit].get('Factor')
+            new_value = round(value / divisor, self.precision)
+        except ZeroDivisionError as e:
+            raise ValueError('Incorrect unit definition: "Value" missing!')
+        return '{} {}'.format(new_value, available[unit].get('Symbol', ''))
 
     ### "Magic" Methods ###
 
@@ -287,14 +303,41 @@ class Physical:
         # check if dimensions are compatible. If so, add them
         if self.dimensions == other.dimensions:
 
-            # factors may
+            # factors may or may not be different and the environment setting keep_SI tells us which to keep
+            # both are the same, e.g. m + m or ft + ft
+            if self.conv_factor == other.conv_factor:
+                new_value = self.value + other.value
+                new_factor = self.conv_factor
+
+            # one of them is SI, e.g. m + ft
+            elif any(x == 1 for x in (self.conv_factor, other.conv_factor)):
+
+                if self.keep_SI:  # SI is kept, the other is converted
+                    new_value = self.value * self.conv_factor + other.value * other.conv_factor
+                    new_factor = 1.0
+
+                else:  # keeping the other
+                    # finding out which is the non-SI
+                    nonSI = self if self.conv_factor != 1 else other
+                    if nonSI == self:
+                        new_value = self.value + other.value / self.conv_factor
+                        new_factor = self.conv_factor
+                    else:
+                        new_value = other.value + self.value / other.conv_factor
+                        new_factor = other.conv_factor
+
+            # none of them is SI but different e.g. ft + inch
+            else:
+                new_value = self.value * self.conv_factor + other.value * other.conv_factor
+                new_factor = self.conv_factor
 
             return Physical(
-                self.value + other.value,
+                new_value,
                 self.dimensions,
                 min(self.precision, other.precision),  # the lower precision is kept
-                self.conv_factor,
+                new_factor,
             )
+
         # dimensions are not compatible
         else:
             raise ValueError(
