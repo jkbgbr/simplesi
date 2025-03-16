@@ -43,7 +43,11 @@ class TestPhysical(unittest.TestCase):
         self.assertTrue(bool(self.physical))
 
     def test_hash(self):
-        self.assertEqual(hash(self.physical), hash((5.2, Dimensions(1, 0, 0, 0, 0, 0, 0), PRECISION, False)))
+        value = 5.2
+        dims = Dimensions(1, 0, 0, 0, 0, 0, 0)
+        prec = PRECISION
+        fact = 1
+        self.assertEqual(hash(self.physical), hash((value, dims, prec, fact)))
 
     def test_round(self):
 

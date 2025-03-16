@@ -12,7 +12,7 @@ class TestEnvironmentCreation(unittest.TestCase):
     def test_environment_module_level(self):
         # no environment loaded yet
         # by importing the basic units are loaded
-        self.assertTrue(len(simplesi.environment.base_units) == 7)
+        self.assertTrue(len(simplesi.environment.si_base_units) == 7)
         # no environment yet
         self.assertFalse(simplesi.environment.environment)
         with self.assertRaises(AttributeError):
@@ -20,7 +20,7 @@ class TestEnvironmentCreation(unittest.TestCase):
 
         # loading an environment
         simplesi.environment(env_name='default')
-        self.assertTrue(len(simplesi.environment.base_units) == 7)  # still the same
+        self.assertTrue(len(simplesi.environment.si_base_units) == 7)  # still the same
         self.assertTrue(simplesi.environment.environment)
         self.assertTrue(len(simplesi.environment.environment) > 0)
         environment_length = simplesi.environment.number_defined_units
@@ -29,7 +29,7 @@ class TestEnvironmentCreation(unittest.TestCase):
         envpath = pathlib.Path(__file__).parent
         simplesi.environment(env_name='test_definitions', env_path=envpath, replace=True)
         # overloading (adding) an environment, should not change the number of base units
-        self.assertTrue(len(simplesi.environment.base_units) == 7)  # still the same
+        self.assertTrue(len(simplesi.environment.si_base_units) == 7)  # still the same
         self.assertGreaterEqual(environment_length, len(simplesi.environment.environment))  # added some units
         environment_length = len(simplesi.environment.environment)
 
@@ -41,7 +41,7 @@ class TestEnvironmentCreation(unittest.TestCase):
         simplesi.environment(env_name='default', replace=False)
 
         # overloading (adding) an environment, should not change the number of base units
-        self.assertTrue(len(simplesi.environment.base_units) == 7)  # still the same
+        self.assertTrue(len(simplesi.environment.si_base_units) == 7)  # still the same
         self.assertGreaterEqual(len(simplesi.environment.environment), environment_length)  # added some units
         environment_length = len(simplesi.environment.environment)
 

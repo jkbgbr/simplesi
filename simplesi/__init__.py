@@ -26,14 +26,14 @@ class Physical:
     An SI class for representing structural physical quantities.
     """
 
-    __slots__ = ("value", "dimensions", "precision", "prefixed")
+    __slots__ = ("value", "dimensions", "precision", "factor")
 
     def __init__(
             self,
             value: float,
             dimensions: Dimensions,
             precision: int = PRECISION,
-            prefixed: Optional[str] = False
+            factor: float = 1.0,
     ):
 
         # being strict about the input makes life easier later
@@ -50,7 +50,7 @@ class Physical:
         self.value = value
         self.dimensions = dimensions
         self.precision = precision
-        self.prefixed = prefixed
+        self.factor = factor
 
     def __str__(self):
         """a pretty print of the Physical instance"""
@@ -65,10 +65,10 @@ class Physical:
         """
         Returns a traditional Python string representation of the Physical instance.
         """
-        return "Physical(value={}, dimensions={}, precision={}, prefixed={})".format(self.value,
+        return "Physical(value={}, dimensions={}, precision={}, factor={})".format(self.value,
                                                                                      self.dimensions,
                                                                                      self.precision,
-                                                                                     self.prefixed)
+                                                                                   self.factor)
 
     def to(self, unit: str = None):
         """
@@ -142,11 +142,11 @@ class Physical:
 
     def __hash__(self):
         return hash(
-            (self.value, self.dimensions, self.precision, self.prefixed)
+            (self.value, self.dimensions, self.precision, self.factor)
         )
 
     def __round__(self, n=0):
-        return Physical(round(self.value, n), self.dimensions, n, self.prefixed)
+        return Physical(round(self.value, n), self.dimensions, n, self.factor)
 
     def __contains__(self, other):
         return False
@@ -254,7 +254,7 @@ class Physical:
                 self.value + other.value,
                 self.dimensions,
                 min(self.precision, other.precision),  # the lower precision is kept
-                self.prefixed,
+                self.factor,
             )
         # dimensions are not compatible
         else:
@@ -287,7 +287,7 @@ class Physical:
                 self.value - other.value,
                 self.dimensions,
                 min(self.precision, other.precision),  # the lower precision is kept
-                self.prefixed,
+                self.factor,
             )
         else:
             raise ValueError(
@@ -304,7 +304,7 @@ class Physical:
                     -self.value,
                     self.dimensions,
                     self.precision,  # the lower precision is kept
-                    self.prefixed,
+                    self.factor,
                 )
             else:
                 raise ValueError('Can subtract a Physical instance only from zero.')
@@ -328,7 +328,7 @@ class Physical:
                 self.value * other,
                 self.dimensions,
                 self.precision,
-                self.prefixed,
+                self.factor,
             )
 
         # compare only between Physical instances
@@ -365,7 +365,7 @@ class Physical:
                 self.value / other,
                 self.dimensions,
                 self.precision,
-                self.prefixed,
+                self.factor,
             )
 
         # compare only between Physical instances
@@ -393,7 +393,7 @@ class Physical:
                     0,
                     self.dimensions,
                     self.precision,  # the lower precision is kept
-                    self.prefixed,
+                    self.factor,
                 )
             else:
                 raise ValueError('Can divide with a Physical only zero.')
@@ -412,8 +412,7 @@ class Physical:
     def __pow__(self, other):
 
         if isinstance(other, NUMBER):
-            # if self.prefixed:
-            #     return float(self) ** other
+
             new_value = self.value ** other
 
             new_dimensions = Dimensions(*[x * other for x in self.dimensions])
@@ -457,4 +456,4 @@ preferred = {
 
 from simplesi.environment import Environment
 
-environment = Environment(base_units=base_units, preferred_units=preferred)
+environment = Environment(si_base_units=base_units, preferred_units=preferred)

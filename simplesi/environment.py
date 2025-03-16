@@ -27,7 +27,7 @@ class Environment:
 
     see the __call__ method for more details.
     """
-    base_units: {}
+    si_base_units: {}
     preferred_units: {}
     environment: {} = None
 
@@ -140,7 +140,7 @@ class Environment:
 
         # if replace is True, the old units, if any, are removed first.
         if replace:
-            for key in self.base_units.keys():
+            for key in self.si_base_units.keys():
                 self.namespace_module.__dict__.pop(key)
             for key in self.environment.keys():
                 # some keys may have been removed earlier we jsut try
@@ -167,7 +167,7 @@ class Environment:
 
         # push
         self._push_vars(self._units, self.namespace_module)  # from the userdefined environment
-        self._push_vars(self.base_units, self.namespace_module)  # base units
+        self._push_vars(self.si_base_units, self.namespace_module)  # base units
 
     def _push_vars(self, units_dict: dict, module: ModuleType) -> None:
         module.__dict__.update(units_dict)
