@@ -97,6 +97,11 @@ class Physical:
                                                                                      self.precision,
                                                                                    self.conv_factor)
 
+    @property
+    def keep_SI(self):
+        """shortcut to the environment setting"""
+        return environment.settings.get('keep_SI', True)
+
     def to(self, unit: str = None):
         """
         Prints the Physical instance to the specified unit.
@@ -281,6 +286,9 @@ class Physical:
 
         # check if dimensions are compatible. If so, add them
         if self.dimensions == other.dimensions:
+
+            # factors may
+
             return Physical(
                 self.value + other.value,
                 self.dimensions,
