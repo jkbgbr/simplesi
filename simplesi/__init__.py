@@ -47,16 +47,16 @@ class Physical:
 
         # being strict about the input makes life easier later
         if not isinstance(value, NUMBER):
-            raise ValueError("Value must be a number.")
+            raise ValueError("Value must be a number, you have {}.".format(type(value)))
 
         if not isinstance(conv_factor, NUMBER):
-            raise ValueError("Conversion factor must be a number.")
+            raise ValueError("Conversion factor must be a number, you have {}.".format(type(conv_factor)))
 
-        if any(x <= 0 for x in (value, conv_factor)):
-            raise ValueError("Value and conversion factor must be positive.")
+        if conv_factor <= 0:
+            raise ValueError("Conversion factor must be positive, you have {}.".format(conv_factor))
 
         if not isinstance(precision, int):
-            raise ValueError("Precision must be an integer.")
+            raise ValueError("Precision must be an integer,you have {}.".format(type(precision)))
 
         # use a scalar if you have no dimensions
         if dimensions.dimensionsless:
@@ -68,7 +68,7 @@ class Physical:
         self.conv_factor = conv_factor
 
     def __str__(self):
-        """a pretty print of the Physical instance"""
+        """A pretty print of the Physical instance"""
 
         # checking if there is a preferred unit for the dimensions
         unit = {k for k, v in environment.preferred_units.items() if v == self.dimensions}
@@ -76,7 +76,8 @@ class Physical:
 
         # if there is no preferred unit, use the smallest available from the environment
         if unit is None:
-            unit = tuple(k for k, v in sorted(self.all_units.items(), key=lambda x: x[1].get('Value')) if v.get('Dimension') == self.dimensions)
+            unit = tuple(k for k, v in sorted(self.all_units.items(), key=lambda x: x[1].get('Value')) if
+                         v.get('Dimension') == self.dimensions)
             # using the unit as set
             printsetting = environment.settings.get('print_unit', None)
             if printsetting == 'smallest':
@@ -93,9 +94,9 @@ class Physical:
         Returns a traditional Python string representation of the Physical instance.
         """
         return "Physical(value={}, dimensions={}, precision={}, conv_factor={})".format(self.value,
-                                                                                     self.dimensions,
-                                                                                     self.precision,
-                                                                                   self.conv_factor)
+                                                                                        self.dimensions,
+                                                                                        self.precision,
+                                                                                        self.conv_factor)
 
     @property
     def keep_SI(self):
@@ -109,8 +110,10 @@ class Physical:
 
     @property
     def all_units(self):
-        """Returns an environment-lke dict made from environment.environment and the base si units"""
-        env = {k: {'Dimension': v.dimensions, 'Factor': v.conv_factor, 'Symbol': k, "Value": v.value} for k, v in environment.si_base_units.items()}
+        """Returns an environment-like dict made from environment.environment and the base si units"""
+        # the base SI units
+        env = {k: {'Dimension': v.dimensions, 'Factor': v.conv_factor, 'Symbol': k, "Value": v.value} for k, v in
+               environment.si_base_units.items()}
         env.update(environment.environment)
         return env
 
@@ -137,7 +140,8 @@ class Physical:
         # raise an error
         if unit is not None:
             if unit not in possible_units.keys():
-                raise ValueError('The requested unit is not compatible with the dimensions of the Physical instance or not defined in this environment.')
+                raise ValueError(
+                    'The requested unit is not compatible with the dimensions of the Physical instance or not defined in this environment.')
 
         # if nothing was found - it is not possible as self must have a unit from the environment but still
         # check for it
@@ -217,7 +221,8 @@ class Physical:
 
         # comparable dimensions
         if self.dimensions == other.dimensions:
-            return math.isclose(self.value * self.conv_factor, other.value * other.conv_factor, rel_tol=RE_TOL, abs_tol=ABS_TOL)
+            return math.isclose(self.value * self.conv_factor, other.value * other.conv_factor, rel_tol=RE_TOL,
+                                abs_tol=ABS_TOL)
 
         else:
             raise ValueError(
@@ -312,7 +317,8 @@ class Physical:
             # one of them is SI, e.g. m + ft
             elif any(x == 1 for x in (self.conv_factor, other.conv_factor)):
 
-                if self.keep_SI:  # SI is kept, the other is converted
+                if self.keep_SI:  # SI is kept, other is converted
+                    # due to the definition of conv_factor simply
                     new_value = self.value * self.conv_factor + other.value * other.conv_factor
                     new_factor = 1.0
 
@@ -327,6 +333,7 @@ class Physical:
                         new_factor = other.conv_factor
 
             # none of them is SI but different e.g. ft + inch
+            # self will determine the unit of the result
             else:
                 new_value = self.value * self.conv_factor + other.value * other.conv_factor
                 new_factor = self.conv_factor
@@ -365,12 +372,46 @@ class Physical:
 
         if self.dimensions == other.dimensions:
 
-            return Physical(
-                self.value - other.value,
-                self.dimensions,
-                min(self.precision, other.precision),  # the lower precision is kept
-                self.conv_factor,
-            )
+            # check if dimensions are compatible. If so, add them
+            if self.dimensions == other.dimensions:
+
+                # factors may or may not be different and the environment setting keep_SI tells us which to keep
+                # both are the same, e.g. m + m or ft + ft
+                if self.conv_factor == other.conv_factor:
+                    new_value = self.value - other.value
+                    new_factor = self.conv_factor
+
+                # one of them is SI, e.g. m + ft
+                elif any(x == 1 for x in (self.conv_factor, other.conv_factor)):
+
+                    if self.keep_SI:  # SI is kept, other is converted
+                        # due to the definition of conv_factor simply
+                        new_value = self.value * self.conv_factor - other.value * other.conv_factor
+                        new_factor = 1.0
+
+                    else:  # keeping the other
+                        # finding out which is the non-SI
+                        nonSI = self if self.conv_factor != 1 else other
+                        if nonSI == self:
+                            new_value = self.value - other.value / self.conv_factor
+                            new_factor = self.conv_factor
+                        else:
+                            new_value = other.value - self.value / other.conv_factor
+                            new_factor = other.conv_factor
+
+                # none of them is SI but different e.g. ft + inch
+                # self will determine the unit of the result
+                else:
+                    new_value = self.value * self.conv_factor - other.value * other.conv_factor
+                    new_factor = self.conv_factor
+
+                return Physical(
+                    new_value,
+                    self.dimensions,
+                    min(self.precision, other.precision),  # the lower precision is kept
+                    new_factor,
+                )
+
         else:
             raise ValueError(
                 f"Cannot subtract between {self} and {other}: "
