@@ -1,10 +1,8 @@
 import pathlib
-import pprint
-import sys
 import math
 import unittest
-from simplesi.dimensions import Dimensions
-from simplesi import Physical, PRECISION
+from simplesi.dimensions import Dimensions  # noqa protected
+from simplesi import Physical, PRECISION  # noqa protected
 import simplesi as si
 si.environment('US_customary')
 si.environment('structural', replace=False)

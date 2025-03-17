@@ -10,8 +10,6 @@ from __future__ import annotations
 __version__ = "0.1"
 
 import math
-import pprint
-from typing import Optional
 
 from simplesi.dimensions import Dimensions
 
