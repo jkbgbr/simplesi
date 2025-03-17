@@ -5,7 +5,7 @@
 import pprint
 
 import simplesi as si
-si.environment('imperial')
+si.environment('US_customary')
 si.environment('structural', replace=False)
 # pprint.pprint(si.environment.environment)
 
@@ -14,6 +14,19 @@ si.environment('structural', replace=False)
 #
 # exit()
 
+
+# print(1 * si.mile)
+# print(si.furlong.to('m'))
+# print(si.fortnight.to('week'))
+
+print(si.furlong)
+print(si.minute.to('s'))
+a = (1 * si.furlong) / (1 * si.fortnight)
+# a = (1 * si.m) / (1 * si.s)
+# print(a.to())
+print(a.to('m_s'))
+print(a.to('m/s'))
+# print(a.to('m/s'))
 
 #
 #
@@ -82,7 +95,7 @@ si.environment('structural', replace=False)
 import timeit
 
 mysetup = """import simplesi as si
-si.environment(env_name='imperial')
+si.environment(env_name='us_customary')
 si.environment(env_name='structural', replace=False)
 import math
 import random"""

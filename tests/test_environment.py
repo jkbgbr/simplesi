@@ -6,7 +6,7 @@ import unittest
 from simplesi.dimensions import Dimensions
 from simplesi import Physical, PRECISION
 import simplesi as si
-si.environment('imperial')
+si.environment('US_customary')
 si.environment('structural', replace=False)
 
 
@@ -49,6 +49,10 @@ class TestPhysicalWithUnits(unittest.TestCase):
         self.assertIsNone(si.km.to())
         self.assertIsNone(si.Hz.to())
         self.assertEqual(si.Hz.__str__(), '1.0 Hz')
+
+        # making sure the Physical object is available: importing it
+        import importlib
+        importlib.import_module('simplesi')
         self.assertEqual(eval(si.km.__repr__()), si.km)
 
     def test_SI(self):
@@ -88,6 +92,9 @@ class TestPhysicalWithUnits(unittest.TestCase):
         self.assertEqual((1 * si.m) / 2, 500 * si.mm)
         self.assertEqual((1 * si.kNm) / (2 * si.m), 0.5 * si.kN)
         self.assertEqual((1 * si.kN) / (2 * si.m ** 2), 0.5 * si.kN_m2)
+
+        self.assertEqual((1 * si.m) / (1 * si.s), 1 * si.m_s)
+
 
         # rtruediv
         self.assertEqual(5 / (1 * si.s), 5 * si.Hz)

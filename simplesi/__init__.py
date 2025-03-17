@@ -78,11 +78,15 @@ class Physical:
         # if there is no preferred unit, use the smallest available from the environment
         if unit is None:
             # possible units, ascending order
-            unit = tuple(k for k, v in sorted(self.all_units.items(), key=lambda x: x[1].get('Value', 1) * x[1].get('Factor', 1)) if
+
+            unit = tuple(k for k, v in sorted(self.all_units.items(), key=lambda x: x[1].get('Value') * x[1].get('Factor')) if
                          v.get('Dimension') == self.dimensions)
+
+            if not unit:
+                raise ValueError('No units found for the dimensions {}.'.format(self.dimensions))
+
             # using the unit as set
             printsetting = environment.settings.get('print_unit', None)
-
             if printsetting == 'smallest':
                 unit = unit[0]
             elif printsetting == 'largest':
@@ -140,9 +144,14 @@ class Physical:
 
         # if the requested unit is not compatible with the dimensions defined in the environment,
         # the requested unit does not show up in the possible_units dictionary
+        # we both check the keys and the symbols
         # raise an error
+        keys = list(possible_units.keys())
+        symbols = list(x.get('Symbol') for x in possible_units.values())
+        keys_and_symbols = keys + symbols
+
         if unit is not None:
-            if unit not in possible_units.keys():
+            if unit not in keys_and_symbols:
                 raise ValueError(
                     'The requested unit is not compatible with the dimensions of the Physical instance or not defined in this environment.')
 
@@ -152,7 +161,7 @@ class Physical:
             raise ValueError('No units found for the given dimensions. This should not be possible!')
 
         # finding the requested unit
-        available = {k: v for k, v in possible_units.items() if v.get('Symbol') == unit}
+        available = {k: v for k, v in possible_units.items() if v.get('Symbol') == unit or k == unit}
 
         # is the requested unit available? If not, give the possible alternatives
         if not available:
@@ -162,9 +171,12 @@ class Physical:
 
         # this should not be possible for many reasons but still
         if len(available) > 1:
-            raise ValueError('More than one unit found for the given dimensions.')
+            raise ValueError('More than one unit found for the given dimensions. This means, symbols and keys in the environment are used multiple times.')
 
         # finally, the unit is found and we are sure there is only one
+        # but maybe we found it by the symbol -> let's find the unit
+        if available.get(unit, None) is None:
+            unit = list(available.keys())[0]
 
         # last check: if the unit is found, but the value is missing, raise an error
         # this should not happen as we check for the existence of the value in the environment but still
