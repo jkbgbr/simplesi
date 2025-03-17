@@ -133,6 +133,8 @@ class Physical:
         - the requested unit has a Value defined
         Latter two tests check the environment definition.
 
+        :param unit: from the environment either the key or the symbol of a unit
+        :return:
         """
         value = self.value
 
