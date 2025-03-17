@@ -520,7 +520,7 @@ base_units = {
 # preferred units
 # the preferred units are used to print the Physical instances so usually the most common units are used
 # the VALUES must beunique, but this is checked for in the environment file
-preferred = {
+preferred_units = {
     'mm': Dimensions(0, 1, 0, 0, 0, 0, 0),
     's': Dimensions(0, 0, 1, 0, 0, 0, 0),
     'kg': Dimensions(1, 0, 0, 0, 0, 0, 0),
@@ -541,4 +541,4 @@ environment_settings = {
 
 from simplesi.environment import Environment
 
-environment = Environment(si_base_units=base_units, preferred_units=preferred, settings=environment_settings)
+environment = Environment(si_base_units=base_units, preferred_units=preferred_units, settings=environment_settings)

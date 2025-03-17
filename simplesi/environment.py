@@ -29,14 +29,22 @@ class Environment:
 
     see the __call__ method for more details.
     """
-    si_base_units: {}
-    preferred_units: {}
+    si_base_units: dict
+    preferred_units: dict
     environment: {} = None
-    settings: dict = field(default_factory=lambda: {'print_unit': 'smallest'})
+    settings: dict = field(default_factory=lambda: {'print_unit': 'smallest',
+                                                    'keep_SI': True})
 
     def __post_init__(self):
         if self.environment is None:
             self.environment = {}
+
+        # checking the environment
+        errors = self._check_environment_definition(self.environment)
+        if errors:
+            for error in errors:
+                print(error)
+            raise ValueError("Errors in the environment.")
 
         # checking preferred units: all values must be unique.
         # This is so when printing the Physical in preferred units the choice is unambiguous.
@@ -60,27 +68,38 @@ class Environment:
             if not isinstance(k, str):
                 errors.append("Unit name must be a string.")
 
-            # check Dimensions are defined
-            if "Dimension" not in v:
+            # check dimension
+            if "Dimension" in v.keys():
+                # 7 dimensions
+                if len(v["Dimension"]) != 7:
+                    errors.append(f"Dimension must have a length of 7 for unit {k}.")
+                # no dimensionsless units
+                if all(d == 0 for d in v["Dimension"]):
+                    errors.append(f"Unit {k} is dimensionless.")
+            else:
                 errors.append(f"Dimension not defined for unit {k}.")
 
-            # check if the dimension has a length of 7
-            if len(v["Dimension"]) != 7:
-                errors.append(f"Dimension must have a length of 7 for unit {k}.")
+            # check symbol
+            if "Symbol" in v.keys():
+                if not isinstance(v["Symbol"], str):
+                    errors.append(f"Symbol must be a string for unit {k}.")
 
-            # if a symbol is given it must be a string
-            if "Symbol" in v and not isinstance(v["Symbol"], str):
-                errors.append(f"Symbol must be a string for unit {k}.")
+            # check factor
+            if "Factor" in v.keys():
+                if not isinstance(v["Factor"], NUMBER):
+                    errors.append(f"Factor must be a number for unit {k}.")
 
-            # no dimensionsless units
-            if all(d == 0 for d in v["Dimension"]):
-                errors.append(f"Unit {k} is dimensionless.")
+            # check value
+            if "Value" in v.keys():
+                if not isinstance(v["Value"], NUMBER):
+                    errors.append(f"Value must be a number for unit {k}.")
 
-        return errors
+        return tuple(errors)
 
     def __call__(self,
-                 env_name: str,
+                 env_name: str = None,
                  env_path: pathlib.Path = None,
+                 env_dict: dict = None,
                  replace: bool = False,  # True: existing units are removed first
                  top_level: bool = False,
                  preferred_units: dict = None,
@@ -92,24 +111,32 @@ class Environment:
         :param env_path: path to the environment file. If None, the file is assumed to be in the "environments" subfolder.
         :param replace: if True, the previously defined environment is removed first.
         :param top_level: if True the environment is pushed to the top level namespace. If False, it is pushed to the module namespace.
+        :param preferred_units: defines which unit to use by default when printing the Physical object.
+        :param env_dict: a dictionary of the environment. If provided, the env_name and env_path are ignored.
         :return:
         """
 
-        # no env_path provided: default location
-        if env_path is None:
-            env_path = pathlib.Path(__file__).parent / 'environments'
-        env_path = env_path / (env_name + ".json")
+        if not env_dict:
 
-        # check if the file exists
-        if not env_path.exists():
-            raise ValueError("Environment file not found at {}.".format(env_path))
+            # no env_path provided: default location
+            if env_path is None:
+                env_path = pathlib.Path(__file__).parent / 'environments'
+            env_path = env_path / (env_name + ".json")
 
-        # open and load
-        with open(env_path, "r", encoding="utf-8") as json_unit_definitions:
-            try:
-                units_environment = json.load(json_unit_definitions)
-            except json.decoder.JSONDecodeError as e:
-                raise ValueError("Error decoding the environment file at {}. Problem: {}".format(env_path, *e.args)) from None
+            # check if the file exists
+            if not env_path.exists():
+                raise ValueError("Environment file not found at {}.".format(env_path))
+
+            # open and load
+            # not tested!
+            with open(env_path, "r", encoding="utf-8") as json_unit_definitions:
+                try:
+                    units_environment = json.load(json_unit_definitions)
+                except json.decoder.JSONDecodeError as e:
+                    raise ValueError("Error decoding the environment file at {}. Problem: {}".format(env_path, *e.args)) from None
+
+        else:
+            units_environment = env_dict
 
         _ret = self._check_environment_definition(units_environment)
         if _ret:
@@ -119,16 +146,19 @@ class Environment:
 
         # reading the environment file
         for unit, definitions in units_environment.items():
-            dimensions = definitions.get("Dimension", ())
+            # previous checks make sure Dimension is present and correwt
+            dimensions = definitions.get("Dimension")
+            # the unitname, if not defined
             symbol = definitions.get("Symbol", unit)
+            # conversion factor is 1 if not defined
             conv_factor = definitions.get("Factor", 1)
-
-            if not dimensions:
-                raise ValueError("Dimension not defined for unit {}.".format(unit))
+            # Value is 1 if not defined
+            value = definitions.get("Value", 1)
 
             units_environment[unit]["Dimension"] = Dimensions(*dimensions)
             units_environment[unit]["Symbol"] = symbol
             units_environment[unit]["Factor"] = conv_factor
+            units_environment[unit]["Value"] = value
 
         # deciding which namespace to push the environment to
         # top level -> builtins. In this case the units are available simply by name, e.g. "m" or "kg"
@@ -144,7 +174,10 @@ class Environment:
         # if replace is True, the old units, if any, are removed first.
         if replace:
             for key in self.si_base_units.keys():
-                self.namespace_module.__dict__.pop(key)
+                try:
+                    self.namespace_module.__dict__.pop(key)
+                except KeyError:
+                    pass
             for key in self.environment.keys():
                 # some keys may have been removed earlier we jsut try
                 try:
@@ -167,12 +200,12 @@ class Environment:
 
             # Physical holds:
             # - the value of the unit. The value of non-SI units is the value in SI units.
-            # - the conversion factor to SI units for further use
+            # - the conversion factor for non_SI units. For SI units this is 1.
             # - the dimensions of the unit as a Dimensions object
             # - the precision of the unit for displaying
 
-            self._units[unit] = Physical(value=definitions.get('Value', 1) * definitions.get('Factor', 1),
-                                         conv_factor=definitions.get('Factor', 1),
+            self._units[unit] = Physical(value=definitions.get('Value') * definitions.get('Factor'),
+                                         conv_factor=definitions.get('Factor'),
                                          dimensions=definitions["Dimension"],
                                          precision=PRECISION, )
 

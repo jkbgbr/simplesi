@@ -112,6 +112,90 @@ class TestPhysicalWithUnits(unittest.TestCase):
         with self.assertRaises(ValueError):
             si.m ** si.s
 
+    def test_environment_definition(self):
+
+        from simplesi.environment import Environment
+        from simplesi import base_units, environment_settings, preferred_units
+
+        # everything is correct
+        correct_environment = {'kg': {"Dimension": [1, 0, 0, 0, 0, 0, 0],
+                                        "Value": 1,
+                                        "Symbol": "kg",
+                                        "Factor": 1},
+                                 }
+        # all is OK
+        self.assertTrue(Environment._check_environment_definition(correct_environment) == ())
+        si.environment('default', top_level=True)
+
+        # unit is not a string
+        with self.assertRaises(ValueError):
+            incorrect_environment = {2: {"Dimension": [1, 0, 0, 0, 0, 0, 0],
+                                         "Value": 0.001},
+                                     }
+            Environment(si_base_units=base_units,
+                        preferred_units={},
+                        environment=incorrect_environment)
+
+        # false number of dimensions
+        with self.assertRaises(ValueError):
+            incorrect_environment = {'2': {"Dimension": [1, 0, 0, ],
+                                         "Value": 0.001},
+                                     }
+            Environment(si_base_units=base_units,
+                        preferred_units={},
+                        environment=incorrect_environment)
+
+        # no dimensions
+        with self.assertRaises(ValueError):
+            incorrect_environment2 = {'2': {"Value": 0.001},}
+            Environment(si_base_units=base_units,
+                        preferred_units={},
+                        environment=incorrect_environment2)
+
+        # dimensionsless
+        with self.assertRaises(ValueError):
+            incorrect_environment3 = {'2': {"Dimension": [0, 0, 0, 0, 0, 0, 0],
+                                            "Value": 0.001},}
+            Environment(si_base_units=base_units,
+                        preferred_units={},
+                        environment=incorrect_environment3)
+
+        # symbol
+        with self.assertRaises(ValueError):
+            incorrect_environment4 = {'2': {"Dimension": [1, 0, 0, 0, 0, 0, 0],
+                                            "Symbol": 0.001},}
+            Environment(si_base_units=base_units,
+                        preferred_units={},
+                        environment=incorrect_environment4)
+
+        # factor
+        with self.assertRaises(ValueError):
+            incorrect_environment5 = {'2': {"Dimension": [1, 0, 0, 0, 0, 0, 0],
+                                            "Factor": "0.001"},}
+            Environment(si_base_units=base_units,
+                        preferred_units={},
+                        environment=incorrect_environment5)
+
+        # value
+        with self.assertRaises(ValueError):
+            incorrect_environment6 = {'2': {"Dimension": [1, 0, 0, 0, 0, 0, 0],
+                                            "Value": "0.001"},}
+            Environment(si_base_units=base_units,
+                        preferred_units={},
+                        environment=incorrect_environment6)
+
+    def test_env_path(self):
+        with self.assertRaises(ValueError):
+            si.environment(env_path=pathlib.Path('foo'), env_name='bar')
+
+        # incorrect environment json file
+        incorrect_environment = {"2": {"Dimension": [1, 0, 0], "Value": 0.001}}
+        # dump it in an utf-8 json file
+        import json
+        with open('incorrect_environment.json', 'w', encoding='utf-8') as f:
+            json.dump(incorrect_environment, f, ensure_ascii=True)
+        with self.assertRaises(ValueError):
+            si.environment(env_path=pathlib.Path('.'), env_name='incorrect_environment')
 
 
 
