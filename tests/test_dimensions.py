@@ -14,6 +14,9 @@ class TestDimensions(unittest.TestCase):
         self.assertEqual(dim.cd, 0.0)
         self.assertEqual(dim.mol, 0.0)
 
+        dim = Dimensions(*[0 for x in range(7)])
+        self.assertTrue(dim.dimensionsless)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -310,37 +310,6 @@ class Physical:
             new_value = self.value + other.value
             new_factor = self.conv_factor
 
-
-            # # factors may or may not be different and the environment setting keep_SI tells us which to keep
-            # # both are the same, e.g. m + m or ft + ft
-            # if self.conv_factor == other.conv_factor:
-            #     new_value = self.value + other.value
-            #     new_factor = self.conv_factor
-            #
-            # # one of them is SI, e.g. m + ft
-            # elif any(x == 1 for x in (self.conv_factor, other.conv_factor)):
-            #
-            #     if self.keep_SI:  # SI is kept, other is converted
-            #         # due to the definition of conv_factor simply
-            #         new_value = self.value * self.conv_factor + other.value * other.conv_factor
-            #         new_factor = 1.0
-            #
-            #     else:  # keeping the other
-            #         # finding out which is the non-SI
-            #         nonSI = self if self.conv_factor != 1 else other
-            #         if nonSI == self:
-            #             new_value = self.value + other.value / self.conv_factor
-            #             new_factor = self.conv_factor
-            #         else:
-            #             new_value = other.value + self.value / other.conv_factor
-            #             new_factor = other.conv_factor
-            #
-            # # none of them is SI but different e.g. ft + inch
-            # # self will determine the unit of the result
-            # else:
-            #     new_value = self.value + other.value * other.conv_factor / self.conv_factor
-            #     new_factor = self.conv_factor
-
             return Physical(
                 new_value,
                 self.dimensions,
@@ -375,45 +344,15 @@ class Physical:
 
         if self.dimensions == other.dimensions:
 
-            # check if dimensions are compatible. If so, add them
-            if self.dimensions == other.dimensions:
+            new_value = self.value - other.value
+            new_factor = self.conv_factor
 
-                # factors may or may not be different and the environment setting keep_SI tells us which to keep
-                # both are the same, e.g. m + m or ft + ft
-                if self.conv_factor == other.conv_factor:
-                    new_value = self.value - other.value
-                    new_factor = self.conv_factor
-
-                # one of them is SI, e.g. m + ft
-                elif any(x == 1 for x in (self.conv_factor, other.conv_factor)):
-
-                    if self.keep_SI:  # SI is kept, other is converted
-                        # due to the definition of conv_factor simply
-                        new_value = self.value * self.conv_factor - other.value * other.conv_factor
-                        new_factor = 1.0
-
-                    else:  # keeping the other
-                        # finding out which is the non-SI
-                        nonSI = self if self.conv_factor != 1 else other
-                        if nonSI == self:
-                            new_value = self.value - other.value / self.conv_factor
-                            new_factor = self.conv_factor
-                        else:
-                            new_value = other.value - self.value / other.conv_factor
-                            new_factor = other.conv_factor
-
-                # none of them is SI but different e.g. ft + inch
-                # self will determine the unit of the result
-                else:
-                    new_value = self.value * self.conv_factor - other.value * other.conv_factor
-                    new_factor = self.conv_factor
-
-                return Physical(
-                    new_value,
-                    self.dimensions,
-                    min(self.precision, other.precision),  # the lower precision is kept
-                    new_factor,
-                )
+            return Physical(
+                new_value,
+                self.dimensions,
+                min(self.precision, other.precision),  # the lower precision is kept
+                new_factor,
+            )
 
         else:
             raise ValueError(
@@ -521,6 +460,15 @@ class Physical:
                     self.precision,  # the lower precision is kept
                     self.conv_factor,
                 )
+
+            if other == 1:
+                return Physical(
+                    1,
+                    Dimensions(*[-x for x in self.dimensions]),
+                    self.precision,  # the lower precision is kept
+                    self.conv_factor,
+                )
+
             else:
                 raise ValueError('Can divide with a Physical only zero.')
 
