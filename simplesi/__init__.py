@@ -451,26 +451,14 @@ class Physical:
 
     def __rtruediv__(self, other):
 
-        # only zero can be divided by a Physical.
         if isinstance(other, NUMBER):
-            if other == 0:
-                return Physical(
-                    0,
-                    self.dimensions,
-                    self.precision,  # the lower precision is kept
-                    self.conv_factor,
-                )
 
-            if other == 1:
-                return Physical(
-                    1,
-                    Dimensions(*[-x for x in self.dimensions]),
-                    self.precision,  # the lower precision is kept
-                    self.conv_factor,
-                )
-
-            else:
-                raise ValueError('Can divide with a Physical only zero.')
+            return Physical(
+                other / self.value,
+                Dimensions(*[-x for x in self.dimensions]),
+                self.precision,  # the lower precision is kept
+                self.conv_factor,
+            )
 
         else:
             # compare only between Physical instances
@@ -504,6 +492,18 @@ class Physical:
         raise ValueError(
             "Cannot raise a Physical to the power of another Physical -> ({}**{})".format(other, self)
         )
+
+    def sqrt(self):
+        """
+        square root, as math.sqrt raises a TypeError
+        """
+        return self ** 0.5
+
+    def root(self, n: NUMBER = 2):
+        """
+        nth root, as math.pow raises a TypeError
+        """
+        return self ** (1 / n)
 
 
 # The seven SI base units

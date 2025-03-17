@@ -393,11 +393,8 @@ class TestDivision(unittest.TestCase):
     def test_rtruediv(self):
         result = 0 / self.physical1
         self.assertEqual(result.value, 0.0)
-        self.assertEqual(result.dimensions, Dimensions(1, 0, 0, 0, 0, 0, 0))
+        self.assertEqual(result.dimensions, Dimensions(-1, 0, 0, 0, 0, 0, 0))
         self.assertEqual(result.precision, self.physical1.precision)
-
-        with self.assertRaises(ValueError):
-            5 / self.physical1
 
         result = self.physical1 / self.physical3
         self.assertEqual(result, 3.0)

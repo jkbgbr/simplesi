@@ -89,24 +89,25 @@ class TestPhysicalWithUnits(unittest.TestCase):
         self.assertEqual((1 * si.kNm) / (2 * si.m), 0.5 * si.kN)
         self.assertEqual((1 * si.kN) / (2 * si.m ** 2), 0.5 * si.kN_m2)
 
-        # only 0 and 1 can be divided with a unit
-        self.assertEqual(1 / (1 * si.s), 1 * si.Hz)
+        # rtruediv
+        self.assertEqual(5 / (1 * si.s), 5 * si.Hz)
         self.assertEqual(1 / (1 * si.m ** 2), 1 * (si.m ** -2))
-        self.assertEqual(1 / (1 * si.m ** 2), 1 / si.m2)
+        self.assertEqual((3 * si.kN) / (si.m ** 2), 3 * si.kN_m2)
 
         with self.assertRaises(ZeroDivisionError):
             1 * si.m / 0
-
-        with self.assertRaises(ValueError):
-            3 / (1 * si.s)
 
     def test_power(self):
         self.assertEqual((1 * si.m) ** 2, 1 * si.m2)
         self.assertEqual((1 * si.s) ** -1, 1 * si.Hz)
         self.assertEqual((4 * si.m2) ** 0.5, 2 * si.m)
+        self.assertEqual((4 * si.m2).sqrt(), 2 * si.m)
+        self.assertEqual((4 * si.m2).sqrt(), (4 * si.m2).root(2))
+        self.assertEqual((8 * si.m3).root(3), 2 * si.m)
 
         with self.assertRaises(TypeError):
             math.sqrt(4 * si.m2)
+            math.pow(4 * si.m2, 0.5)
 
         with self.assertRaises(ValueError):
             si.m ** si.s
