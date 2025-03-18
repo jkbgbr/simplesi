@@ -84,26 +84,25 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-Simplesi is a package to enable units-aware calculations. It is based on and heavily influenced by [forallpeople](https://github.com/connorferster/forallpeople), but differs from it considerably.
-Here's a blank template to get started. To avoid retyping too much info, do a search and replace with your text editor for the following: `jkbgbr`, `simplesi`, `email_client`, `jkbgbr@gmail.com`, `simplesi`, `project_description`, `MIT`
+Simplesi is a package enabling units-aware engineering calculations. It is based on and heavily influenced by [forallpeople](https://github.com/connorferster/forallpeople), but differs from it considerably.
+It schratches somewhat the itch that most such packages are quite slow.
+
+Compared to forallpeople:
+- ~3-4x speedup 
+- simplified the original Physical object
+- SI and non-SI units are in separated environments; environment definitions are otherwise similar
+- loading multiple environments is allowed, hence mixing e.g. US customary and SI units is possible
+- more robust operations, e.g. between scalar and Physical
+- modified, probably more intuitive behaviour of printing
+- user-defined environment behaviour
+ 
+  - exception handling print or raise for interactive or app use cases
+  - number of significant digits for print
+  - user-defined preferred units for printing to reduce broilerplate code 
+
+Some features of forallpeople e.g. prefixes, html and latex printing are not implemented. Weaknesses like handling °C and K units remain.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-### Built With
-
-* [![Next][Next.js]][Next-url]
-* [![React][React.js]][React-url]
-* [![Vue][Vue.js]][Vue-url]
-* [![Angular][Angular.io]][Angular-url]
-* [![Svelte][Svelte.dev]][Svelte-url]
-* [![Laravel][Laravel.com]][Laravel-url]
-* [![Bootstrap][Bootstrap.com]][Bootstrap-url]
-* [![JQuery][JQuery.com]][JQuery-url]
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 
 <!-- GETTING STARTED -->
