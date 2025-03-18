@@ -602,17 +602,20 @@ preferred_units = {
     'MPa': Dimensions(1, -1, -2, 0, 0, 0, 0),
 }
 
-# # dump the perferred units in an utf-8 json file
-# import json
-# with open('preferred_units.json', 'w', encoding='utf-8') as f:
-#     json.dump(preferred, f, ensure_ascii=True)
+# dump the perferred units in an utf-8 json file
+import json
+with open('preferred_units.json', 'w', encoding='utf-8') as f:
+    json.dump(preferred_units, f, ensure_ascii=True)
 
 environment_settings = {
     'print_unit': 'smallest',  # smallest, largest
     'keep_SI': True,  # if True, operations on SI and non-SI units return the result to SI units
     'to_fails': 'print',  # raise, print
 }
+import json
+with open('settings.json', 'w', encoding='utf-8') as f:
+    json.dump(environment_settings, f, ensure_ascii=True, indent=4)
 
 from simplesi.environment import Environment
 
-environment = Environment(si_base_units=base_units, preferred_units=preferred_units, settings=environment_settings)
+environment = Environment(si_base_units=base_units)

@@ -1,0 +1,5 @@
+{
+    "print_unit": "smallest",
+    "keep_SI": true,
+    "to_fails": "print"
+}

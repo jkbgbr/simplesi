@@ -141,7 +141,7 @@ class TestPhysicalWithUnits(unittest.TestCase):
     def test_environment_definition(self):
 
         from simplesi.environment import Environment
-        from simplesi import base_units, environment_settings, preferred_units
+        from simplesi import base_units  # , environment_settings, preferred_units
 
         # everything is correct
         correct_environment = {'kg': {"Dimension": [1, 0, 0, 0, 0, 0, 0],

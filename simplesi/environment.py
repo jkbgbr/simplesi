@@ -30,10 +30,9 @@ class Environment:
     see the __call__ method for more details.
     """
     si_base_units: dict
-    preferred_units: dict
+    preferred_units: dict = None
     environment: {} = None
-    settings: dict = field(default_factory=lambda: {'print_unit': 'smallest',
-                                                    'keep_SI': True})
+    settings: dict = None
 
     def __post_init__(self):
         if self.environment is None:
@@ -46,11 +45,11 @@ class Environment:
                 print(error)
             raise ValueError("Errors in the environment.")
 
-        # checking preferred units: all values must be unique.
-        # This is so when printing the Physical in preferred units the choice is unambiguous.
-        if self.preferred_units:
-            if not len(self.preferred_units) == len(set(self.preferred_units.values())):
-                raise ValueError("Preferred unit values must be unique.")
+        # # checking preferred units: all values must be unique.
+        # # This is so when printing the Physical in preferred units the choice is unambiguous.
+        # if self.preferred_units:
+        #     if not len(self.preferred_units) == len(set(self.preferred_units.values())):
+        #         raise ValueError("Preferred unit values must be unique.")
 
     @classmethod
     def _check_environment_definition(cls, definitions: dict):
@@ -102,8 +101,8 @@ class Environment:
                  env_dict: dict = None,
                  replace: bool = False,  # True: existing units are removed first
                  top_level: bool = False,
-                 preferred_units: dict = None,
-                 settings: dict = None,
+                 preferred_units: dict | pathlib.Path = None,
+                 settings: dict | pathlib.Path = None,
                  ):
         """
         Loads the environment from a json file.
@@ -117,25 +116,29 @@ class Environment:
         :return:
         """
 
+        # no environment provided, trying to find the file by path and name
         if not env_dict:
 
-            # no env_path provided: default location
-            if env_path is None:
-                env_path = pathlib.Path(__file__).parent / 'environments'
-            env_path = env_path / (env_name + ".json")
+            units_environment = self._read_from_file(_path=env_path, _name=env_name)
 
-            # check if the file exists
-            if not env_path.exists():
-                raise ValueError("Environment file not found at {}.".format(env_path))
+            # # no env_path provided: default location
+            # if env_path is None:
+            #     env_path = pathlib.Path(__file__).parent / 'environments'
+            # env_path = env_path / (env_name + ".json")
+            #
+            # # check if the file exists
+            # if not env_path.exists():
+            #     raise ValueError("Environment file not found at {}.".format(env_path))
+            #
+            # # open and load
+            # # not tested!
+            # with open(env_path, "r", encoding="utf-8") as json_unit_definitions:
+            #     try:
+            #         units_environment = json.load(json_unit_definitions)
+            #     except json.decoder.JSONDecodeError as e:
+            #         raise ValueError("Error decoding the environment file at {}. Problem: {}".format(env_path, *e.args)) from None
 
-            # open and load
-            # not tested!
-            with open(env_path, "r", encoding="utf-8") as json_unit_definitions:
-                try:
-                    units_environment = json.load(json_unit_definitions)
-                except json.decoder.JSONDecodeError as e:
-                    raise ValueError("Error decoding the environment file at {}. Problem: {}".format(env_path, *e.args)) from None
-
+        # environment from a dict
         else:
             units_environment = env_dict
 
@@ -213,6 +216,67 @@ class Environment:
         # push
         self._push_vars(self._units, self.namespace_module)  # from the userdefined environment
         self._push_vars(self.si_base_units, self.namespace_module)  # base units
+
+        # settings, print preferences
+        self.apply_settings(settings)
+        self.apply_preferences(preferred_units)
+
+    def _read_from_file(self, _name: str, _path: pathlib.Path = None):
+
+        # no _path provided: default location
+        if _path is None:
+            _path = pathlib.Path(__file__).parent / 'environments'
+        _path = _path / (_name + ".json")
+
+        # check if the file exists
+        if not _path.exists():
+            raise ValueError("File not found at {}.".format(_path))
+
+        # open and load
+        # not tested!
+        with open(_path, "r", encoding="utf-8") as f:
+            try:
+                content = json.load(f)
+            except json.decoder.JSONDecodeError as e:
+                raise ValueError(
+                    "Error decoding the environment file at {}. Problem: {}".format(_path, *e.args)) from None
+
+        return content
+
+    def apply_settings(self, settings: dict | pathlib.Path):
+        """
+
+        :param settings:
+        :return:
+        """
+
+        if isinstance(settings, dict):
+            _settings = settings
+
+        elif isinstance(settings, pathlib.Path):
+            _settings = self._read_from_file(_path=settings, _name='settings')
+
+        elif settings is None:
+            _settings = self._read_from_file(_name='settings')
+
+        else:
+            raise ValueError('Settings units incorrect')
+        self.settings = _settings
+
+    def apply_preferences(self, preferred_units: dict | pathlib.Path):
+
+        if isinstance(preferred_units, dict):
+            _preferred_units = preferred_units
+
+        elif isinstance(preferred_units, pathlib.Path):
+            _preferred_units = self._read_from_file(_path=preferred_units, _name='preferred_units')
+
+        elif preferred_units is None:
+            _preferred_units = {}
+
+        else:
+            raise ValueError('Preferred units incorrect')
+        self.preferred_units = _preferred_units
 
     def _push_vars(self, units_dict: dict, module: ModuleType) -> None:
         module.__dict__.update(units_dict)
