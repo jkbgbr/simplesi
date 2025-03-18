@@ -2,8 +2,9 @@
 # TODO
 
 
-preferred units and settings should be handled like environment json files, currently in __init__.py
-precision -> significant digits
-to(): if no unit found, format Dimension to be readable. e.g. 5 kg.m.s^-2
+clean up to() Errors
 
-°C -> K -> "shift"
+preferred units and settings should be handled like environment json files, currently in __init__.py.
+- both in __call__ only.
+
+precision -> significant digits
