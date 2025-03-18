@@ -199,19 +199,18 @@ class Environment:
         # pusing the environment to the chosen namespace. To do this, first the environment is
         # used to generate a dict of Physical objects, which is then pushed to the namespace.
         self._units = {}
-        from simplesi import Physical, PRECISION
+        from simplesi import Physical
         for unit, definitions in self.environment.items():
 
             # Physical holds:
             # - the value of the unit. The value of non-SI units is the value in SI units.
             # - the conversion factor for non_SI units. For SI units this is 1.
             # - the dimensions of the unit as a Dimensions object
-            # - the precision of the unit for displaying
 
             self._units[unit] = Physical(value=definitions.get('Value') * definitions.get('Factor'),
                                          conv_factor=definitions.get('Factor'),
-                                         dimensions=definitions["Dimension"],
-                                         precision=PRECISION, )
+                                         dimensions=definitions["Dimension"]
+                                         )
 
         # push
         self._push_vars(self._units, self.namespace_module)  # from the userdefined environment

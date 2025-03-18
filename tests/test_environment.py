@@ -2,10 +2,11 @@ import pathlib
 import math
 import unittest
 from simplesi.dimensions import Dimensions  # noqa protected
-from simplesi import Physical, PRECISION  # noqa protected
+from simplesi import Physical  # noqa protected
 import simplesi as si
 si.environment(env_name='test_US_customary', env_path=pathlib.Path('.'))
 si.environment(env_name='test_structural', env_path=pathlib.Path('.'), replace=False)
+si.environment.settings['significant_digits'] = 3
 
 
 class TestPhysicalWithUnits(unittest.TestCase):
@@ -26,19 +27,19 @@ class TestPhysicalWithUnits(unittest.TestCase):
         self.assertFalse(1 * si.yard > 1258 * si.mm)
 
     def test_to(self):
-        self.assertEqual((1 * si.inch).to('inch'), '1.0 inch')
-        self.assertEqual((1 * si.ft).to('inch'), '12.0 inch')
-        self.assertEqual((1 * si.m).to('m'), '1.0 m')
-        self.assertEqual((12 * si.inch).to('ft'), '1.0 ft')
-        self.assertEqual((1 * si.yard).to('ft'), '3.0 ft')
+        self.assertEqual((1 * si.inch).to('inch'), '1.00 inch')
+        self.assertEqual((1 * si.ft).to('inch'), '12.00 inch')
+        self.assertEqual((1 * si.m).to('m'), '1.00 m')
+        self.assertEqual((12 * si.inch).to('ft'), '1.00 ft')
+        self.assertEqual((1 * si.yard).to('ft'), '3.00 ft')
 
         self.assertEqual((1 * si.m).to('inch'), '39.37 inch')
-        self.assertEqual((1 * si.m).to('ft'), '3.281 ft')
+        self.assertEqual((1 * si.m).to('ft'), '3.28 ft')
 
         self.assertEqual((10 * si.inch).to('m'), '0.254 m')
         self.assertEqual((1 * si.ft).to('cm'), '30.48 cm')
-        self.assertEqual((1 * si.ft).to('mm'), '304.8 mm')
-        self.assertEqual((2 * si.yard).to('mm'), '1828.8 mm')
+        self.assertEqual((1 * si.ft).to('mm'), '304.80 mm')
+        self.assertEqual((2 * si.yard).to('mm'), '1828.80 mm')
 
         self.assertEqual(12 * si.inch + 2 * si.ft, 1 * si.yard)
         self.assertEqual(12 * si.cm + 2 * si.m, 2120 * si.mm)
@@ -58,7 +59,7 @@ class TestPhysicalWithUnits(unittest.TestCase):
         self.assertIsNone(si.Hz.to('1/s'))  # only as Hz available
 
         # this makes sense
-        self.assertEqual(si.Hz.__str__(), '1.0 Hz')
+        self.assertEqual(si.Hz.__str__(), '1.00 Hz')
 
         # making sure the Physical object is available: importing it
         import importlib

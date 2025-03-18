@@ -18,7 +18,6 @@ RE_TOL = 1e-9
 ABS_TOL = 1e-12
 
 NUMBER = int, float
-# PRECISION = 3
 
 
 class Physical:
@@ -26,13 +25,12 @@ class Physical:
     An SI class for representing structural physical quantities.
     """
 
-    __slots__ = ("value", "dimensions", "precision", "conv_factor")
+    __slots__ = ("value", "dimensions", "conv_factor")
 
     def __init__(
             self,
             value: float,
             dimensions: Dimensions,
-            # precision: int = PRECISION,
             conv_factor: float = 1.0,
     ):
         """
@@ -41,7 +39,6 @@ class Physical:
         :param value: How many pieces of this unit. Non-SI units are converted to the SI unit of the same dimensionality when instantiated.
         e.g. 1 ft = 0.3048 m -> value = n x 0.3048
         :param dimensions: dimensionality
-        :param precision:
         :param conv_factor: number of base SI units in this unit. e.g. 1 ft = 0.3048 m -> conv_factor = 0.3048
         """
 
@@ -55,17 +52,34 @@ class Physical:
         if conv_factor <= 0:
             raise ValueError("Conversion factor must be positive, you have {}.".format(conv_factor))
 
-        # if not isinstance(precision, int):
-        #     raise ValueError("Precision must be an integer,you have {}.".format(type(precision)))
-
         # use a scalar if you have no dimensions
         if dimensions.dimensionsless:
             raise ValueError("Dimensions must be non-zero. Use a scalar instead.")
 
         self.value = value
         self.dimensions = dimensions
-        # self.precision = precision
         self.conv_factor = conv_factor
+
+    @classmethod
+    def as_str(cls, value: NUMBER) -> str:
+        try:
+            value.is_integer()  # integer raises AttributeError
+
+            # formatting to N significant digits
+            _ret1 = '{:.{}g}'.format(value, environment.settings.get('significant_digits'))
+            # formatting to at least 2 deciman spaces
+            _ret2 = '{:.{}f}'.format(value, min(2, environment.settings.get('significant_digits')))
+
+            # making sure scientific notation does not kick in
+            if any(x in _ret1 for x in '+-'):
+                _ret1 = '0'
+
+            # returning the "longest" number
+            return sorted([_ret1, _ret2], key=lambda x: len(x))[-1]
+
+        except AttributeError:  # an integer
+            return str(value)
+
 
     def __str__(self):
         """A pretty print of the Physical instance"""
@@ -98,10 +112,9 @@ class Physical:
         """
         Returns a traditional Python string representation of the Physical instance.
         """
-        return "Physical(value={}, dimensions={}, precision={}, conv_factor={})".format(self.value,
-                                                                                        self.dimensions,
-                                                                                        self.precision,
-                                                                                        self.conv_factor)
+        return "Physical(value={}, dimensions={}, conv_factor={})".format(self.value,
+                                                                          self.dimensions,
+                                                                          self.conv_factor)
 
     @property
     def is_SI(self):
@@ -163,6 +176,7 @@ class Physical:
                         ex = ''.join(_superex)
                         _ret.append('{}{}'.format(u, ex))
 
+                return self.as_str(self.value) + ' \u00d7 '.join(_ret)
                 return "{} ".format(self.value) + ' \u00d7 '.join(_ret)
 
             elif environment.settings.get('to_fails') == 'raise':
@@ -226,8 +240,9 @@ class Physical:
                 _symbol = available[unit].get('Symbol', '')
 
                 divider = _value * _factor
-                new_value = round(value / divider, self.precision)
-                return '{} {}'.format(new_value, _symbol)
+                new_value = value / divider
+
+                return '{} {}'.format(self.as_str(new_value), _symbol)
 
         else:  # no unit is provided to print self in
 
@@ -265,11 +280,11 @@ class Physical:
 
     def __hash__(self):
         return hash(
-            (self.value, self.dimensions, self.precision, self.conv_factor)
+            (self.value, self.dimensions, self.conv_factor)
         )
 
     def __round__(self, n=0):
-        return Physical(round(self.value, n), self.dimensions, n, self.conv_factor)
+        return Physical(round(self.value, n), self.dimensions, self.conv_factor)
 
     def __contains__(self, other):
         return False
@@ -380,7 +395,6 @@ class Physical:
             return Physical(
                 new_value,
                 self.dimensions,
-                min(self.precision, other.precision),  # the lower precision is kept
                 new_factor,
             )
 
@@ -417,7 +431,6 @@ class Physical:
             return Physical(
                 new_value,
                 self.dimensions,
-                min(self.precision, other.precision),  # the lower precision is kept
                 new_factor,
             )
 
@@ -435,7 +448,6 @@ class Physical:
                 return Physical(
                     -self.value,
                     self.dimensions,
-                    self.precision,  # the lower precision is kept
                     self.conv_factor,
                 )
             else:
@@ -459,7 +471,6 @@ class Physical:
             return Physical(
                 self.value * other,
                 self.dimensions,
-                self.precision,
                 self.conv_factor,
             )
 
@@ -469,13 +480,12 @@ class Physical:
         # multiplying by another Physical instance, e.g. si.N * si.m
         new_dims = Dimensions(*[x + y for x, y in zip(self.dimensions, other.dimensions)])
         new_value = self.value * other.value
-        new_precision = min(self.precision, other.precision)
 
         # if the result is dimensionless, the value is returned
         if new_dims.dimensionsless:
             return new_value
         else:
-            return Physical(new_value, new_dims, new_precision)
+            return Physical(new_value, new_dims)
 
     def __imul__(self, other):
         raise ValueError(
@@ -496,7 +506,6 @@ class Physical:
             return Physical(
                 self.value / other,
                 self.dimensions,
-                self.precision,
                 self.conv_factor,
             )
 
@@ -514,7 +523,7 @@ class Physical:
         if new_dims.dimensionsless:
             return new_value
         else:
-            return Physical(new_value, new_dims, self.precision)
+            return Physical(new_value, new_dims)
 
     def __rtruediv__(self, other):
 
@@ -523,7 +532,6 @@ class Physical:
             return Physical(
                 other / self.value,
                 Dimensions(*[-x for x in self.dimensions]),
-                self.precision,  # the lower precision is kept
                 self.conv_factor,
             )
 
@@ -548,7 +556,7 @@ class Physical:
             if new_dimensions.dimensionsless:
                 return new_value
 
-            return Physical(new_value, new_dimensions, self.precision)
+            return Physical(new_value, new_dimensions)
 
         else:
             raise ValueError(
@@ -575,13 +583,13 @@ class Physical:
 
 # The seven SI base units
 base_units = {
-    "kg": Physical(1, Dimensions(1, 0, 0, 0, 0, 0, 0), PRECISION),
-    "m": Physical(1, Dimensions(0, 1, 0, 0, 0, 0, 0), PRECISION),
-    "s": Physical(1, Dimensions(0, 0, 1, 0, 0, 0, 0), PRECISION),
-    "A": Physical(1, Dimensions(0, 0, 0, 1, 0, 0, 0), PRECISION),
-    "cd": Physical(1, Dimensions(0, 0, 0, 0, 1, 0, 0), PRECISION),
-    "K": Physical(1, Dimensions(0, 0, 0, 0, 0, 1, 0), PRECISION),
-    "mol": Physical(1, Dimensions(0, 0, 0, 0, 0, 0, 1), PRECISION),
+    "kg": Physical(1, Dimensions(1, 0, 0, 0, 0, 0, 0)),
+    "m": Physical(1, Dimensions(0, 1, 0, 0, 0, 0, 0)),
+    "s": Physical(1, Dimensions(0, 0, 1, 0, 0, 0, 0)),
+    "A": Physical(1, Dimensions(0, 0, 0, 1, 0, 0, 0)),
+    "cd": Physical(1, Dimensions(0, 0, 0, 0, 1, 0, 0)),
+    "K": Physical(1, Dimensions(0, 0, 0, 0, 0, 1, 0)),
+    "mol": Physical(1, Dimensions(0, 0, 0, 0, 0, 0, 1)),
 }
 
 # # preferred units

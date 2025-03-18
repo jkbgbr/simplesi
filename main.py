@@ -1,8 +1,8 @@
 
 
-# import simplesi as si
-# si.environment(env_name='structural')
-# si.environment(env_name='US_customary', replace=False)
+import simplesi as si
+si.environment(env_name='structural')
+si.environment(env_name='US_customary', replace=False)
 #
 # a = 1 * si.m
 # b = 1 * si.ft
@@ -15,6 +15,29 @@
 #
 # exit()
 #
+
+from simplesi import Physical
+
+# Physical.as_str(value=12.2535)
+# Physical.as_str(value=0.2535)
+# Physical.as_str(value=0.253)
+# Physical.as_str(value=0.25)
+# Physical.as_str(value=0.2)
+# Physical.as_str(value=0.02)
+# Physical.as_str(value=0.002)
+# Physical.as_str(value=0.0002)
+# Physical.as_str(value=1.2)
+# Physical.as_str(value=1.02)
+# Physical.as_str(value=1.002)
+# Physical.as_str(value=1.0002)
+# Physical.as_str(value=2535)
+# Physical.as_str(value=253.5)
+
+print(2 * si.yard)
+print((2 * si.yard).to('mm'))
+
+exit()
+
 
 import timeit
 
