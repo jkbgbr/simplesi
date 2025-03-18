@@ -18,7 +18,7 @@ RE_TOL = 1e-9
 ABS_TOL = 1e-12
 
 NUMBER = int, float
-PRECISION = 3
+# PRECISION = 3
 
 
 class Physical:
@@ -32,7 +32,7 @@ class Physical:
             self,
             value: float,
             dimensions: Dimensions,
-            precision: int = PRECISION,
+            # precision: int = PRECISION,
             conv_factor: float = 1.0,
     ):
         """
@@ -55,8 +55,8 @@ class Physical:
         if conv_factor <= 0:
             raise ValueError("Conversion factor must be positive, you have {}.".format(conv_factor))
 
-        if not isinstance(precision, int):
-            raise ValueError("Precision must be an integer,you have {}.".format(type(precision)))
+        # if not isinstance(precision, int):
+        #     raise ValueError("Precision must be an integer,you have {}.".format(type(precision)))
 
         # use a scalar if you have no dimensions
         if dimensions.dimensionsless:
@@ -64,7 +64,7 @@ class Physical:
 
         self.value = value
         self.dimensions = dimensions
-        self.precision = precision
+        # self.precision = precision
         self.conv_factor = conv_factor
 
     def __str__(self):

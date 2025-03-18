@@ -1,4 +1,5 @@
 {
     "to_fails": "print",
-    "print_unit": "smallest"
+    "print_unit": "smallest",
+    "significant_digits": 3
 }
