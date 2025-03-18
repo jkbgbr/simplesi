@@ -262,9 +262,9 @@ Distributed under the MIT. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-jkbgbr@gmail.com@gmail.com
+jkbgbr@gmail.com
 
-Project Link: [https://github.com/jkbgbr/simplesi](https://github.com/jkbgbr/simplesi)
+[//]: # (Project Link: [https://github.com/jkbgbr/simplesi]&#40;https://github.com/jkbgbr/simplesi&#41;)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
