@@ -162,7 +162,6 @@ class Physical:
                         elif ex == 1:
                             _ret.append('{}'.format(u))
                         else:
-                            # _ret.append('{}^{}'.format(u, ex))
                             _superex = []
                             _superscripts = "⁰¹²³⁴⁵⁶⁷⁸⁹"
                             _minus = "⁻"
