@@ -1,3 +1,15 @@
+
+
+import simplesi as si
+si.environment(env_name='structural')
+
+a = (1 * si.m * 3 * si.kg / si.s**2) ** 0.5
+print(a.to('nm'))
+
+
+exit()
+
+
 import timeit
 
 mysetup = """import simplesi as si

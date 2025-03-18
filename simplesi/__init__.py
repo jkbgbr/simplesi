@@ -145,15 +145,41 @@ class Physical:
         # if the requested unit is not compatible with the dimensions defined in the environment,
         # the requested unit does not show up in the possible_units dictionary
         # we both check the keys and the symbols
-        # raise an error
         keys = list(possible_units.keys())
         symbols = list(x.get('Symbol') for x in possible_units.values())
         keys_and_symbols = keys + symbols
 
         if unit is not None:
             if unit not in keys_and_symbols:
-                raise ValueError(
-                    'The requested unit is not compatible with the dimensions of the Physical instance or not defined in this environment.')
+
+                if environment.settings.get('to_fails') == 'print':
+                    # print it by the dimensions
+                    # results something like 1.73 kg⁰‧⁵ × m⁰‧⁵ × s⁻¹‧⁰
+                    _ret = []
+                    for u, ex in zip(environment.si_base_units.keys(), self.dimensions):
+                        if ex == 0:
+                            continue
+                        elif ex == 1:
+                            _ret.append('{}'.format(u))
+                        else:
+                            # _ret.append('{}^{}'.format(u, ex))
+                            _superex = []
+                            _superscripts = "⁰¹²³⁴⁵⁶⁷⁸⁹"
+                            _minus = "⁻"
+                            for x in str(ex):
+                                if x == '-':
+                                    _superex.append(_minus)
+                                elif x == '.':
+                                    _superex.append('\u2027')
+                                else:
+                                    _superex.append(_superscripts[int(x)])
+                            ex = ''.join(_superex)
+                            _ret.append('{}{}'.format(u, ex))
+
+                    return "{} ".format(self.value) + ' \u00d7 '.join(_ret)
+
+                elif environment.settings.get('to_fails') == 'raise':
+                    raise ValueError('No unit for conversion defined. Compatible units are: {}'.format(keys_and_symbols))
 
         # if nothing was found - it is not possible as self must have a unit from the environment but still
         # check for it
@@ -549,6 +575,7 @@ preferred_units = {
 environment_settings = {
     'print_unit': 'smallest',  # smallest, largest
     'keep_SI': True,  # if True, operations on SI and non-SI units return the result to SI units
+    'to_fails': 'print',  # raise, print
 }
 
 from simplesi.environment import Environment
