@@ -1,24 +1,20 @@
 
 
-import simplesi as si
-si.environment(env_name='structural')
-si.environment(env_name='US_customary', replace=False)
-
-print(si.environment.preferred_units)
-print(si.environment.settings)
-
-
-a = 1 * si.m
-b = 1 * si.ft
-
-print(a)
-print(a)
-# print(b)
-# print((a+b).to('ft'))
-# print(b+a)
-
-exit()
-
+# import simplesi as si
+# si.environment(env_name='structural')
+# si.environment(env_name='US_customary', replace=False)
+#
+# a = 1 * si.m
+# b = 1 * si.ft
+#
+# print(a)
+# print(a)
+# # print(b)
+# # print((a+b).to('ft'))
+# # print(b+a)
+#
+# exit()
+#
 
 import timeit
 

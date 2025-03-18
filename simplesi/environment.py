@@ -254,10 +254,10 @@ class Environment:
             _settings = settings
 
         elif isinstance(settings, pathlib.Path):
-            _settings = self._read_from_file(_path=settings, _name='settings')
+            _settings = self._read_from_file(_path=settings, _name='_settings')
 
         elif settings is None:
-            _settings = self._read_from_file(_name='settings')
+            _settings = self._read_from_file(_name='_settings')
 
         else:
             raise ValueError('Settings units incorrect')
@@ -269,10 +269,10 @@ class Environment:
             _preferred_units = preferred_units
 
         elif isinstance(preferred_units, pathlib.Path):
-            _preferred_units = self._read_from_file(_path=preferred_units, _name='preferred_units')
+            _preferred_units = self._read_from_file(_path=preferred_units, _name='_preferred_units')
 
         elif preferred_units is None:
-            _preferred_units = self._read_from_file(_name='preferred_units')
+            _preferred_units = self._read_from_file(_name='_preferred_units')
 
         else:
             raise ValueError('Preferred units incorrect')

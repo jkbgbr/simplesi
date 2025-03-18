@@ -598,14 +598,14 @@ base_units = {
 #
 # # dump the perferred units in an utf-8 json file
 # import json
-# with open('preferred_units.json', 'w', encoding='utf-8') as f:
+# with open('_preferred_units.json', 'w', encoding='utf-8') as f:
 #     json.dump(preferred_units, f, ensure_ascii=True)
 #
 # environment_settings = {
 #     'to_fails': 'print',  # raise, print
 # }
 # import json
-# with open('settings.json', 'w', encoding='utf-8') as f:
+# with open('_settings.json', 'w', encoding='utf-8') as f:
 #     json.dump(environment_settings, f, ensure_ascii=True, indent=4)
 
 from simplesi.environment import Environment
