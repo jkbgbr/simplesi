@@ -1,18 +1,21 @@
 
 
 import simplesi as si
-si.environment(env_name='proba')
+si.environment(env_name='structural')
+si.environment(env_name='US_customary', replace=False)
 
-a = 1 * si.kN / si.m**2
-print(a.to())
-print(a.to('kN_m2'))
-print(a.to('kN/m2'))
+print(si.environment.preferred_units)
+print(si.environment.settings)
 
 
-print(a.to())
-print(a.to('kN_m2'))
-print(a.to('kN/m2'))
+a = 1 * si.m
+b = 1 * si.ft
 
+print(a)
+print(a)
+# print(b)
+# print((a+b).to('ft'))
+# print(b+a)
 
 exit()
 

@@ -272,7 +272,7 @@ class Environment:
             _preferred_units = self._read_from_file(_path=preferred_units, _name='preferred_units')
 
         elif preferred_units is None:
-            _preferred_units = {}
+            _preferred_units = self._read_from_file(_name='preferred_units')
 
         else:
             raise ValueError('Preferred units incorrect')

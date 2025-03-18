@@ -71,13 +71,12 @@ class Physical:
         """A pretty print of the Physical instance"""
 
         # checking if there is a preferred unit for the dimensions
-        unit = {k for k, v in environment.preferred_units.items() if v == self.dimensions}
+        unit = {k for k, v in environment.preferred_units.items() if v == list(self.dimensions)}
         unit = unit.pop() if unit else None
 
-        # if there is no preferred unit, use the smallest available from the environment
+        # if there is no preferred unit, use the smallest or largest available from the environment
         if unit is None:
             # possible units, ascending order
-
             unit = tuple(k for k, v in sorted(self.all_units.items(), key=lambda x: x[1].get('Value') * x[1].get('Factor')) if
                          v.get('Dimension') == self.dimensions)
 
@@ -103,11 +102,6 @@ class Physical:
                                                                                         self.dimensions,
                                                                                         self.precision,
                                                                                         self.conv_factor)
-
-    @property
-    def keep_SI(self):
-        """shortcut to the environment setting"""
-        return environment.settings.get('keep_SI', True)
 
     @property
     def is_SI(self):
@@ -590,31 +584,29 @@ base_units = {
     "mol": Physical(1, Dimensions(0, 0, 0, 0, 0, 0, 1), PRECISION),
 }
 
-# preferred units
-# the preferred units are used to print the Physical instances so usually the most common units are used
-# the VALUES must beunique, but this is checked for in the environment file
-preferred_units = {
-    'mm': Dimensions(0, 1, 0, 0, 0, 0, 0),
-    's': Dimensions(0, 0, 1, 0, 0, 0, 0),
-    'kg': Dimensions(1, 0, 0, 0, 0, 0, 0),
-    'kN': Dimensions(1, 1, -2, 0, 0, 0, 0),
-    'kNm': Dimensions(1, 2, -2, 0, 0, 0, 0),
-    'MPa': Dimensions(1, -1, -2, 0, 0, 0, 0),
-}
-
-# dump the perferred units in an utf-8 json file
-import json
-with open('preferred_units.json', 'w', encoding='utf-8') as f:
-    json.dump(preferred_units, f, ensure_ascii=True)
-
-environment_settings = {
-    'print_unit': 'smallest',  # smallest, largest
-    'keep_SI': True,  # if True, operations on SI and non-SI units return the result to SI units
-    'to_fails': 'print',  # raise, print
-}
-import json
-with open('settings.json', 'w', encoding='utf-8') as f:
-    json.dump(environment_settings, f, ensure_ascii=True, indent=4)
+# # preferred units
+# # the preferred units are used to print the Physical instances so usually the most common units are used
+# # the VALUES must beunique, but this is checked for in the environment file
+# preferred_units = {
+#     'mm': Dimensions(0, 1, 0, 0, 0, 0, 0),
+#     's': Dimensions(0, 0, 1, 0, 0, 0, 0),
+#     'kg': Dimensions(1, 0, 0, 0, 0, 0, 0),
+#     'kN': Dimensions(1, 1, -2, 0, 0, 0, 0),
+#     'kNm': Dimensions(1, 2, -2, 0, 0, 0, 0),
+#     'MPa': Dimensions(1, -1, -2, 0, 0, 0, 0),
+# }
+#
+# # dump the perferred units in an utf-8 json file
+# import json
+# with open('preferred_units.json', 'w', encoding='utf-8') as f:
+#     json.dump(preferred_units, f, ensure_ascii=True)
+#
+# environment_settings = {
+#     'to_fails': 'print',  # raise, print
+# }
+# import json
+# with open('settings.json', 'w', encoding='utf-8') as f:
+#     json.dump(environment_settings, f, ensure_ascii=True, indent=4)
 
 from simplesi.environment import Environment
 
