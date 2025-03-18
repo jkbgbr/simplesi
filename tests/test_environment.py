@@ -4,8 +4,8 @@ import unittest
 from simplesi.dimensions import Dimensions  # noqa protected
 from simplesi import Physical, PRECISION  # noqa protected
 import simplesi as si
-si.environment('US_customary')
-si.environment('structural', replace=False)
+si.environment(env_name='test_US_customary', env_path=pathlib.Path('.'))
+si.environment(env_name='test_structural', env_path=pathlib.Path('.'), replace=False)
 
 
 class TestPhysicalWithUnits(unittest.TestCase):
@@ -44,14 +44,35 @@ class TestPhysicalWithUnits(unittest.TestCase):
         self.assertEqual(12 * si.cm + 2 * si.m, 2120 * si.mm)
 
     def test_print(self):
-        self.assertIsNone(si.km.to())
-        self.assertIsNone(si.Hz.to())
+
+        # setting the environment to print an exception if to() fails
+        si.environment.settings['to_fails'] = 'print'
+
+        # not None as a text is printed
+        self.assertIsNotNone(si.km.to())
+        self.assertIsNotNone(si.Hz.to())
+
+        # unit unknown,prints something but no return value
+        self.assertIsNone(si.Hz.to('1/hour'))  # unkown
+        self.assertIsNone(si.Hz.to('whatever'))  # unknown
+        self.assertIsNone(si.Hz.to('1/s'))  # only as Hz available
+
+        # this makes sense
         self.assertEqual(si.Hz.__str__(), '1.0 Hz')
 
         # making sure the Physical object is available: importing it
         import importlib
         importlib.import_module('simplesi')
         self.assertEqual(eval(si.km.__repr__()), si.km)
+
+        # setting the environment to raise an exception if to() fails
+        si.environment.settings['to_fails'] = 'raise'
+        with self.assertRaises(ValueError):
+            si.km.to()
+            si.Hz.to()
+
+        # setting the environment to print an exception if to() fails
+        si.environment.settings['to_fails'] = 'print'
 
     def test_SI(self):
         self.assertTrue(si.m.is_SI)
@@ -201,6 +222,9 @@ class TestPhysicalWithUnits(unittest.TestCase):
             json.dump(incorrect_environment, f, ensure_ascii=True)
         with self.assertRaises(ValueError):
             si.environment(env_path=pathlib.Path('.'), env_name='incorrect_environment')
+        # delete the .json file
+        import os
+        os.remove("incorrect_environment.json")
 
 
 

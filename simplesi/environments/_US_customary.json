@@ -1,0 +1,113 @@
+{
+    "mile": {
+        "Dimension": [0,1,0,0,0,0,0],
+        "Symbol": "mile",
+        "Factor": 1609.344},
+    "yard": {
+        "Dimension": [0,1,0,0,0,0,0],
+        "Symbol": "yard",
+        "Factor": 0.9144},
+    "ft": {
+        "Dimension": [0,1,0,0,0,0,0],
+        "Symbol": "ft",
+        "Factor": 0.3048},
+    "inch": {
+        "Dimension": [0,1,0,0,0,0,0],
+        "Symbol": "inch",
+        "Factor": 0.0254},
+    "furlong": {
+        "Dimension": [0,1,0,0,0,0,0],
+        "Symbol": "fur",
+        "Factor": 201.168},
+
+    "ounce": {
+        "Dimension": [1,0,0,0,0,0,0],
+        "Factor": 0.0283495,
+        "Symbol": "oz."},
+    "lbm": {
+        "Dimension": [1,0,0,0,0,0,0],
+        "Factor": 0.453592,
+        "Symbol": "lbm"},
+    "firkin": {
+        "Dimension": [1,0,0,0,0,0,0],
+        "Factor": 40.8233133,
+        "Symbol": "fir"},
+
+    "acre": {
+        "Dimension": [0,2,0,0,0,0,0],
+        "Symbol": "acre",
+        "Factor": 4046.86},
+    "sq.ft": {
+        "Dimension": [0,2,0,0,0,0,0],
+        "Symbol": "sq.ft",
+        "Factor": 0.092903},
+
+    "fl_ounce": {
+        "Dimension": [0,3,0,0,0,0,0],
+        "Symbol": "fl. oz.",
+        "Factor": 2.95735e-5},
+    "quart": {
+        "Dimension": [0,3,0,0,0,0,0],
+        "Symbol": "qt.",
+        "Factor": 0.000946353},
+    "pint": {
+        "Dimension": [0,3,0,0,0,0,0],
+        "Symbol": "pt.",
+        "Factor": 0.000473176},
+    "gallon": {
+        "Dimension": [0,3,0,0,0,0,0],
+        "Symbol": "gal",
+        "Factor": 0.00378541},
+
+    "lbf": {
+        "Dimension": [1,1,-2,0,0,0,0],
+        "Factor": 4.448,
+        "Symbol": "lbf"},
+    "kip": {
+        "Dimension": [1,1,-2,0,0,0,0],
+        "Factor": 4448.2216,
+        "Symbol": "kip"},
+    "ton": {
+        "Dimension": [1,1,-2,0,0,0,0],
+        "Factor": 907.18474,
+        "Symbol": "ton"},
+
+    "psi": {
+        "Dimension": [1,-1,-2,0,0,0,0],
+        "Factor": 6894.76,
+        "Symbol": "psi"},
+    "ksi": {
+        "Dimension": [1,-1,-2,0,0,0,0],
+        "Factor": 6.89476e6,
+        "Symbol": "ksi"},
+
+    "pcf": {
+        "Dimension": [1,-2,-2,0,0,0,0],
+        "Factor": 16.018463,
+        "Symbol": "pcf"},
+    "kcf": {
+        "Dimension": [1,-2,-2,0,0,0,0],
+        "Factor": 16018.46337396,
+        "Symbol": "kcf"},
+
+    "minute": {
+        "Dimension": [0,0,1,0,0,0,0],
+        "Factor": 60,
+        "Symbol": "minute"},
+    "hour": {
+        "Dimension": [0,0,1,0,0,0,0],
+        "Factor": 3600,
+        "Symbol": "hour"},
+    "day": {
+        "Dimension": [0,0,1,0,0,0,0],
+        "Factor": 86400,
+        "Symbol": "day"},
+    "week": {
+        "Dimension": [0,0,1,0,0,0,0],
+        "Factor": 604800,
+        "Symbol": "week"},
+    "fortnight": {
+        "Dimension": [0,0,1,0,0,0,0],
+        "Factor": 1209600,
+        "Symbol": "ftn"}
+}

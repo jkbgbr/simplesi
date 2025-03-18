@@ -103,6 +103,7 @@ class Environment:
                  replace: bool = False,  # True: existing units are removed first
                  top_level: bool = False,
                  preferred_units: dict = None,
+                 settings: dict = None,
                  ):
         """
         Loads the environment from a json file.

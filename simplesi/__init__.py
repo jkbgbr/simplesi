@@ -10,6 +10,7 @@ from __future__ import annotations
 __version__ = "0.1"
 
 import math
+import pprint
 
 from simplesi.dimensions import Dimensions
 
@@ -136,82 +137,117 @@ class Physical:
         :param unit: from the environment either the key or the symbol of a unit
         :return:
         """
+
+        def print_or_raise():
+            # either print it or raise an exception, based on the setting
+            if environment.settings.get('to_fails') == 'print':
+                # print it by the dimensions
+                # results something like 1.73 kg⁰‧⁵ × m⁰‧⁵ × s⁻¹‧⁰
+                _ret = []
+                for u, ex in zip(environment.si_base_units.keys(), self.dimensions):  # SI base unit, exponent
+                    # getting rid of unnecessary zeros
+                    try:
+                        ex.is_integer()
+                        ex = int(ex)
+                    except AttributeError:
+                        pass
+                    if ex == 0:  # u^ex = 1 removed
+                        continue
+                    elif ex == 1:  # ex = 1 -> simply the SI base unit
+                        _ret.append('{}'.format(u))
+                    else:  # the exponent is shown
+                        _superex = []
+                        _superscripts = "⁰¹²³⁴⁵⁶⁷⁸⁹"
+                        _minus = "⁻"
+                        for x in str(ex):
+                            if x == '-':
+                                _superex.append(_minus)
+                            elif x == '.':
+                                _superex.append('\u2027')  # dot in the exponent
+                            else:
+                                _superex.append(_superscripts[int(x)])
+                        ex = ''.join(_superex)
+                        _ret.append('{}{}'.format(u, ex))
+
+                return "{} ".format(self.value) + ' \u00d7 '.join(_ret)
+
+            elif environment.settings.get('to_fails') == 'raise':
+
+                raise ValueError(
+                    'The requested unit is not defined in the environment. Possible values to use are: {}'.format(
+                        possible_units))
+
         value = self.value
 
-        # looking for the symbol in the environment
+        # looking for the units in the environment that have the same dimensionality
         env = self.all_units
-        possible_units = {k: v for k, v in env.items() if v['Dimension'] == self.dimensions}
+        units_same_dims = {k: v for k, v in env.items() if v['Dimension'] == self.dimensions}
 
-        # if the requested unit is not compatible with the dimensions defined in the environment,
-        # the requested unit does not show up in the possible_units dictionary
-        # we both check the keys and the symbols
-        keys = list(possible_units.keys())
-        symbols = list(x.get('Symbol') for x in possible_units.values())
-        keys_and_symbols = keys + symbols
+        # going over the units with same dims, looking for the desired unit in the keys and symbols
+        keys = list(units_same_dims.keys())
+        symbols = list(x.get('Symbol') for x in units_same_dims.values())
+        keys_and_symbols = set(keys + symbols)
+        possible_units = ', '.join('"{}"'.format(x) for x in keys_and_symbols)
 
-        if unit is not None:
+        # there is a unit given as argument to print self in
+        if unit is not None:  # a unit is provided to print self in
+            # the unit is not found in the environment
             if unit not in keys_and_symbols:
 
-                if environment.settings.get('to_fails') == 'print':
-                    # print it by the dimensions
-                    # results something like 1.73 kg⁰‧⁵ × m⁰‧⁵ × s⁻¹‧⁰
-                    _ret = []
-                    for u, ex in zip(environment.si_base_units.keys(), self.dimensions):
-                        if ex == 0:
-                            continue
-                        elif ex == 1:
-                            _ret.append('{}'.format(u))
-                        else:
-                            _superex = []
-                            _superscripts = "⁰¹²³⁴⁵⁶⁷⁸⁹"
-                            _minus = "⁻"
-                            for x in str(ex):
-                                if x == '-':
-                                    _superex.append(_minus)
-                                elif x == '.':
-                                    _superex.append('\u2027')
-                                else:
-                                    _superex.append(_superscripts[int(x)])
-                            ex = ''.join(_superex)
-                            _ret.append('{}{}'.format(u, ex))
+                # either print the value or raise an exception
+                # either print the value or raise an exceptionprint
+                if environment.settings.get('to_fails') == 'raise':
+                    ValueError(
+                        'The requested unit is not defined in the environment. Possible values to use are: {}'.format(
+                            possible_units))
+                elif environment.settings.get('to_fails') == 'print':
+                    print(
+                        'The requested unit is not defined in the environment. Possible values to use are: {}'.format(
+                            possible_units))
 
-                    return "{} ".format(self.value) + ' \u00d7 '.join(_ret)
+            else:  # the requested unit was found
+                # finding the requested unit
+                available = {k: v for k, v in units_same_dims.items() if v.get('Symbol') == unit or k == unit}
 
-                elif environment.settings.get('to_fails') == 'raise':
-                    raise ValueError('No unit for conversion defined. Compatible units are: {}'.format(keys_and_symbols))
+                # is the requested unit available? If not, give the possible alternatives
+                if not available:
+                    _list = ', '.join(['"{}"'.format(v.get('Symbol', k)) for k, v in units_same_dims.items()])
+                    print('No unit for conversion defined. Compatible units are: {}'.format(_list))
+                    return
 
-        # if nothing was found - it is not possible as self must have a unit from the environment but still
-        # check for it
-        if not possible_units:
-            raise ValueError('No units found for the given dimensions. This should not be possible!')
+                # this should not be possible for many reasons but still
+                if len(available) > 1:
+                    raise ValueError('More than one unit found for the given dimensions. This means, symbols and keys in the environment are used multiple times.')
 
-        # finding the requested unit
-        available = {k: v for k, v in possible_units.items() if v.get('Symbol') == unit or k == unit}
+                # finally, the unit is found and we are sure there is only one
+                # but maybe we found it by the symbol -> let's find the unit
+                if available.get(unit, None) is None:
+                    unit = list(available.keys())[0]
 
-        # is the requested unit available? If not, give the possible alternatives
-        if not available:
-            _list = ', '.join(['"{}"'.format(v.get('Symbol', k)) for k, v in possible_units.items()])
-            print('No unit for conversion defined. Compatible units are: {}'.format(_list))
-            return
+                # last check: if the unit is found, but the value is missing, raise an error
+                # this should not happen as we check for the existence of the value in the environment but still
 
-        # this should not be possible for many reasons but still
-        if len(available) > 1:
-            raise ValueError('More than one unit found for the given dimensions. This means, symbols and keys in the environment are used multiple times.')
+                _value = available[unit].get('Value', 1)
+                _factor = available[unit].get('Factor', 1)
+                _symbol = available[unit].get('Symbol', '')
 
-        # finally, the unit is found and we are sure there is only one
-        # but maybe we found it by the symbol -> let's find the unit
-        if available.get(unit, None) is None:
-            unit = list(available.keys())[0]
+                divider = _value * _factor
+                new_value = round(value / divider, self.precision)
+                return '{} {}'.format(new_value, _symbol)
 
-        # last check: if the unit is found, but the value is missing, raise an error
-        # this should not happen as we check for the existence of the value in the environment but still
-        _value = available[unit].get('Value', 1)
-        _factor = available[unit].get('Factor', 1)
-        _symbol = available[unit].get('Symbol', '')
+        else:  # no unit is provided to print self in
 
-        divider = _value * _factor
-        new_value = round(value / divider, self.precision)
-        return '{} {}'.format(new_value, _symbol)
+            # no units available in the environment
+            if not units_same_dims:
+                # either print the value or raise an exception
+                return print_or_raise()
+
+            # there are some units available, list them.
+            else:
+                if environment.settings.get('to_fails') == 'raise':
+                    raise ValueError('The requested unit is not defined in the environment. Possible values to use are: {}'.format(possible_units))
+                else:
+                    return 'The requested unit is not defined in the environment.\nPossible values to use are: {}'.format(possible_units)
 
     ### "Magic" Methods ###
 
