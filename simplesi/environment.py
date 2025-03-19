@@ -224,6 +224,18 @@ class Environment:
             self.preferred_units = preferred_units
 
     def _read_from_file(self, _name: str, _path: pathlib.Path = None):
+        """
+        Reads the json file at the given location.
+
+        If no path is given, the default place is the environments folder in the same directory as this file.
+        If a path is given, that is used.
+
+        A name is always to be provided, this must be the filename, without extension.
+
+        :param _name:
+        :param _path:
+        :return:
+        """
 
         # no _path provided: default location
         if _path is None:
