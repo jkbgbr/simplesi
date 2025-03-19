@@ -101,8 +101,8 @@ class Environment:
                  env_dict: dict = None,
                  replace: bool = False,  # True: existing units are removed first
                  top_level: bool = False,
-                 preferred_units: dict | pathlib.Path = None,
-                 settings: dict | pathlib.Path = None,
+                 preferred_units: dict = None,
+                 settings: dict = None,
                  ):
         """
         Loads the environment from a json file.
@@ -217,8 +217,11 @@ class Environment:
         self._push_vars(self.si_base_units, self.namespace_module)  # base units
 
         # settings, print preferences
-        self.apply_settings(settings)
-        self.apply_preferences(preferred_units)
+        if settings is not None:
+            self.settings = settings
+
+        if preferred_units is not None:
+            self.preferred_units = preferred_units
 
     def _read_from_file(self, _name: str, _path: pathlib.Path = None):
 
@@ -243,39 +246,11 @@ class Environment:
         return content
 
     def apply_settings(self, settings: dict | pathlib.Path):
-        """
-
-        :param settings:
-        :return:
-        """
-
-        if isinstance(settings, dict):
-            _settings = settings
-
-        elif isinstance(settings, pathlib.Path):
-            _settings = self._read_from_file(_path=settings, _name='_settings')
-
-        elif settings is None:
-            _settings = self._read_from_file(_name='_settings')
-
-        else:
-            raise ValueError('Settings units incorrect')
+        _settings = settings
         self.settings = _settings
 
-    def apply_preferences(self, preferred_units: dict | pathlib.Path):
-
-        if isinstance(preferred_units, dict):
-            _preferred_units = preferred_units
-
-        elif isinstance(preferred_units, pathlib.Path):
-            _preferred_units = self._read_from_file(_path=preferred_units, _name='_preferred_units')
-
-        elif preferred_units is None:
-            _preferred_units = self._read_from_file(_name='_preferred_units')
-
-        else:
-            raise ValueError('Preferred units incorrect')
-        self.preferred_units = _preferred_units
+    def apply_preferences(self, preferred_units):
+        _preferred_units = preferred_units
 
     def _push_vars(self, units_dict: dict, module: ModuleType) -> None:
         module.__dict__.update(units_dict)

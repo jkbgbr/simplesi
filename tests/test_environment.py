@@ -4,7 +4,20 @@ import unittest
 from simplesi.dimensions import Dimensions  # noqa protected
 from simplesi import Physical, environment  # noqa protected
 import simplesi as si
-si.environment(env_name='test_US_customary', env_path=pathlib.Path('.'))
+
+preferred_units = {"mm": [0, 1, 0, 0, 0, 0, 0],
+                   "s": [0, 0, 1, 0, 0, 0, 0],
+                   "kg": [1, 0, 0, 0, 0, 0, 0],
+                   "kN": [1, 1, -2, 0, 0, 0, 0],
+                   "kNm": [1, 2, -2, 0, 0, 0, 0],
+                   "MPa": [1, -1, -2, 0, 0, 0, 0]
+                   }
+env_settings = {"to_fails": "raise",
+                "print_unit": "smallest",
+                "significant_digits": 3
+                }
+
+si.environment(env_name='test_US_customary', env_path=pathlib.Path('.'), preferred_units=preferred_units, settings=env_settings)
 si.environment(env_name='test_structural', env_path=pathlib.Path('.'), replace=False)
 si.environment.settings['significant_digits'] = 3
 
