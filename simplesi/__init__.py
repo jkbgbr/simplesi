@@ -79,12 +79,6 @@ class Physical:
         except AttributeError:  # an integer
             return str(value)
 
-    @classmethod
-    def split_str(cls, physical: str) -> tuple[str, str]:
-        """Given a string representation of the Physical instance, splits it into value and unit"""
-        value, unit = physical.split(' ')
-        return value, unit
-
     def __str__(self):
         """A pretty print of the Physical instance"""
 
@@ -583,6 +577,13 @@ class Physical:
         nth root, as math.pow raises a TypeError
         """
         return self ** (1 / n)
+
+
+def split_str(physical: str) -> tuple[str, str]:
+    """Given a string representation of the Physical instance, splits it into value and unit"""
+    value, unit = physical.split(' ')
+    return value, unit
+
 
 
 # The seven SI base units
