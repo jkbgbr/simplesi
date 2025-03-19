@@ -61,23 +61,26 @@ class Physical:
 
     @classmethod
     def as_str(cls, value: NUMBER) -> str:
-        try:
-            value.is_integer()  # integer raises AttributeError
 
-            # formatting to N significant digits
-            _ret1 = '{:.{}g}'.format(value, environment.settings.get('significant_digits'))
-            # formatting to at least 2 deciman spaces
-            _ret2 = '{:.{}f}'.format(value, min(2, environment.settings.get('significant_digits')))
+        if not isinstance(value, NUMBER):
+            raise ValueError("Value must be a number, you have {}.".format(type(value)))
 
-            # making sure scientific notation does not kick in
-            if any(x in _ret1 for x in '+-'):
-                _ret1 = '0'
+        # essentially an integer
+        if float(value) == int(value):
+            return str(int(value))
 
-            # returning the "longest" number
-            return sorted([_ret1, _ret2], key=lambda x: len(x))[-1]
+        # it is truly a float
+        # formatting to N significant digits
+        _ret1 = '{:.{}g}'.format(value, environment.settings.get('significant_digits'))
+        # formatting to at least 2 deciman spaces
+        _ret2 = '{:.{}f}'.format(value, min(2, environment.settings.get('significant_digits')))
 
-        except AttributeError:  # an integer
-            return str(value)
+        # making sure scientific notation does not kick in
+        if any(x in _ret1 for x in '+-'):
+            _ret1 = '0'
+
+        # returning the "longest" number
+        return sorted([_ret1, _ret2], key=lambda x: len(x))[-1]
 
     def __str__(self):
         """A pretty print of the Physical instance"""

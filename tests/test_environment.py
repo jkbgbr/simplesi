@@ -2,7 +2,7 @@ import pathlib
 import math
 import unittest
 from simplesi.dimensions import Dimensions  # noqa protected
-from simplesi import Physical  # noqa protected
+from simplesi import Physical, environment  # noqa protected
 import simplesi as si
 si.environment(env_name='test_US_customary', env_path=pathlib.Path('.'))
 si.environment(env_name='test_structural', env_path=pathlib.Path('.'), replace=False)
@@ -27,11 +27,11 @@ class TestPhysicalWithUnits(unittest.TestCase):
         self.assertFalse(1 * si.yard > 1258 * si.mm)
 
     def test_to(self):
-        self.assertEqual((1 * si.inch).to('inch'), '1.00 inch')
+        self.assertEqual((1 * si.inch).to('inch'), '1 inch')
         self.assertEqual((1 * si.ft).to('inch'), '12.00 inch')
-        self.assertEqual((1 * si.m).to('m'), '1.00 m')
+        self.assertEqual((1 * si.m).to('m'), '1 m')
         self.assertEqual((12 * si.inch).to('ft'), '1.00 ft')
-        self.assertEqual((1 * si.yard).to('ft'), '3.00 ft')
+        self.assertEqual((1 * si.yard).to('ft'), '3 ft')
 
         self.assertEqual((1 * si.m).to('inch'), '39.37 inch')
         self.assertEqual((1 * si.m).to('ft'), '3.28 ft')
@@ -43,6 +43,55 @@ class TestPhysicalWithUnits(unittest.TestCase):
 
         self.assertEqual(12 * si.inch + 2 * si.ft, 1 * si.yard)
         self.assertEqual(12 * si.cm + 2 * si.m, 2120 * si.mm)
+
+
+    def test_as_str(self):
+
+        sigdig = environment.settings.get('significant_digits')
+
+        self.assertEqual(Physical.as_str(12.2535), '12.25')
+        self.assertEqual(Physical.as_str(0.2535), '0.254')
+        self.assertEqual(Physical.as_str(0.253), '0.253')
+        self.assertEqual(Physical.as_str(0.25), '0.25')
+        self.assertEqual(Physical.as_str(0.2), '0.20')
+        self.assertEqual(Physical.as_str(0.02), '0.02')
+        self.assertEqual(Physical.as_str(0.002), '0.002')
+        self.assertEqual(Physical.as_str(0.0002), '0.0002')
+        self.assertEqual(Physical.as_str(1.2), '1.20')
+        self.assertEqual(Physical.as_str(1.02), '1.02')
+        self.assertEqual(Physical.as_str(1.002), '1.00')
+        self.assertEqual(Physical.as_str(1.0002), '1.00')
+        self.assertEqual(Physical.as_str(2535), '2535')
+        self.assertEqual(Physical.as_str(253.5), '253.50')
+
+        environment.settings['significant_digits'] = 1
+        self.assertEqual(Physical.as_str(12.2535), '12.3')
+        self.assertEqual(Physical.as_str(0.2535), '0.3')
+        self.assertEqual(Physical.as_str(0.253), '0.3')
+        self.assertEqual(Physical.as_str(0.25), '0.2')
+        self.assertEqual(Physical.as_str(0.2), '0.2')
+        self.assertEqual(Physical.as_str(0.02), '0.02')
+        self.assertEqual(Physical.as_str(0.002), '0.002')
+        self.assertEqual(Physical.as_str(0.0002), '0.0002')
+        self.assertEqual(Physical.as_str(1.2), '1.2')
+        self.assertEqual(Physical.as_str(1.02), '1.0')
+        self.assertEqual(Physical.as_str(1.002), '1.0')
+        self.assertEqual(Physical.as_str(1.0002), '1.0')
+        self.assertEqual(Physical.as_str(2535), '2535')
+        self.assertEqual(Physical.as_str(253.5), '253.5')
+
+        print(12.2535 * si.m)
+        print(12 * si.m)
+        print(12 * si.mm)
+
+        # setting it back
+        environment.settings['significant_digits'] = sigdig
+
+        # self.assertNotEqual(Physical.as_str(1.002), '1.002')
+        #
+        # self.assertEqual(Physical.as_str(1), '1')
+        # self.assertNotEqual(Physical.as_str(1), '1.0')
+
 
     def test_print(self):
 
@@ -59,7 +108,7 @@ class TestPhysicalWithUnits(unittest.TestCase):
         self.assertIsNone(si.Hz.to('1/s'))  # only as Hz available
 
         # this makes sense
-        self.assertEqual(si.Hz.__str__(), '1.00 Hz')
+        self.assertEqual(si.Hz.__str__(), '1 Hz')
 
         # making sure the Physical object is available: importing it
         import importlib
