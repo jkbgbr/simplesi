@@ -579,10 +579,10 @@ class Physical:
         return self ** (1 / n)
 
 
-def split_str(physical: str) -> tuple[str, str]:
+def split_str(physical: str) -> tuple[float, str]:
     """Given a string representation of the Physical instance, splits it into value and unit"""
     value, unit = physical.split(' ')
-    return value, unit
+    return float(value), unit
 
 
 
