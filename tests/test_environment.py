@@ -75,6 +75,11 @@ class TestPhysicalWithUnits(unittest.TestCase):
         # setting the environment to print an exception if to() fails
         si.environment.settings['to_fails'] = 'print'
 
+    def test_split_str(self):
+        # splitting to value and unit
+        self.assertEqual(si.km.split_str('1.00 km'), ('1.00', 'km'))
+        self.assertEqual(si.Physical.split_str('1.345 km'), ('1.345', 'km'))
+
     def test_SI(self):
         self.assertTrue(si.m.is_SI)
         self.assertFalse(si.ft.is_SI)
