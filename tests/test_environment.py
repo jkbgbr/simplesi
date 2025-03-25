@@ -299,18 +299,22 @@ class TestPhysicalWithUnits(unittest.TestCase):
 
 class TestRepresentation(unittest.TestCase):
 
-    def test_PhysRepr(self):
-        p = 1200 * si.mm
-        _repr = p.repr(unit='m')
-        self.assertEqual(_repr.value, 1.2)
-        self.assertEqual(_repr.unit, 'm')
+    def test_PhysRepr_int(self):
+        physical = 1200 * si.mm
+        as_meter = physical('m')
+        self.assertEqual(as_meter.value, 1.2)
+        self.assertEqual(as_meter.unit, 'm')
 
-        _repr = p.repr(unit='cm')
-        self.assertEqual(_repr.value, 120)
-        self.assertEqual(_repr.unit, 'cm')
+        as_centimeter = physical('cm')
+        self.assertEqual(as_centimeter.value, 120)
+        self.assertEqual(as_centimeter.unit, 'cm')
+        self.assertEqual(as_centimeter.physical, 1200 * si.mm)
+        self.assertEqual(as_centimeter.physical, 120 * si.cm)
 
-        self.assertEqual(_repr.physical, 1200 * si.mm)
-        self.assertEqual(_repr.physical, 120 * si.cm)
+    def test_PhysRepr_float(self):
+        p = 12 * si.mm
+        some_distance = p('cm')
+        self.assertEqual(some_distance.value, 1.2)
 
 
 if __name__ == '__main__':
