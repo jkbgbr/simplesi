@@ -131,7 +131,7 @@ class Physical:
         env.update(environment.environment)
         return env
 
-    def to(self, unit: str = None):
+    def to(self, unit: str = None) -> str:
         """
         Prints the Physical instance to the specified unit.
         DOES NOT CHANGE ANYTHING, just prints.
@@ -581,12 +581,72 @@ class Physical:
         """
         return self ** (1 / n)
 
+    def repr(self, unit: str) -> PhysicalRepresentation:
+
+        mi = self.to(unit)
+        rep = split_str(mi)
+
+        return PhysicalRepresentation(*rep)
+
+
+class PhysicalRepresentation:
+    """
+    A class that makes handling units as string, number easier.
+
+    say we have a Physical instance 12 m:
+    p = 12 * si.m
+
+    then we can do:
+    rep = p.repr('mm')
+    rep.value
+    >>>12000
+    rep.unit
+    >>>'mm'
+
+    rep = p.repr('cm')
+    rep.value
+    >>>120
+    rep.unit
+    >>>'cm'
+
+
+    """
+
+    def __init__(self, value: float, unit: str):
+        self.value = value
+        self.unit = unit
+
+    @property
+    def physical(self) -> Physical:
+        """
+        Returns a Physical instance of the representation
+
+        :return:
+        """
+        unit = environment.environment.get(self.unit, None)
+        if unit is None:
+            raise ValueError('The unit "{}" is not defined in the environment.'.format(self.unit))
+
+        print(unit)
+        print(self.value)
+
+        return self.value * unit.get('Dimension') * unit.get('Factor')
+
 
 def split_str(physical: str) -> tuple[float, str]:
     """Given a string representation of the Physical instance, splits it into value and unit"""
     value, unit = physical.split(' ')
     return float(value), unit
 
+
+def justvalue(physical: str) -> float:
+    """
+    Given a string representation of the Physical instance, returns the value
+
+    This can be used to e.g. after having printed a Physical instance using to(), return the value
+
+    """
+    return split_str(physical)[0]
 
 
 # The seven SI base units

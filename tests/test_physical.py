@@ -1,6 +1,6 @@
 import unittest
 from simplesi.dimensions import Dimensions
-from simplesi import Physical
+from simplesi import Physical, PhysicalRepresentation
 
 
 class TestPhysical(unittest.TestCase):
@@ -404,7 +404,6 @@ class TestPower(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             2 ** self.physical2
-
 
 
 

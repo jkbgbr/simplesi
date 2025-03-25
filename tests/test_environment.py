@@ -296,5 +296,18 @@ class TestPhysicalWithUnits(unittest.TestCase):
 
 
 
+class TestRepresentation(unittest.TestCase):
+
+    def test_creating(self):
+        p = 1200 * si.mm
+        _repr = p.repr(unit='m')
+        self.assertEqual(_repr.value, 1.2)
+        self.assertEqual(_repr.unit, 'm')
+        self.assertEqual(_repr.physical, 1200 * si.mm)
+        self.assertEqual(_repr.physical, 120 * si.cm)
+
+
+
+
 if __name__ == '__main__':
     unittest.main()
