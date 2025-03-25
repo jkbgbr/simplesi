@@ -581,17 +581,20 @@ class Physical:
         """
         return self ** (1 / n)
 
-    def repr(self, unit: str) -> PhysicalRepresentation:
+    def repr(self, unit: str) -> PhysRep:
 
         mi = self.to(unit)
         rep = split_str(mi)
 
-        return PhysicalRepresentation(*rep)
+        return PhysRep(*rep)
 
 
-class PhysicalRepresentation:
+class PhysRep:
     """
     A class that makes handling units as string, number easier.
+
+    When a Physical is printed, a string is returned.
+    Using PhysRep this string becomes an object
 
     say we have a Physical instance 12 m:
     p = 12 * si.m
@@ -616,21 +619,40 @@ class PhysicalRepresentation:
         self.value = value
         self.unit = unit
 
-    @property
-    def physical(self) -> Physical:
+    @classmethod
+    def split_str(cls, in_string: str) -> PhysRep:
         """
-        Returns a Physical instance of the representation
+        Given a string representation of the Physical instance e.g. from Physical.to(), splits it into value and unit
 
-        :return:
+        Expected input is line '12 mm'
+
         """
-        unit = environment.environment.get(self.unit, None)
-        if unit is None:
-            raise ValueError('The unit "{}" is not defined in the environment.'.format(self.unit))
+        valunit = in_string.split(' ')
 
-        print(unit)
-        print(self.value)
+        # checking that the split was successful
+        if not len(valunit) == 2:
+            raise ValueError('in_string must have 2 parts: value and unit')
 
-        return self.value * unit.get('Dimension') * unit.get('Factor')
+        # taking it apart
+        value, unit = valunit
+
+        # checking the first part, it must be converted to float later
+        try:
+            value = float(value)
+        except ValueError:
+            raise ValueError('could not convert value to float: {}'.format(value))
+        except:
+            raise ValueError('could not convert value to float: {}'.format(value))
+
+        # checking the second part, it must be a string
+        try:
+            unit = unit.lower()
+        except AttributeError:
+            raise ValueError('unit is not a string: {}'.format(unit))
+        except:
+            raise ValueError('unit is not a string: {}'.format(unit))
+
+        return cls(float(value), unit.lower())
 
 
 def split_str(physical: str) -> tuple[float, str]:

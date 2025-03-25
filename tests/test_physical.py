@@ -1,6 +1,6 @@
 import unittest
 from simplesi.dimensions import Dimensions
-from simplesi import Physical, PhysicalRepresentation
+from simplesi import Physical
 
 
 class TestPhysical(unittest.TestCase):
