@@ -60,6 +60,10 @@ class Physical:
         self.dimensions = dimensions
         self.conv_factor = conv_factor
 
+    def __call__(self, unit: str) -> PhysRep:
+        """Returns the value in the given unit as a PhysRep instance"""
+        return self._repr(unit)
+
     @classmethod
     def as_str(cls, value: NUMBER) -> str:
         """Returns the value as a string with N significant digits"""
@@ -133,10 +137,10 @@ class Physical:
         env.update(environment.environment)
         return env
 
-    def repr(self, unit: str) -> PhysRep:
+    def _repr(self, unit: str) -> PhysRep:
         """
-        Representation of the Physical instance in the given unit.
-        THIS IS NOT A SRTING, but a glorified NamedTuple. It has two attributes: value and unit.
+        Representation of the Physical instance in the given unit, as a pair of value, unit.
+        THIS IS NOT A SRTING, but a glorified NamedTuple.
         """
         u = self.to(unit)  # getting the string representation
         rep = split_str(u)  # splitting it into value and unit, both strings
@@ -607,13 +611,13 @@ class PhysRep:
     p = 12 * si.m
 
     then we can do:
-    rep = p.repr('mm')
+    rep = p._repr('mm')
     rep.value
     >>>12000
     rep.unit
     >>>'mm'
 
-    rep = p.repr('cm')
+    rep = p._repr('cm')
     rep.value
     >>>120
     rep.unit
@@ -663,6 +667,7 @@ class PhysRep:
 
     @property
     def physical(self):
+        """Returns a physical of the same value and unit"""
 
         keys = environment.namespace_module.__dict__.keys()
         new_unit = [x for x in keys if x == self.unit]
@@ -674,13 +679,6 @@ class PhysRep:
             new_unit = new_unit[0]
 
         return self.value * environment.namespace_module.__dict__[new_unit]
-
-
-
-        # unit = si.base_units.get(self.unit)
-        # if unit is None:
-        #     raise ValueError('unit {} is not defined in the environment'.format(unit_str))
-        # return si.Physical(self.value, unit)
 
 
 def split_str(physical: str) -> tuple[float, str]:
