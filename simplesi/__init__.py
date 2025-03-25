@@ -10,6 +10,7 @@ from __future__ import annotations
 __version__ = "0.1"
 
 import math
+import pprint
 
 from simplesi.dimensions import Dimensions
 
@@ -61,6 +62,7 @@ class Physical:
 
     @classmethod
     def as_str(cls, value: NUMBER) -> str:
+        """Returns the value as a string with N significant digits"""
 
         if not isinstance(value, NUMBER):
             raise ValueError("Value must be a number, you have {}.".format(type(value)))
@@ -131,10 +133,20 @@ class Physical:
         env.update(environment.environment)
         return env
 
+    def repr(self, unit: str) -> PhysRep:
+        """
+        Representation of the Physical instance in the given unit.
+        THIS IS NOT A SRTING, but a glorified NamedTuple. It has two attributes: value and unit.
+        """
+        u = self.to(unit)  # getting the string representation
+        rep = split_str(u)  # splitting it into value and unit, both strings
+
+        return PhysRep(*rep)
+
     def to(self, unit: str = None) -> str:
         """
         Prints the Physical instance to the specified unit.
-        DOES NOT CHANGE ANYTHING, just prints.
+        DOES NOT CHANGE ANYTHING, just prints and returns a string.
 
         Does multiple checks to ensure the result is correct:
         - the requested unit is compatible with the dimensions of the Physical instance
@@ -581,20 +593,15 @@ class Physical:
         """
         return self ** (1 / n)
 
-    def repr(self, unit: str) -> PhysRep:
-
-        mi = self.to(unit)
-        rep = split_str(mi)
-
-        return PhysRep(*rep)
-
 
 class PhysRep:
     """
     A class that makes handling units as string, number easier.
 
     When a Physical is printed, a string is returned.
-    Using PhysRep this string becomes an object
+    Using PhysRep this string becomes an object with value and unit attributes.
+    Value is a float, unit is a string.
+    Thus, converting to another unit while being able to use the value as a number is easier.
 
     say we have a Physical instance 12 m:
     p = 12 * si.m
@@ -653,6 +660,27 @@ class PhysRep:
             raise ValueError('unit is not a string: {}'.format(unit))
 
         return cls(float(value), unit.lower())
+
+    @property
+    def physical(self):
+
+        keys = environment.namespace_module.__dict__.keys()
+        new_unit = [x for x in keys if x == self.unit]
+        if not new_unit:
+            raise ValueError('unit {} is not defined in the environment'.format(self.unit))
+        elif len(new_unit) > 1:
+            raise ValueError('unit {} is defined multiple times in the environment'.format(self.unit))
+        else:
+            new_unit = new_unit[0]
+
+        return self.value * environment.namespace_module.__dict__[new_unit]
+
+
+
+        # unit = si.base_units.get(self.unit)
+        # if unit is None:
+        #     raise ValueError('unit {} is not defined in the environment'.format(unit_str))
+        # return si.Physical(self.value, unit)
 
 
 def split_str(physical: str) -> tuple[float, str]:

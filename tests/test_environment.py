@@ -5,13 +5,14 @@ from simplesi.dimensions import Dimensions  # noqa protected
 from simplesi import Physical, environment  # noqa protected
 import simplesi as si
 
-preferred_units = {"mm": [0, 1, 0, 0, 0, 0, 0],
-                   "s": [0, 0, 1, 0, 0, 0, 0],
-                   "kg": [1, 0, 0, 0, 0, 0, 0],
-                   "kN": [1, 1, -2, 0, 0, 0, 0],
-                   "kNm": [1, 2, -2, 0, 0, 0, 0],
-                   "MPa": [1, -1, -2, 0, 0, 0, 0]
-                   }
+# preferred_units = {"mm": [0, 1, 0, 0, 0, 0, 0],
+#                    "s": [0, 0, 1, 0, 0, 0, 0],
+#                    "kg": [1, 0, 0, 0, 0, 0, 0],
+#                    "kN": [1, 1, -2, 0, 0, 0, 0],
+#                    "kNm": [1, 2, -2, 0, 0, 0, 0],
+#                    "MPa": [1, -1, -2, 0, 0, 0, 0]
+#                    }
+preferred_units = {}
 env_settings = {"to_fails": "raise",
                 "print_unit": "smallest",
                 "significant_digits": 3
@@ -298,18 +299,18 @@ class TestPhysicalWithUnits(unittest.TestCase):
 
 class TestRepresentation(unittest.TestCase):
 
-    def test_creating(self):
+    def test_PhysRepr(self):
         p = 1200 * si.mm
         _repr = p.repr(unit='m')
-        # self.assertEqual(_repr.value, 1.2)
-        # self.assertEqual(_repr.unit, 'm')
+        self.assertEqual(_repr.value, 1.2)
+        self.assertEqual(_repr.unit, 'm')
 
-        print(_repr.physical)
+        _repr = p.repr(unit='cm')
+        self.assertEqual(_repr.value, 120)
+        self.assertEqual(_repr.unit, 'cm')
 
         self.assertEqual(_repr.physical, 1200 * si.mm)
         self.assertEqual(_repr.physical, 120 * si.cm)
-
-
 
 
 if __name__ == '__main__':
