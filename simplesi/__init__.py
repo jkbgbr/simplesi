@@ -711,27 +711,31 @@ base_units = {
 # # preferred units
 # # the preferred units are used to print the Physical instances so usually the most common units are used
 # # the VALUES must beunique, but this is checked for in the environment file
-# preferred_units = {
-#     'mm': Dimensions(0, 1, 0, 0, 0, 0, 0),
-#     's': Dimensions(0, 0, 1, 0, 0, 0, 0),
-#     'kg': Dimensions(1, 0, 0, 0, 0, 0, 0),
-#     'kN': Dimensions(1, 1, -2, 0, 0, 0, 0),
-#     'kNm': Dimensions(1, 2, -2, 0, 0, 0, 0),
-#     'MPa': Dimensions(1, -1, -2, 0, 0, 0, 0),
-# }
+preferred_units = {
+    'mm': Dimensions(0, 1, 0, 0, 0, 0, 0),
+    's': Dimensions(0, 0, 1, 0, 0, 0, 0),
+    'kg': Dimensions(1, 0, 0, 0, 0, 0, 0),
+    'kN': Dimensions(1, 1, -2, 0, 0, 0, 0),
+    'kNm': Dimensions(1, 2, -2, 0, 0, 0, 0),
+    'MPa': Dimensions(1, -1, -2, 0, 0, 0, 0),
+}
 #
 # # dump the perferred units in an utf-8 json file
 # import json
 # with open('_preferred_units.json', 'w', encoding='utf-8') as f:
 #     json.dump(preferred_units, f, ensure_ascii=True)
 #
-# environment_settings = {
-#     'to_fails': 'print',  # raise, print
-# }
+environment_settings = {
+    'to_fails': 'print',  # raise, print
+    'significant_digits': 3,
+    'print_unit': 'largest',  # smallest, largest
+}
 # import json
 # with open('_settings.json', 'w', encoding='utf-8') as f:
 #     json.dump(environment_settings, f, ensure_ascii=True, indent=4)
 
 from simplesi.environment import Environment
 
-environment = Environment(si_base_units=base_units)
+environment = Environment(si_base_units=base_units,
+                          preferred_units=preferred_units,
+                          settings=environment_settings)
