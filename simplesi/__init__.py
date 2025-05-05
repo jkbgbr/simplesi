@@ -92,7 +92,7 @@ class Physical:
         """A pretty print of the Physical instance"""
 
         # checking if there is a preferred unit for the dimensions
-        unit = {k for k, v in environment.preferred_units.items() if v == list(self.dimensions)}
+        unit = {k for k, v in environment.preferred_units.items() if v == self.dimensions}
         unit = unit.pop() if unit else None
 
         # if there is no preferred unit, use the smallest or largest available from the environment
@@ -199,7 +199,7 @@ class Physical:
             elif environment.settings.get('to_fails') == 'raise':
 
                 raise ValueError(
-                    'The requested unit is not defined in the environment. Possible values to use are: {}'.format(
+                    'Conversion not possible. Possible values to use are: {}'.format(
                         possible_units))
 
         value = self.value
@@ -222,12 +222,12 @@ class Physical:
                 # either print the value or raise an exception
                 # either print the value or raise an exceptionprint
                 if environment.settings.get('to_fails') == 'raise':
-                    ValueError(
-                        'The requested unit is not defined in the environment. Possible values to use are: {}'.format(
+                    raise ValueError(
+                        'Conversion not possible. Possible values to use are: {}'.format(
                             possible_units))
                 elif environment.settings.get('to_fails') == 'print':
                     print(
-                        'The requested unit is not defined in the environment. Possible values to use are: {}'.format(
+                        'Conversion not possible. Possible values to use are: {}'.format(
                             possible_units))
 
             else:  # the requested unit was found
@@ -271,9 +271,9 @@ class Physical:
             # there are some units available, list them.
             else:
                 if environment.settings.get('to_fails') == 'raise':
-                    raise ValueError('The requested unit is not defined in the environment. Possible values to use are: {}'.format(possible_units))
+                    raise ValueError('Conversion not possible. Possible values to use are: {}'.format(possible_units))
                 else:
-                    return 'The requested unit is not defined in the environment.\nPossible values to use are: {}'.format(possible_units)
+                    return 'Conversion not possible.\nPossible values to use are: {}'.format(possible_units)
 
     ### "Magic" Methods ###
 
@@ -728,7 +728,8 @@ preferred_units = {
 environment_settings = {
     'to_fails': 'print',  # raise, print
     'significant_digits': 3,
-    'print_unit': 'largest',  # smallest, largest
+    'print_unit': 'smallest',  # smallest, largest
+    # 'print_unit': 'largest',  # smallest, largest
 }
 # import json
 # with open('_settings.json', 'w', encoding='utf-8') as f:

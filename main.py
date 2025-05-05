@@ -2,9 +2,27 @@
 
 import simplesi as si
 si.environment(env_name='structural')
-si.environment(env_name='US_customary', replace=False)
+# si.environment(env_name='US_customary', replace=False)
 #
-# a = 1 * si.m
+
+si.environment.settings['to_fails'] = 'raise'
+
+a = 0.134435 * si.m
+print(a)
+si.environment.settings['significant_digits'] = 5
+print(a)
+
+print(a.to('m'))
+# a.to('m')
+print(a.to('N_m'))
+print(a.to('kN/m'))
+print(a.to('kN_m'))
+
+si.environment.settings['print_unit'] = 'largest'
+print(a)
+si.environment.settings['print_unit'] = 'smallest'
+print(a)
+exit()
 # b = 1 * si.ft
 #
 # print(a)

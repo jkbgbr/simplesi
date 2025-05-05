@@ -127,10 +127,153 @@ Some features of forallpeople e.g. prefixes, html and latex printing are not imp
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-[//]: # ()
-[//]: # (<!-- GETTING STARTED -->)
 
-[//]: # (## Getting Started)
+<!-- GETTING STARTED -->
+
+## Getting Started
+
+I chose `si` to be the customary abbreviation for the package. 
+The simplest way to use the package is to import it and call the environment with the filename of the environment.
+
+```python
+import simplesi as si
+si.environment(env_name='structural')
+```
+
+This will load units defined in the environment file `structural.json` from the `environments` subdirectory, which is the default place the unit definitions.
+
+At this point the units defined in `structural.json` are available for use, but the behavior may be not what you expect.
+In an IDE the units are probably not recognized and thus marked unknown as they are not defined in the namespace but added to `__builtins__`.
+
+Values defined with a unit are `Physical` objects.
+
+Importing the package will create an `Environment` object with some default settings that define the default behavior of the `Physical` objects. These are:
+
+The printing behavior: if for a `Physical` a preferred unit is set, it will be used to display the number with the set number of significant digits.
+
+```python
+print(1.34 * si.m)
+>>> 1340 mm  # the default unit for length is [mm]
+```
+
+```python
+print(0.134435 * si.m)
+>>> 0.134 m  # the default number of significant digits is 3
+```
+
+A list of available units is shown when the `to()` method is called empty or with an incompatible unit.
+```python
+a = 2.45 * si.kN_m
+print(a.to())
+>>> Conversion not possible. Possible values to use are: "kN_m", "N/m", "kN/m", "N_m"
+print(a.to('mm'))
+>>> Conversion not possible. Possible values to use are: "kN_m", "N/m", "kN/m", "N_m"
+```
+
+Otherwise a conversion simply returns the value in the requested unit. Both the symbol and the unit name can be used.
+```python
+a = 1234.56 * si.m
+print(a.to('km'))
+>>> 1.23 km  # remember the significant digits?
+print(a.to('mm'))
+>>> 1234560 mm
+b = 2.45 * si.kN_m
+print(b.to('N/m'))
+>>> 2450 N/m
+print(b.to('N_m'))
+>>> 2450 N/m
+```
+
+If no preferred unit is set for a `Physical` object, depending on the setting 'print_unit' it will use the smallest or the largest compatible unit.
+```python
+si.environment.settings['print_unit'] = 'largest'
+print(2.45 * si.kN_m)
+>>> 2.45 kN/m  # the default setting is to use the 'largest' unit (providing the smallest value)
+```
+
+Using the setting 'smallest' will use the smallest compatible unit.
+```python
+si.environment.settings['print_unit'] = 'smallest'
+print(2.45 * si.kN_m)
+>>> 2450 N/m
+```
+
+Exception handing: one can choose to print the exception or raise it. This is useful for interactive use cases, where one may want to see the error message, but in an app it is better to raise an exception.
+By default, the exception is printed. 
+
+```python
+si.environment.settings['to_fails'] = 'raise'
+a = 1234.56 * si.N_m
+print(a.to('m'))
+>>> ValueError: Conversion not possible. Possible values to use are: "kN_m", "N_m", "N/m", "kN/m"
+```
+
+Finally, the number of significant digits can be set. This is useful for printing the results in a more readable way. The default is 3 significant digits.
+
+```python
+print(0.134435 * si.m)
+>>> 0.134 m  # the default number of significant digits is 3
+si.environment.settings['significant_digits'] = 5
+>>> 0.13443 mm
+```
+
+
+
+
+
+ 
+
+Depending on the use case setup can be short or lengthy. A number of environments are pre-defined and provided in the environment subdirectory. 
+If no location is provided when  
+
+```python
+si.environment(env_name='structural')
+```
+
+
+
+The following example shows the setup for a simple app with SI and US customary units.
+
+```python
+import pathlib
+
+# the path to look for the dimfiles in. If 
+SI_DIMFILE_PATH = pathlib.Path('path to the directory of your dimfiles')
+
+```
+
+# the name of the dimfile(s) without the .json extension
+SI_DIMFILE = 'structural'
+US_DIMFILE = 'US_customary'
+
+preferred_units = {"mm": [0, 1, 0, 0, 0, 0, 0],
+                   "s": [0, 0, 1, 0, 0, 0, 0],
+                   "kg": [1, 0, 0, 0, 0, 0, 0],
+                   "kN": [1, 1, -2, 0, 0, 0, 0],
+                   "kNm": [1, 2, -2, 0, 0, 0, 0],
+                   "MPa": [1, -1, -2, 0, 0, 0, 0],
+                   "m3": [0, 3, 0, 0, 0, 0, 0],
+                   "m2": [0, 2, 0, 0, 0, 0, 0],
+                   }
+env_settings = {"to_fails": "raise",
+                "print_unit": "smallest",
+                "significant_digits": 3
+                }
+
+si.environment(env_path=SI_DIMFILE_PATH, env_name=SI_DIMFILE, preferred_units=preferred_units, settings=env_settings)
+si.environment(env_path=US_DIMFILE_PATH, env_name=US_DIMFILE, replace=False)
+
+
+
+
+
+```python
+import simplesi as si
+si.environment(env_name='structural')
+```
+
+import simplesi as si
+si.environment(env_name='structural')
 
 [//]: # ()
 [//]: # (This is an example of how you may give instructions on setting up your project locally.)
@@ -145,11 +288,11 @@ Some features of forallpeople e.g. prefixes, html and latex printing are not imp
 
 [//]: # (* npm)
 
-[//]: # (  ```sh)
+  ```sh
 
-[//]: # (  npm install npm@latest -g)
+  npm install npm@latest -g
 
-[//]: # (  ```)
+  ```
 
 [//]: # ()
 [//]: # (### Installation)
