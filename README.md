@@ -109,20 +109,19 @@
 ## About The Project
 
 Simplesi is a package enabling units-aware engineering calculations. It is based on and heavily influenced by [forallpeople](https://github.com/connorferster/forallpeople), but differs from it considerably.
-It schratches somewhat the itch that most such packages are quite slow.
+It schratches somewhat the itch that most such packages are quite slow. Also, this module was made with apps in head rather than interactive use (e.g. jupyter).
 
 Compared to forallpeople:
-- ~3-4x speedup 
-- simplified the original Physical object
-- SI and non-SI units are in separated environments; environment definitions are otherwise similar
-- loading multiple environments is allowed, hence mixing e.g. US customary and SI units is possible
-- more robust operations, e.g. between scalar and Physical
-- modified, probably more intuitive behaviour of printing
+- faster
+- the concept of environments is adapted with changes.
+  - SI and non-SI units are in separated environments; environment definitions are otherwise similar to forallpeople
+  - loading multiple environments is allowed, hence mixing e.g. US customary and SI units is possible
+- more robust operations, e.g. between scalar and Physical - no more ambiguous additions
+- modified, probably more intuitive behavior of printing
 - user-defined environment behaviour
- 
   - exception handling print or raise for interactive or app use cases
-  - number of significant digits for print
-  - user-defined preferred units for printing to reduce broilerplate code 
+  - number of significant digits for print can be set
+  - user-defined preferred units can be defined for printing to reduce broilerplate code 
 
 Some features of forallpeople e.g. prefixes, html and latex printing are not implemented. Weaknesses like handling °C and K units remain.
 
