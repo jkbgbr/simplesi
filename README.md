@@ -121,7 +121,9 @@ Compared to forallpeople:
 - user-defined environment behaviour
   - exception handling print or raise for interactive or app use cases
   - number of significant digits for print can be set
-  - user-defined preferred units can be defined for printing to reduce broilerplate code 
+  - user-defined preferred units can be defined for printing to reduce broilerplate code
+
+Compared to pint - skipping it, not a fair comparison.
 
 Some features of forallpeople e.g. prefixes, html and latex printing are not implemented. Weaknesses like handling °C and K units remain.
 
@@ -149,7 +151,9 @@ Values defined with a unit are `Physical` objects.
 
 Importing the package will create an `Environment` object with some default settings that define the default behavior of the `Physical` objects. These are:
 
-The printing behavior: if for a `Physical` a preferred unit is set, it will be used to display the number with the set number of significant digits.
+### Printing
+
+If for a `Physical` a preferred unit is set, it will be used to display the number with the set number of significant digits.
 
 ```python
 print(1.34 * si.m)
@@ -198,7 +202,8 @@ print(2.45 * si.kN_m)
 >>> 2450 N/m
 ```
 
-Exception handing: one can choose to print the exception or raise it. This is useful for interactive use cases, where one may want to see the error message, but in an app it is better to raise an exception.
+### Exception handing
+One can choose to print the exception or raise it. This is useful for interactive use cases, where one may want to see the error message, but in an app it is better to raise an exception.
 By default, the exception is printed. 
 
 ```python
@@ -208,6 +213,7 @@ print(a.to('m'))
 >>> ValueError: Conversion not possible. Possible values to use are: "kN_m", "N_m", "N/m", "kN/m"
 ```
 
+### Significant digits
 Finally, the number of significant digits can be set. This is useful for printing the results in a more readable way. The default is 3 significant digits.
 
 ```python
@@ -218,62 +224,6 @@ si.environment.settings['significant_digits'] = 5
 ```
 
 
-
-
-
- 
-
-Depending on the use case setup can be short or lengthy. A number of environments are pre-defined and provided in the environment subdirectory. 
-If no location is provided when  
-
-```python
-si.environment(env_name='structural')
-```
-
-
-
-The following example shows the setup for a simple app with SI and US customary units.
-
-```python
-import pathlib
-
-# the path to look for the dimfiles in. If 
-SI_DIMFILE_PATH = pathlib.Path('path to the directory of your dimfiles')
-
-```
-
-# the name of the dimfile(s) without the .json extension
-SI_DIMFILE = 'structural'
-US_DIMFILE = 'US_customary'
-
-preferred_units = {"mm": [0, 1, 0, 0, 0, 0, 0],
-                   "s": [0, 0, 1, 0, 0, 0, 0],
-                   "kg": [1, 0, 0, 0, 0, 0, 0],
-                   "kN": [1, 1, -2, 0, 0, 0, 0],
-                   "kNm": [1, 2, -2, 0, 0, 0, 0],
-                   "MPa": [1, -1, -2, 0, 0, 0, 0],
-                   "m3": [0, 3, 0, 0, 0, 0, 0],
-                   "m2": [0, 2, 0, 0, 0, 0, 0],
-                   }
-env_settings = {"to_fails": "raise",
-                "print_unit": "smallest",
-                "significant_digits": 3
-                }
-
-si.environment(env_path=SI_DIMFILE_PATH, env_name=SI_DIMFILE, preferred_units=preferred_units, settings=env_settings)
-si.environment(env_path=US_DIMFILE_PATH, env_name=US_DIMFILE, replace=False)
-
-
-
-
-
-```python
-import simplesi as si
-si.environment(env_name='structural')
-```
-
-import simplesi as si
-si.environment(env_name='structural')
 
 [//]: # ()
 [//]: # (This is an example of how you may give instructions on setting up your project locally.)
