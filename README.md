@@ -153,6 +153,8 @@ Importing the package will create an `Environment` object with some default sett
 
 ### Printing
 
+The aim is to reduce boilerplate by defining some key behavior properties thus reducing the amount of typing.
+
 If for a `Physical` a preferred unit is set, it will be used to display the number with the set number of significant digits.
 
 ```python
@@ -174,7 +176,7 @@ print(a.to('mm'))
 >>> Conversion not possible. Possible values to use are: "kN_m", "N/m", "kN/m", "N_m"
 ```
 
-Otherwise a conversion simply returns the value in the requested unit. Both the symbol and the unit name can be used.
+Otherwise a conversion simply returns the value in the requested unit. Both the symbol and the unit name can be used to define the unit to convert to.
 ```python
 a = 1234.56 * si.m
 print(a.to('km'))
@@ -236,13 +238,6 @@ si.environment.settings['significant_digits'] = 5
 [//]: # ()
 [//]: # (This is an example of how to list things you need to use the software and how to install them.)
 
-[//]: # (* npm)
-
-  ```sh
-
-  npm install npm@latest -g
-
-  ```
 
 [//]: # ()
 [//]: # (### Installation)
