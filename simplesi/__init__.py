@@ -211,7 +211,7 @@ class Physical:
         # going over the units with same dims, looking for the desired unit in the keys and symbols
         keys = list(units_same_dims.keys())
         symbols = list(x.get('Symbol') for x in units_same_dims.values())
-        keys_and_symbols = set(keys + symbols)
+        keys_and_symbols = sorted(set(keys + symbols))
         possible_units = ', '.join('"{}"'.format(x) for x in keys_and_symbols)
 
         # there is a unit given as argument to print self in
@@ -273,7 +273,7 @@ class Physical:
                 if environment.settings.get('to_fails') == 'raise':
                     raise ValueError('Conversion not possible. Possible values to use are: {}'.format(possible_units))
                 else:
-                    return 'Conversion not possible.\nPossible values to use are: {}'.format(possible_units)
+                    return 'Conversion not possible. Possible values to use are: {}'.format(possible_units)
 
     ### "Magic" Methods ###
 
