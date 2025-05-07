@@ -158,7 +158,7 @@ Values defined with a unit are `Physical` objects. These have three attributes:
 - `dimensions` - a 7-element namedtuple defining the dimension of the unit. See [dimensional analysis](https://en.wikipedia.org/wiki/Dimensional_analysis) for the theory.
 - `conv_factor` - a (linear) conversion factor to allow for non-SI units. The conversion factor means: what number of base SI-units are in this unit. For example 1 ft = 0.3048 m -> conv_factor = 0.3048 
 
-This simple approach allows for SI and non-SI units, with the resctriction of not being able to use "shifted" units like °C and °F, though one can misuse K for °C. Also, forget any non-linear units like dB and there is obviously no support for value uncertainities. If you need these, use [pint](https://github.com/hgrecco/pint).
+This simple approach allows for SI and non-SI units, with the resctriction of not being able to use "shifted" units like °C and °F (though one can misuse K for °C). Also, forget any non-linear units like dB, and there is obviously no support for value uncertainities. If you need these, use [pint](https://github.com/hgrecco/pint).
 
 Importing the package will create an `Environment` object with some default settings that define the default behavior of the `Physical` objects. These are:
 
