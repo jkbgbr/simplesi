@@ -109,7 +109,7 @@
 ## About The Project
 
 Simplesi is a package enabling units-aware engineering calculations. It is based on and heavily influenced by [forallpeople](https://github.com/connorferster/forallpeople), but differs from it considerably.
-It schratches somewhat the itch that most such packages are quite slow. Also, this module was made with apps in head rather than interactive use (e.g. jupyter).
+It scratches somewhat the itch that most such packages are quite slow. Also, this module was made with apps in head rather than interactive use (e.g. jupyter).
 
 Compared to forallpeople:
 - faster - I measured ~3-4x speedup but YMMW.
@@ -122,12 +122,15 @@ Compared to forallpeople:
   - exception handling: print or raise
   - number of significant digits for print can be set
   - user-defined preferred units can be defined for printing to reduce boilerplate code
-- Fractions are not used anymore, which resulted in the massive speedup but makes using fractional dimensions - well, probably impossible. For me it is a great deal.
+- [Fractions](https://docs.python.org/3/library/fractions.html) are not used anymore, which resulted in the massive speedup but makes using fractional dimensions - well, in some cases impossible as fractional dimensions are now subject to float precision issues.
 
 Compared to [pint](https://github.com/hgrecco/pint) - just kidding, not a fair comparison.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+## Installation
+
+Currently only available by direct download from github.
 
 <!-- GETTING STARTED -->
 
@@ -699,14 +702,17 @@ Distributed under the MIT. See `LICENSE.txt` for more information.
 
 
 
-<!-- CONTACT -->
-## Contact
+[//]: # (<!-- CONTACT -->)
 
-jkbgbr@gmail.com
+[//]: # (## Contact)
 
-[//]: # (Project Link: [https://github.com/jkbgbr/simplesi]&#40;https://github.com/jkbgbr/simplesi&#41;)
+[//]: # ()
+[//]: # (jkbgbr@gmail.com)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+[//]: # ()
+[//]: # ([//]: # &#40;Project Link: [https://github.com/jkbgbr/simplesi]&#40;https://github.com/jkbgbr/simplesi&#41;&#41;)
+[//]: # ()
+[//]: # (<p align="right">&#40;<a href="#readme-top">back to top</a>&#41;</p>)
 
 
 
