@@ -300,7 +300,10 @@ class Physical:
             (self.value, self.dimensions, self.conv_factor)
         )
 
-    def __round__(self, n=0):
+    def __round__(self, n=None):
+        if n is None:
+            n = environment.settings.get('significant_digits')
+
         return Physical(round(self.value, n), self.dimensions, self.conv_factor)
 
     def __contains__(self, other):

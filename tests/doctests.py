@@ -79,15 +79,22 @@ True
 >>> print(hash(a))
 -8489301225018749141
 
->>> si.environment.settings['significant_digits'] = 10
+>>> si.environment.settings['significant_digits'] = 4
 >>> a = 2.4345635 * si.kN
->>> print(round(a, 3))
-2.4346 kN
+>>> print(round(a))
+2.435 kN
+>>> print(round(a).value)
+2434.5635
+>>> print(round(a, 1))
+2.435 kN
+>>> print(round(a, 1).value)
+2434.6
 >>> a = 240.545 * si.kN
 >>> print(round(a, -3))
 241 kN
->>> si.environment.settings['significant_digits'] = 3
 
+
+>>> si.environment.settings['significant_digits'] = 3
 >>> a = 2.45 * si.kN
 >>> b = 3450 * si.lbf
 >>> c = a + b

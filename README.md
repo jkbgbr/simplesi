@@ -522,14 +522,30 @@ Traceback (most recent call last):
 ValueError: Can only __gt__ between Physical instances, these are <class 'int'> = 3 and <class 'simplesi.Physical'> = 2 kN
 ```
 
-
 #### Other cool stuff
 
 `Physical` objects 
 - evaluate to True
 - are hashable
 - can be rounded
-- 
+
+Rounding is essentially like the built-in round() function but instead of returning the int() of the number if no significant digits is provided, the current setting of the environment is used. Rounding affects `Physical.value`, and the result may be unexpected if `Physical` is represented in something else than the base unit. 
+
+```python
+>>> si.environment.settings['significant_digits'] = 4
+>>> a = 2.4345635 * si.kN
+>>> print(round(a))  # same as round(a, 4)
+2.435 kN
+>>> print(round(a).value)  # value is rounded to 4 significant digits
+2434.5635
+>>> print(round(a, 1))  # same return value as round(a, 4)
+2.435 kN
+>>> print(round(a, 1).value)  # value is rounded to 1 significant digit
+2434.6
+>>> a = 240.545 * si.kN
+>>> print(round(a, -3))
+241 kN
+```
 
 
 
