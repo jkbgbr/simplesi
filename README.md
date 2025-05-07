@@ -114,19 +114,17 @@ It schratches somewhat the itch that most such packages are quite slow. Also, th
 Compared to forallpeople:
 - faster - I measured ~3-4x speedup but YMMW.
 - the concept of environments is adapted with changes.
-  - SI and non-SI units are in separated environments; environment definitions are otherwise similar to forallpeople
+  - SI and non-SI units are in separated environments; environment definitions are otherwise similar
   - loading multiple environments is allowed, hence mixing e.g. US customary and SI units is still possible
-- more robust operations, e.g. between a scalar and a Physical - no more ambiguous additions
+- more robust operations, e.g. between a scalar and a Physical - no ambiguous additions
 - modified, maybe more intuitive behavior of printing
 - user-defined environment behaviour
-  - exception handling print or raise for interactive or app use cases
+  - exception handling: print or raise
   - number of significant digits for print can be set
-  - user-defined preferred units can be defined for printing to reduce broilerplate code
+  - user-defined preferred units can be defined for printing to reduce boilerplate code
+- Fractions are not used anymore, which resulted in the massive speedup but makes using fractional dimensions - well, probably impossible. For me it is a great deal.
 
 Compared to [pint](https://github.com/hgrecco/pint) - just kidding, not a fair comparison.
-
-Some features of forallpeople e.g. prefixes, html and latex printing are not implemented. Weaknesses like handling °C and K units remain.
-The simple approach implemented allows for SI and non-SI units, with the resctriction of not being able to use "shifted" units like °C and °F (though one can misuse K for °C). Also, forget any non-linear units like dB, there is obviously no support for value uncertainities and a bunch of other stuff pint excels at.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
