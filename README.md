@@ -52,59 +52,6 @@
 </div>
 -->
 
-[//]: # ()
-[//]: # (<!-- TABLE OF CONTENTS -->)
-
-[//]: # (<details>)
-
-[//]: # (  <summary>Table of Contents</summary>)
-
-[//]: # (  <ol>)
-
-[//]: # (    <li>)
-
-[//]: # (      <a href="#about-the-project">About The Project</a>)
-
-[//]: # (      <ul>)
-
-[//]: # (        <li><a href="#built-with">Built With</a></li>)
-
-[//]: # (      </ul>)
-
-[//]: # (    </li>)
-
-[//]: # (    <li>)
-
-[//]: # (      <a href="#getting-started">Getting Started</a>)
-
-[//]: # (      <ul>)
-
-[//]: # (        <li><a href="#prerequisites">Prerequisites</a></li>)
-
-[//]: # (        <li><a href="#installation">Installation</a></li>)
-
-[//]: # (      </ul>)
-
-[//]: # (    </li>)
-
-[//]: # (    <li><a href="#usage">Usage</a></li>)
-
-[//]: # (    <li><a href="#roadmap">Roadmap</a></li>)
-
-[//]: # (    <li><a href="#contributing">Contributing</a></li>)
-
-[//]: # (    <li><a href="#license">License</a></li>)
-
-[//]: # (    <li><a href="#contact">Contact</a></li>)
-
-[//]: # (    <li><a href="#acknowledgments">Acknowledgments</a></li>)
-
-[//]: # (  </ol>)
-
-[//]: # (</details>)
-
-
-
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
@@ -131,6 +78,8 @@ Compared to [pint](https://github.com/hgrecco/pint) - just kidding, not a fair c
 ## Installation
 
 Currently only available by direct download from github.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
 
@@ -161,6 +110,8 @@ Values defined with a unit are `Physical` objects. These have three attributes:
 - `conv_factor` - a (linear) conversion factor to allow for non-SI units. The conversion factor means: what number of base SI-units are in this unit. For example 1 ft = 0.3048 m -> conv_factor = 0.3048
 
 Importing the package will create an `Environment` object with some default settings that define the default behavior of the `Physical` objects. These are:
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Printing
 
@@ -216,6 +167,8 @@ Using the setting 'smallest' will use the smallest compatible unit.
 2450 N/m
 ```
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 ### Exception handing
 One can choose to print the exception or raise it. This is useful for interactive use cases, where one may want to see the error message, but in an app it is better to raise an exception.
 By default, the exception is printed. 
@@ -228,6 +181,7 @@ Traceback (most recent call last):
 ...
 ValueError: Conversion not possible. Possible values to use are: "N/m", "N_m", "kN/m", "kN_m"
 ```
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Significant digits
 Finally, the number of significant digits can be set. This is useful for printing the results in a more readable way. The default is 3 significant digits.
@@ -239,6 +193,7 @@ Finally, the number of significant digits can be set. This is useful for printin
 >>> print(0.0013441256745 * si.m)
 1.3441 mm
 ```
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Environments
 
@@ -262,6 +217,7 @@ base_units = {
     "mol": Physical(1, Dimensions(0, 0, 0, 0, 0, 0, 1)),
 }
 ```
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Default environment
 
@@ -296,6 +252,7 @@ When calling `si.environment()` the following arguments are available:
 - `preferred_units`: the dictionary defining the preferred units for printing.
 - `settings`: the dictionary defining the environment settings. The default settings are used if not provided.
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Loading multiple environments
 
@@ -315,6 +272,8 @@ Loading the second environment is simple and any number of environments can be l
 
 When loading multiple environments, the settings are not affected.
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 ## Arithmetics
 
 `Physical` objects can be added, subtracted, multiplied, divided, compared etc. like scalars, assuming they are compatible. `Physical` objects are compatible if their `Dimensions` properties are equal. If compatible, arithmetics is basically same as scalar arithmetics with the exception that operations between SI and non-SI units are possible.  
@@ -330,6 +289,7 @@ Negation is possible in any cases even if the result has no physical sense.
 >>> print(b)
 -2450 mm
 ```
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 #### Absolute value
 
@@ -338,6 +298,8 @@ Negation is possible in any cases even if the result has no physical sense.
 >>> print(abs(a))
 2.45 kN
 ```
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 #### Addition, substraction
 
@@ -378,6 +340,8 @@ Being able to add zero, using the sum() function on `Physical` objects is possib
 3000 mm
 ```
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 #### Multiplication
 
 Multiplication with a scalars is possible.
@@ -411,6 +375,8 @@ The multiplication can yield a dimensionsless result - it is a scalar then.
 9
 ```
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 #### Division
 
 Division with a scalar other than zero is possible.
@@ -442,6 +408,9 @@ Traceback (most recent call last):
 ...
 ValueError: No units found for the dimensions Dimensions(kg=0, m=1, s=0, A=0, cd=0, K=-1, mol=0).
 ```
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 #### Power
 
 Raising a `Physical` object to a power returns a new `Physical` object with each element of dimensions multiplied with the power.
@@ -469,9 +438,9 @@ There is a `Physical.sqrt()` method, as `math.sqrt()` is not defined for `Physic
 Traceback (most recent call last):
 ...
 ValueError: No units found for the dimensions Dimensions(kg=0.0, m=0.6666666666666666, s=0.0, A=0.0, cd=0.0, K=0.0, mol=0.0).
-
-
 ```
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Representing a Physical object
 
@@ -503,7 +472,7 @@ From the `PhysRep` the `Physical` object can be recreated.
 >>> print(type(p2))
 <class 'simplesi.Physical'>
 ```
-
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Rich comparison
 
@@ -532,7 +501,9 @@ Traceback (most recent call last):
 ValueError: Can only __gt__ between Physical instances, these are <class 'int'> = 3 and <class 'simplesi.Physical'> = 2 kN
 ```
 
-#### Other cool stuff
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Other cool stuff
 
 `Physical` objects 
 - evaluate to True
@@ -557,141 +528,16 @@ Rounding is essentially like the built-in round() function but instead of return
 241 kN
 ```
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- CONTRIBUTING -->
 
 
-[//]: # ()
-[//]: # (This is an example of how you may give instructions on setting up your project locally.)
+## Contributing
 
-[//]: # (To get a local copy up and running follow these simple example steps.)
+Contributions are welcome!
 
-[//]: # ()
-[//]: # (### Prerequisites)
-
-[//]: # ()
-[//]: # (This is an example of how to list things you need to use the software and how to install them.)
-
-
-[//]: # ()
-[//]: # (### Installation)
-
-[//]: # ()
-[//]: # (1. Get a free API Key at [https://example.com]&#40;https://example.com&#41;)
-
-[//]: # (2. Clone the repo)
-
-[//]: # (   ```sh)
-
-[//]: # (   git clone https://github.com/jkbgbr/simplesi.git)
-
-[//]: # (   ```)
-
-[//]: # (3. Install NPM packages)
-
-[//]: # (   ```sh)
-
-[//]: # (   npm install)
-
-[//]: # (   ```)
-
-[//]: # (4. Enter your API in `config.js`)
-
-[//]: # (   ```js)
-
-[//]: # (   const API_KEY = 'ENTER YOUR API';)
-
-[//]: # (   ```)
-
-[//]: # (5. Change git remote url to avoid accidental pushes to base project)
-
-[//]: # (   ```sh)
-
-[//]: # (   git remote set-url origin jkbgbr/simplesi)
-
-[//]: # (   git remote -v # confirm the changes)
-
-[//]: # (   ```)
-
-[//]: # ()
-[//]: # (<p align="right">&#40;<a href="#readme-top">back to top</a>&#41;</p>)
-
-[//]: # ()
-[//]: # ()
-[//]: # ()
-[//]: # (<!-- USAGE EXAMPLES -->)
-
-[//]: # (## Usage)
-
-[//]: # ()
-[//]: # (Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.)
-
-[//]: # ()
-[//]: # (_For more examples, please refer to the [Documentation]&#40;https://example.com&#41;_)
-
-[//]: # ()
-[//]: # (<p align="right">&#40;<a href="#readme-top">back to top</a>&#41;</p>)
-
-[//]: # ()
-[//]: # ()
-[//]: # ()
-[//]: # (<!-- ROADMAP -->)
-
-[//]: # (## Roadmap)
-
-[//]: # ()
-[//]: # (- [ ] Feature 1)
-
-[//]: # (- [ ] Feature 2)
-
-[//]: # (- [ ] Feature 3)
-
-[//]: # (    - [ ] Nested Feature)
-
-[//]: # ()
-[//]: # (See the [open issues]&#40;https://github.com/jkbgbr/simplesi/issues&#41; for a full list of proposed features &#40;and known issues&#41;.)
-
-[//]: # ()
-[//]: # (<p align="right">&#40;<a href="#readme-top">back to top</a>&#41;</p>)
-
-[//]: # ()
-[//]: # ()
-[//]: # ()
-[//]: # (<!-- CONTRIBUTING -->)
-
-[//]: # (## Contributing)
-
-[//]: # ()
-[//]: # (Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.)
-
-[//]: # ()
-[//]: # (If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".)
-
-[//]: # (Don't forget to give the project a star! Thanks again!)
-
-[//]: # ()
-[//]: # (1. Fork the Project)
-
-[//]: # (2. Create your Feature Branch &#40;`git checkout -b feature/AmazingFeature`&#41;)
-
-[//]: # (3. Commit your Changes &#40;`git commit -m 'Add some AmazingFeature'`&#41;)
-
-[//]: # (4. Push to the Branch &#40;`git push origin feature/AmazingFeature`&#41;)
-
-[//]: # (5. Open a Pull Request)
-
-[//]: # ()
-[//]: # (<p align="right">&#40;<a href="#readme-top">back to top</a>&#41;</p>)
-
-[//]: # ()
-[//]: # (### Top contributors:)
-
-[//]: # ()
-[//]: # (<a href="https://github.com/jkbgbr/simplesi/graphs/contributors">)
-
-[//]: # (  <img src="https://contrib.rocks/image?repo=jkbgbr/simplesi" alt="contrib.rocks image" />)
-
-[//]: # (</a>)
-
-[//]: # ()
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- LICENSE -->
 ## License
@@ -699,21 +545,6 @@ Rounding is essentially like the built-in round() function but instead of return
 Distributed under the MIT. See `LICENSE.txt` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-[//]: # (<!-- CONTACT -->)
-
-[//]: # (## Contact)
-
-[//]: # ()
-[//]: # (jkbgbr@gmail.com)
-
-[//]: # ()
-[//]: # ([//]: # &#40;Project Link: [https://github.com/jkbgbr/simplesi]&#40;https://github.com/jkbgbr/simplesi&#41;&#41;)
-[//]: # ()
-[//]: # (<p align="right">&#40;<a href="#readme-top">back to top</a>&#41;</p>)
-
 
 
 <!-- ACKNOWLEDGMENTS -->
