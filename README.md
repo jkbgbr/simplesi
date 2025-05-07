@@ -134,7 +134,7 @@ Compared to [pint](https://github.com/hgrecco/pint) - just kidding, not a fair c
 ## Getting Started
 
 I chose `si` to be the customary abbreviation for the package. 
-The simplest way to use the package is to import it and call the environment with the filename of the environment.
+The simplest way to use the package is to import it and call the environment with the filename of the environment. `env_name` is optional, if omitted, the seven base SI units are available only.
 
 ```python
 >>> import simplesi as si
@@ -143,8 +143,8 @@ The simplest way to use the package is to import it and call the environment wit
 
 This will load units defined in the environment file `structural.json` from the `environments` subdirectory, which is the default place the unit definitions.
 
-At this point the units defined in `structural.json` are available for use, but the behavior may be not what you expect.
-In an IDE the units are probably not recognized and thus marked unknown as they are not defined in the namespace but added to `__builtins__`.
+At this point the units defined in `structural.json` are loaded in the `si` namespace and are available for use.
+In an IDE the units are probably not recognized and thus marked unknown as they are not directly defined in the code.
 
 From here on, defining a variable with a unit is as simple as
 
@@ -161,7 +161,7 @@ Importing the package will create an `Environment` object with some default sett
 
 ### Printing
 
-The aim is to reduce boilerplate by defining some key behavior properties thus reducing the amount of typing.
+The aim is to reduce boilerplate by defining some key behavior properties, thus reducing the amount of typing.
 
 If for a `Physical` a preferred unit is set, it will be used to display the number with the set number of significant digits.
 
