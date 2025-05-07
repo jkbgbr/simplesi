@@ -176,7 +176,7 @@ If for a `Physical` a preferred unit is set, it will be used to display the numb
 ```
 
 A list of available units is shown when the `to()` method is called empty or with an incompatible unit.
-Note: for this example the setting `to_fails` is set 'print'. See the section Exception handing for more details.
+Note: for this example the setting `to_fails` is set 'print'. See the section [Exception handing](https://github.com/jkbgbr/simplesi#exception-handing) for more details.
 ```python
 >>> a = 2.45 * si.kN_m
 >>> print(a.to())
@@ -262,7 +262,7 @@ base_units = {
 
 ### Default environment
 
-The default settings are probably best for structural engineers writing an app (yours truly).
+The default settings are probably best for structural engineers writing an app (yours truly). When simply importing the package and setting the environment name via `si.environment()`, only the base SI units are available and following settings are applied:
 
 ```python
 
@@ -283,9 +283,20 @@ environment_settings = {
 
 ```
 
+When calling `si.environment()` the following arguments are available:
+
+- `env_name`: the name of the environment to load. An 'env_name.json' file must exist in the default environmants directory or the one provided in `env_path`.
+- `env_path`: a pathlib.Path object defining the path to the environment file. If not provided, the default path is used.
+- `env_dict`: a dictionary defining the environment if for some reason it makes more sense to provide it directly rather than in a file.
+- `replace`: see Loading multiple environments
+- `top_level`: if True, the environment is loaded to `__builtins__` and units are available instead of e.g. `si.m` as `m`. If False, the environment is loaded to the `simplesi` namespace and are available via e.g. `si.m`.
+- `preferred_units`: the dictionary defining the preferred units for printing.
+- `settings`: the dictionary defining the environment settings. The default settings are used if not provided.
+
+
 ### Loading multiple environments
 
-If you can't avoid using US customary units and SI units in the same project, you can load multiple environments. Which allows for fun definitions like
+If you can't avoid using e.g. US customary units and SI units in the same project, you can load multiple environments. Which allows for fun definitions like
 
 ```python
 m = 1 * si.mile
@@ -430,7 +441,7 @@ ValueError: No units found for the dimensions Dimensions(kg=0, m=1, s=0, A=0, cd
 ```
 #### Power
 
-Raising a `Physical` object to a power returns a new `Physical` object with the dimensions of the two multiplied elementwise.
+Raising a `Physical` object to a power returns a new `Physical` object with each element of dimensions multiplied with the power.
 
 ```python
 >>> a = 8 * si.kN
@@ -459,11 +470,10 @@ ValueError: No units found for the dimensions Dimensions(kg=0.0, m=0.66666666666
 
 ```
 
-
 ## Representing a Physical object
 
 Once printed, a `Physical` object is represented as a string. Great, but from this point on it is not really easy to reuse the value.
-The `PhysRep` class is used to represent a `Physical` object. It can be accessed from the `Physical` via the `_prep()` method and has some helper functions that my be handy.
+The `PhysRep` class is used to represent a `Physical` objects value as float and unit as string. It can be accessed from the `Physical` via the `_prep()` method and has some helper functions that my be handy.
 
 ```python
 >>> p = 12 * si.m
