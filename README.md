@@ -112,20 +112,21 @@ Simplesi is a package enabling units-aware engineering calculations. It is based
 It schratches somewhat the itch that most such packages are quite slow. Also, this module was made with apps in head rather than interactive use (e.g. jupyter).
 
 Compared to forallpeople:
-- faster
+- faster - I measured ~3-4x speedup but YMMW.
 - the concept of environments is adapted with changes.
   - SI and non-SI units are in separated environments; environment definitions are otherwise similar to forallpeople
-  - loading multiple environments is allowed, hence mixing e.g. US customary and SI units is possible
-- more robust operations, e.g. between scalar and Physical - no more ambiguous additions
-- modified, probably more intuitive behavior of printing
+  - loading multiple environments is allowed, hence mixing e.g. US customary and SI units is still possible
+- more robust operations, e.g. between a scalar and a Physical - no more ambiguous additions
+- modified, maybe more intuitive behavior of printing
 - user-defined environment behaviour
   - exception handling print or raise for interactive or app use cases
   - number of significant digits for print can be set
   - user-defined preferred units can be defined for printing to reduce broilerplate code
 
-Compared to pint - skipping it, not a fair comparison.
+Compared to [pint](https://github.com/hgrecco/pint) - just kidding, not a fair comparison.
 
 Some features of forallpeople e.g. prefixes, html and latex printing are not implemented. Weaknesses like handling °C and K units remain.
+The simple approach implemented allows for SI and non-SI units, with the resctriction of not being able to use "shifted" units like °C and °F (though one can misuse K for °C). Also, forget any non-linear units like dB, there is obviously no support for value uncertainities and a bunch of other stuff pint excels at.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -156,9 +157,7 @@ From here on, defining a variable with a unit is as simple as
 Values defined with a unit are `Physical` objects. These have three attributes:
 - `value` - the value of the object, e.g. 2.45
 - `dimensions` - a 7-element namedtuple defining the dimension of the unit. See [dimensional analysis](https://en.wikipedia.org/wiki/Dimensional_analysis) for the theory.
-- `conv_factor` - a (linear) conversion factor to allow for non-SI units. The conversion factor means: what number of base SI-units are in this unit. For example 1 ft = 0.3048 m -> conv_factor = 0.3048 
-
-This simple approach allows for SI and non-SI units, with the resctriction of not being able to use "shifted" units like °C and °F (though one can misuse K for °C). Also, forget any non-linear units like dB, and there is obviously no support for value uncertainities. If you need these, use [pint](https://github.com/hgrecco/pint).
+- `conv_factor` - a (linear) conversion factor to allow for non-SI units. The conversion factor means: what number of base SI-units are in this unit. For example 1 ft = 0.3048 m -> conv_factor = 0.3048
 
 Importing the package will create an `Environment` object with some default settings that define the default behavior of the `Physical` objects. These are:
 
