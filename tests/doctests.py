@@ -1,24 +1,26 @@
 
-
-
 """
 
+# defining
 
 >>> import simplesi as si
 >>> si.environment(env_name='structural')
 >>> print(1.34 * si.m)
 1340 mm
 
+# significant digits
 
 >>> print(0.134435 * si.m)
 134.44 mm
 
+# to, to_fails
 
 >>> a = 2.45 * si.kN_m
 >>> print(a.to())
 Conversion not possible. Possible values to use are: "N/m", "N_m", "kN/m", "kN_m"
 >>> a.to('mm')
 Conversion not possible. Possible values to use are: "N/m", "N_m", "kN/m", "kN_m"
+
 
 
 >>> a = 1234.56 * si.m
@@ -172,6 +174,59 @@ ValueError: No units found for the dimensions Dimensions(kg=0, m=1, s=0, A=0, cd
 2 kN/m²
 
 
+>>> a = 9 * si.m2
+>>> print(a.sqrt())
+3000 mm
+>>> a = 4 * si.m3
+>>> print(a.root(3))
+1587.40 mm
+>>> a = 1 * si.m2
+>>> print(a.root(3))
+Traceback (most recent call last):
+...
+ValueError: No units found for the dimensions Dimensions(kg=0.0, m=0.6666666666666666, s=0.0, A=0.0, cd=0.0, K=0.0, mol=0.0).
 
+# physrep
+>>> p = 12 * si.m
+>>> rep = p._repr('mm')
+>>> rep.value
+12000.0
+>>> rep.unit
+'mm'
+>>> rep = p._repr('cm')
+>>> rep.value
+1200.0
+>>> rep.unit
+'cm'
+
+>>> p = 12 * si.m
+>>> rep = p._repr('mm')
+>>> p2 = rep.physical
+>>> print(p2)
+12000 mm
+>>> print(type(p2))
+<class 'simplesi.Physical'>
+
+
+# rich comparison
+>>> a = 1 * si.kN
+>>> b = 2 * si.kN
+>>> c = 2 * si.m
+>>> print(a == b)
+False
+>>> print(0 < b)
+True
+>>> print(a < b)
+True
+>>> print(a <= b)
+True
+>>> print(b > c)
+Traceback (most recent call last):
+...
+ValueError: Can only compare between Physical instances of equal dimension or zero.
+>>> print(b > 3)
+Traceback (most recent call last):
+...
+ValueError: Can only __gt__ between Physical instances, these are <class 'int'> = 3 and <class 'simplesi.Physical'> = 2 kN
 
 """

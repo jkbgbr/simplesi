@@ -608,20 +608,22 @@ class PhysRep:
     Thus, converting to another unit while being able to use the value as a number is easier.
 
     say we have a Physical instance 12 m:
-    p = 12 * si.m
+    >>> import simplesi as si
+    >>> si.environment(env_name='structural')
+    >>> p = 12 * si.m
 
     then we can do:
-    rep = p._repr('mm')
-    rep.value
-    >>>12000
-    rep.unit
-    >>>'mm'
+    >>> rep = p._repr('mm')
+    >>> rep.value
+    12000.0
+    >>> rep.unit
+    'mm'
 
-    rep = p._repr('cm')
-    rep.value
-    >>>120
-    rep.unit
-    >>>'cm'
+    >>> rep = p._repr('cm')
+    >>> rep.value
+    1200.0
+    >>> rep.unit
+    'cm'
 
 
     """

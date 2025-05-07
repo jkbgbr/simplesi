@@ -376,7 +376,7 @@ Multiplication with a scalars is possible.
 >>> print(a * 2)
 4.90 kN
 ```
-Multiplication with a `Physical` object returns a new `Physical` object with the dimensions of the two added.
+Multiplication with a `Physical` object returns a new `Physical` object with the dimensions of the two added elementwise.
 If the return value is not defined, a `Physical` is still returned. If the multiplication yields a dimensionsless value, a float is returned.
 
 ```python
@@ -414,7 +414,7 @@ Traceback (most recent call last):
 ...
 ZeroDivisionError: Cannot divide by zero.
 ```
-Division with a `Physical` object returns a new `Physical` object with the dimensions of the two substracted.
+Division with a `Physical` object returns a new `Physical` object with the dimensions of the two substracted elementwise.
 If the return value is not defined, a `Physical` is still returned. If the division yields a dimensionsless value, a float is returned.
 
 ```python
@@ -431,10 +431,9 @@ Traceback (most recent call last):
 ...
 ValueError: No units found for the dimensions Dimensions(kg=0, m=1, s=0, A=0, cd=0, K=-1, mol=0).
 ```
-
 #### Power
 
-Raising a `Physical` object to a power returns a new `Physical` object with the dimensions of the two multiplied.
+Raising a `Physical` object to a power returns a new `Physical` object with the dimensions of the two multiplied elementwise.
 
 ```python
 >>> a = 8 * si.kN
@@ -444,13 +443,84 @@ Raising a `Physical` object to a power returns a new `Physical` object with the 
 >>> print((a / b ** 2).to('kN_m2'))
 2 kN/m²
 ```
+There is a `Physical.sqrt()` method, as `math.sqrt()` is not defined for `Physical` objects and raises TypeError. There is also a `Physical.root()` to calculate the nth root. Internally both use `__pow__()`.
+
+```python
+>>> a = 9 * si.m2
+>>> print(a.sqrt())
+3000 mm
+>>> a = 4 * si.m3
+>>> print(a.root(3))
+1587.40 mm
+
+>>> a = 1 * si.m2
+>>> print(a.root(3))
+Traceback (most recent call last):
+...
+ValueError: No units found for the dimensions Dimensions(kg=0.0, m=0.6666666666666666, s=0.0, A=0.0, cd=0.0, K=0.0, mol=0.0).
+
+
+```
+
+
+## Representing a Physical object
+
+Once printed, a `Physical` object is represented as a string. Great, but from this point on it is not really easy to reuse the value.
+The `PhysRep` class is used to represent a `Physical` object. It can be accessed from the `Physical` via the `_prep()` method and has some helper functions that my be handy.
+
+```python
+>>> p = 12 * si.m
+>>> rep = p._repr('mm')
+>>> rep.value
+12000.0
+>>> rep.unit
+'mm'
+>>> rep = p._repr('cm')
+>>> rep.value
+1200.0
+>>> rep.unit
+'cm'
+```
+
+From the `PhysRep` the `Physical` object can be recreated.
+
+```python
+>>> p = 12 * si.m
+>>> rep = p._repr('mm')
+>>> p2 = rep.physical
+>>> print(p2)
+12000 mm
+>>> print(type(p2))
+<class 'simplesi.Physical'>
+```
 
 
 ## Rich comparison
 
 `Physical` objects can be compared with each other if they are compatible. Comparison with a scalar other than zero raises a ValueError.
 
+
 ```python
+>>> a = 1 * si.kN
+>>> b = 2 * si.kN
+>>> c = 2 * si.m
+>>> print(a == b)
+False
+>>> print(a < b)
+True
+>>> print(0 < b)
+True
+>>> print(a <= b)
+True
+>>> print(b > c)
+Traceback (most recent call last):
+...
+ValueError: Can only compare between Physical instances of equal dimension or zero.
+>>> print(b > c)
+Traceback (most recent call last):
+...
+ValueError: Can only __gt__ between Physical instances, these are <class 'int'> = 3 and <class 'simplesi.Physical'> = 2 kN
+```
 
 
 #### Other cool stuff
