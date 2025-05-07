@@ -117,10 +117,11 @@ Traceback (most recent call last):
 ...
 ValueError: Cannot incrementally add Physical instances because they are immutable. Use 'a = a + b', to make the operation explicit.
 
+# multiplication
+
 >>> a = 2.45 * si.kN
 >>> print(a * 2)
 4.90 kN
-
 
 >>> a = 2.45 * si.kN
 >>> b = 3 * si.ft
@@ -130,8 +131,47 @@ ValueError: Cannot incrementally add Physical instances because they are immutab
 >>> b = 1 * si.ft
 >>> print((a * b).to('m2'))
 0.305 m²
->>> print(a * (1 * si.K))
+>>> a * (1 * si.K)
+Physical(value=1, dimensions=Dimensions(kg=0, m=1, s=0, A=0, cd=0, K=1, mol=0), conv_factor=1.0)
+
+>>> a = 3 * si.s
+>>> b = 3 * si.Hz
+>>> print(a * b)
+9
+
+# division
+>>> a = 2.45 * si.kN
+>>> b = 3
+>>> print(a / b)
+0.817 kN
+>>> print(a / 0)
 Traceback (most recent call last):
 ...
-ValueError: No units found for the dimensions Dimensions(kg=1, m=1, s=-2, A=0, cd=0, K=1, mol=0).
+ZeroDivisionError: Cannot divide by zero.
+
+
+>>> a = 2.45 * si.kN
+>>> b = 3 * si.ft
+>>> print(a / b)
+2679.35 N/m
+>>> a = 1 * si.m
+>>> b = 1 * si.ft
+>>> print(b / a == b.conv_factor)
+True
+>>> print(a / (1 * si.K))
+Traceback (most recent call last):
+...
+ValueError: No units found for the dimensions Dimensions(kg=0, m=1, s=0, A=0, cd=0, K=-1, mol=0).
+
+# power
+>>> a = 8 * si.kN
+>>> b = 2 * si.m
+>>> print(a / b ** 2)
+0.002 MPa
+>>> print((a / b ** 2).to('kN_m2'))
+2 kN/m²
+
+
+
+
 """

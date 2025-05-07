@@ -376,8 +376,8 @@ Multiplication with a scalars is possible.
 >>> print(a * 2)
 4.90 kN
 ```
-Multiplication with a `Physical` object returns a new `Physical` object with the dimensions of the two multiplied together.
-If the return value is not defined, a ValueError is raised.
+Multiplication with a `Physical` object returns a new `Physical` object with the dimensions of the two added.
+If the return value is not defined, a `Physical` is still returned. If the multiplication yields a dimensionsless value, a float is returned.
 
 ```python
 >>> a = 2.45 * si.kN
@@ -389,13 +389,61 @@ If the return value is not defined, a ValueError is raised.
 >>> print((a * b).to('m2'))
 0.305 m²
 >>> print(a * (1 * si.K))
-Traceback (most recent call last):
-...
-ValueError: No units found for the dimensions Dimensions(kg=1, m=1, s=-2, A=0, cd=0, K=1, mol=0).
+Physical(value=1, dimensions=Dimensions(kg=0, m=1, s=0, A=0, cd=0, K=1, mol=0), conv_factor=1.0)
+```
+
+The multiplication can yield a dimensionsless result - it is a scalar then.
+```python
+>>> a = 3 * si.s
+>>> b = 3 * si.Hz
+>>> print(a * b)
+9
 ```
 
 #### Division
 
+Division with a scalar other than zero is possible.
+
+```python
+>>> a = 2.45 * si.kN
+>>> b = 3
+>>> print(a / b)
+0.817 kN
+>>> print(a / 0)
+Traceback (most recent call last):
+...
+ZeroDivisionError: Cannot divide by zero.
+```
+Division with a `Physical` object returns a new `Physical` object with the dimensions of the two substracted.
+If the return value is not defined, a `Physical` is still returned. If the division yields a dimensionsless value, a float is returned.
+
+```python
+>>> a = 2.45 * si.kN
+>>> b = 3 * si.ft
+>>> print(a / b)
+2679.35 N/m
+>>> a = 1 * si.m
+>>> b = 1 * si.ft
+>>> print(b / a == b.conv_factor)
+True
+>>> print(a / (1 * si.K))
+Traceback (most recent call last):
+...
+ValueError: No units found for the dimensions Dimensions(kg=0, m=1, s=0, A=0, cd=0, K=-1, mol=0).
+```
+
+#### Power
+
+Raising a `Physical` object to a power returns a new `Physical` object with the dimensions of the two multiplied.
+
+```python
+>>> a = 8 * si.kN
+>>> b = 2 * si.m
+>>> print(a / b ** 2)
+0.002 MPa
+>>> print((a / b ** 2).to('kN_m2'))
+2 kN/m²
+```
 
 
 ## Rich comparison
