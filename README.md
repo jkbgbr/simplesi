@@ -329,7 +329,7 @@ ValueError: No units found for the dimensions Dimensions(kg=0.0, m=0.66666666666
 
 ## Representing a Physical object
 
-Printing a `Physical` object returns just a string. Great, it is not really easy to reuse the value from that point.
+Printing a `Physical` object returns just a string. Great, but it is not really easy to reuse the value from that point.
 The `PhysRep` class is used to represent a `Physical` objects value as float and unit as string. The `Physical` is a callable so accessing the `PhysRep` of a `Physical` is simple.
 
 ```python
