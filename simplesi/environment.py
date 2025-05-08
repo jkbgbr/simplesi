@@ -258,11 +258,10 @@ class Environment:
         return content
 
     def apply_settings(self, settings: dict | pathlib.Path):
-        _settings = settings
-        self.settings = _settings
+        self.settings = settings
 
     def apply_preferences(self, preferred_units):
-        _preferred_units = preferred_units
+        self.preferred_units = preferred_units
 
     def _push_vars(self, units_dict: dict, module: ModuleType) -> None:
         module.__dict__.update(units_dict)
