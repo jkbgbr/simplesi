@@ -55,8 +55,8 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-Simplesi is a package enabling units-aware engineering calculations. It is based on and heavily influenced by [forallpeople](https://github.com/connorferster/forallpeople), but differs from it considerably.
-It scratches somewhat the itch that most such packages are quite slow. Also, this module was made with apps in head rather than interactive use (e.g. jupyter).
+Simplesi is a package enabling units-aware engineering calculations. It is based on and heavily influenced by [forallpeople](https://github.com/connorferster/forallpeople).
+It somewhat scratches the itch that most such packages are quite slow. Also, this module was made with apps in head rather than interactive use.
 
 Compared to forallpeople:
 - faster - I measured ~3-4x speedup but YMMW.
@@ -121,7 +121,7 @@ Conversion not possible. Possible values to use are: "N", "kN"
 236.06 lbf
 ```
 
-Values defined with a unit are `Physical` objects. These have three attributes:
+Variables defined with a unit are `Physical` objects. These have three attributes:
 - `value` - the value of the object, e.g. 2.45; this is the value in the base SI unit.
 - `dimensions` - a 7-element tuple defining the dimension of the unit.
 - `conv_factor` - a (linear) conversion factor to allow for non-SI units. The conversion factor means: what number of base SI-units are in this unit. For example 1 ft = 0.3048 m -> conv_factor = 0.3048.
@@ -157,8 +157,6 @@ The `Physical` object is callable and returns a `PhysRep` object. See [Represent
 `Physical` objects can be added, subtracted, multiplied, divided, compared etc. like scalars, assuming they are compatible. `Physical` objects are compatible if their `Dimensions` properties are equal. If compatible, arithmetics is basically same as scalar arithmetics with the exception that operations between SI and non-SI units are possible.  
 All operations result in a new `Physical` instance since these are immutable. This also means, none of the incremental operations are available.
 If an operation yields a dimensionsless result, a float is returned. 
-
-```python
 
 #### Negation
 
@@ -197,7 +195,7 @@ The operations are straightforward.
 -12.90 kN
 ```
 
-Adding a scalar other than zero or any non-compatible `PhysicaL` fails.
+Adding a scalar other than zero or any non-compatible `Physical` fails.
 
 ```python
 >>> a = 2.45 * si.kN
@@ -326,7 +324,7 @@ ValueError: No units found for the dimensions Dimensions(kg=0.0, m=0.66666666666
 ## Representing a Physical object
 
 Printing a `Physical` object returns just a string. Great, but it is not really easy to reuse the value from that point.
-The `PhysRep` class is used to represent a `Physical` objects value as float and unit as string. The `Physical` is a callable so accessing the `PhysRep` of a `Physical` is simple.
+The `PhysRep` class is used to represent a `Physical` object's value as float and unit as string. `Physical` is a callable so accessing the `PhysRep` of a `Physical` is simple.
 
 ```python
 >>> p = 12 * si.m
@@ -358,7 +356,7 @@ From the `PhysRep` the `Physical` object can be recreated.
 
 ## Rich comparison
 
-`Physical` objects can be compared with each other if they are compatible. Comparison with a scalar other than zero raises a ValueError.
+`Physical` objects can be compared to each other if they are compatible. Comparison with a scalar other than zero raises a ValueError.
 
 
 ```python
@@ -435,10 +433,10 @@ environment_settings = {
 When calling `si.environment()` the following arguments are available:
 
 - `env_name`: the name of the environment to load. An 'env_name.json' file must exist in the default environmants directory or the one provided in `env_path`.
-- `env_path`: a `pathlib.Path` object defining the path to the environment file. If not provided, the default path is used.
+- `env_path`: a `pathlib.Path` object defining the path to the environment file. If not provided, the default path is used, that is, the environments directory in the package.
 - `env_dict`: a dictionary defining the environment if for some reason it makes more sense to provide it directly rather than in a file.
 - `replace`: see [Loading multiple environments](#loading-multiple-environments) for details.
-- `top_level`: if True, the environment is loaded to `__builtins__` and units are available instead of e.g. `si.m` as `m`. If False, the environment is loaded to the `simplesi` namespace and are available via e.g. `si.m`.
+- `top_level`: if True, the environment is loaded to `__builtins__` and units are available instead of e.g. `si.m` as `m`. Note, this may interfere with other / already defined variables. If False, the environment is loaded to the `simplesi` namespace and are available via e.g. `si.m`.
 - `preferred_units`: the dictionary defining the preferred units for printing. See [Printing](#printing) for details.
 - `settings`: the dictionary defining the environment settings. The default settings are used if not provided. See [Printing](#printing), [Exception handling](#exception-handing) and [Significant digits](#significant-digits) for details.
 
@@ -457,9 +455,12 @@ m = 1 * si.mile
 Loading the second environment is simple and any number of environments can be loaded.
 
 ```python
+# loading the first environment
 >>> si.environment(env_name='structural')
->>> si.environment(env_name='US_customary', replace=False)  # loads the second environment and doesn't replace the first one
->>> si.environment(env_name='US_customary', replace=True)  # loads the second environment and replaces any previously loaded environment
+# loading the second environment and doesn't replace the first one
+>>> si.environment(env_name='US_customary', replace=False)  # structural, US_customary are available
+# loading the second environment and replaces any previously loaded environment
+>>> si.environment(env_name='US_customary', replace=True)  # only US_customary is available
 ```
 
 When loading multiple environments, the settings are not affected.
