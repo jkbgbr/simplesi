@@ -155,6 +155,9 @@ The `Physical` object is callable and returns a `PhysRep` object. See [Represent
 
 `Physical` objects can be added, subtracted, multiplied, divided, compared etc. like scalars, assuming they are compatible. `Physical` objects are compatible if their `Dimensions` properties are equal. If compatible, arithmetics is basically same as scalar arithmetics with the exception that operations between SI and non-SI units are possible.  
 All operations result in a new `Physical` instance since these are immutable. This also means, none of the incremental operations are available.
+If an operation yields a dimensionsless result, a float is returned. 
+
+```python
 
 #### Negation
 
@@ -229,7 +232,7 @@ Multiplication with a scalars is possible.
 4.90 kN
 ```
 Multiplication with a `Physical` object returns a new `Physical` object with the dimensions of the two added elementwise.
-If the return value is not defined, a `Physical` is still returned. If the multiplication yields a dimensionsless value, a float is returned.
+If the return value is not defined, a `Physical` is still returned.
 
 ```python
 >>> a = 2.45 * si.kN
@@ -269,7 +272,7 @@ Traceback (most recent call last):
 ZeroDivisionError: Cannot divide by zero.
 ```
 Division with a `Physical` object returns a new `Physical` object with the dimensions of the two substracted elementwise.
-If the return value is not defined, a `Physical` is still returned. If the division yields a dimensionsless value, a float is returned.
+If the return value is not defined, a `Physical` is still returned.
 
 ```python
 >>> a = 2.45 * si.kN
@@ -460,6 +463,9 @@ Loading the second environment is simple and any number of environments can be l
 
 When loading multiple environments, the settings are not affected.
 
+See [Environments](#the-environment-object) for details on environment definition.
+
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Printing
@@ -597,6 +603,17 @@ It holds the units available to create `Physical` objects, the settings and the 
 When unit definitions are provided, they are checked formally for correctness - not necessarily a bulletproof solution, but probably good enough.
 Preferences and settings can be updated using the `apply_preferences()` and `apply_settings()` methods. 
 
+Unit names were defined by the following rules:
+- multiplication signs are omitted, e.g. `kNm` instead of `kN*m`
+- deivision signs are replaced with an underscore, e.g. `kN_m` instead of `kN/m`
+- power indices are simple numbers, e.g. `m3` instead of `m³`
+
+When checking the environment definition, the following checks are performed:
+- unit names must be unique strings,
+- symbol must be a string,
+- value must be an int or a float,
+- conv_factor must be an int or a float,
+- dimensions must be a 7-element iterable, at least one element must be non-zero.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
