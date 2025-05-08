@@ -72,9 +72,6 @@ class Environment:
                 # 7 dimensions
                 if len(v["Dimension"]) != 7:
                     errors.append(f"Dimension must have a length of 7 for unit {k}.")
-                # no dimensionsless units
-                if all(d == 0 for d in v["Dimension"]):
-                    errors.append(f"Unit {k} is dimensionless.")
             else:
                 errors.append(f"Dimension not defined for unit {k}.")
 

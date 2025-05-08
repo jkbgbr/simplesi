@@ -12,9 +12,16 @@ print(a)
 si.environment.settings['significant_digits'] = 5
 print(a)
 
+p = 180 * si.deg
+# rep = p()
+_, unit = si.split_str(str(p))
+print(_)
+print(unit)
 
-print(a())
-
+b = p.to('rad')
+print(b)
+b = p()
+print(b)
 
 exit()
 

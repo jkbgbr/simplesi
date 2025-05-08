@@ -248,12 +248,10 @@ class TestPhysicalWithUnits(unittest.TestCase):
                         environment=incorrect_environment2)
 
         # dimensionsless
-        with self.assertRaises(ValueError):
-            incorrect_environment3 = {'2': {"Dimension": [0, 0, 0, 0, 0, 0, 0],
-                                            "Value": 0.001},}
-            Environment(si_base_units=base_units,
-                        preferred_units={},
-                        environment=incorrect_environment3)
+        dimless = {'deg': {"Dimension": [0, 0, 0, 0, 0, 0, 0], "Value": 1}, }
+        Environment(si_base_units=base_units,
+                    preferred_units={},
+                    environment=dimless)
 
         # symbol
         with self.assertRaises(ValueError):
@@ -329,10 +327,13 @@ class TestRepresentation(unittest.TestCase):
         as_cm = physical('cm')
         self.assertEqual(as_cm.value, 120)
         self.assertEqual(as_cm.unit, 'cm')
-        # no preferred unit set
+
+        # no preferred unit set - the PhysRep is the same as the input value
         second = 25 * si.s
-        with self.assertRaises(ValueError):  # no preferred unit set!
-            as_minute = second()
+        as_minute = second()
+        self.assertEqual(as_minute.value, second.value)
+        self.assertEqual(as_minute.unit, 's')
+
         # no unit found - the provided unit is not defined so it is not possible to convert to it.
         with self.assertRaises(AttributeError):
             as_cm = physical('whatever')

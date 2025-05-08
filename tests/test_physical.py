@@ -13,8 +13,6 @@ class TestPhysical(unittest.TestCase):
 
     def test_incorrect_init(self):
         with self.assertRaises(ValueError):
-            Physical(5.0, Dimensions(0, 0, 0, 0, 0, 0, 0))
-        with self.assertRaises(ValueError):
             Physical('5.0', Dimensions(1, 0, 0, 0, 0, 0, 0))
 
     def test_neg(self):

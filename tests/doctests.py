@@ -167,7 +167,7 @@ ValueError: Cannot add between 2.45 kN and 1000 mm: dimensions are incompatible
 >>> a += 3.45 * si.kN
 Traceback (most recent call last):
 ...
-ValueError: Cannot incrementally add Physical instances because they are immutable. Use 'a = a + b', to make the operation explicit.
+ValueError: Cannot incrementally add Physical instances. Use 'a = a + b', to make the operation explicit.
 
 # multiplication
 
@@ -247,10 +247,21 @@ ValueError: No units found for the dimensions Dimensions(kg=0.0, m=0.66666666666
 'mm'
 
 >>> p = 12 * si.t_m3
+>>> print(p)
+12000 kg/m³
 >>> rep = p()
-Traceback (most recent call last):
-...
-ValueError: No preferred unit found for the dimensions Dimensions(kg=1, m=-3, s=0, A=0, cd=0, K=0, mol=0), can't provide PhysRep.
+>>> print(rep)
+12000.0 kg/m³
+>>> rep.value
+12000.0
+>>> rep.unit
+'kg/m³'
+
+
+>>> print(rep)
+12000.0 kg/m³
+>>> rep.__repr__()
+"PhysRep(value=12000.0, unit='kg/m³')"
 
 
 >>> p = 12 * si.m

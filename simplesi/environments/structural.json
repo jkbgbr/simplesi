@@ -136,6 +136,13 @@
     "m_s2": {
         "Dimension": [0,1,-2,0,0,0,0],
         "Value": 1,
-        "Symbol": "m/s²"}
-
+        "Symbol": "m/s²"},
+    "deg": {
+        "Dimension": [0,0,0,0,0,0,0],
+        "Value": 1,
+        "Symbol": "°"},
+    "rad": {
+        "Dimension": [0,0,0,0,0,0,0],
+        "Value": 1,
+        "Factor": 57.2975}
 }

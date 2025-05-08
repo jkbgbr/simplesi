@@ -152,11 +152,29 @@ Dimensions(kg=0, m=2, s=0, A=0, cd=0, K=0, mol=0)
 
 The `Physical` object is callable and returns a `PhysRep` object. See [Representing a Physical object](#representing-a-physical-object) for more details.
 
+Usually all defined units have at least one of their dimension nonzero. Now, in some cases it might still be desirable to 
+have something that doesn't have an SI/non-SI unit, but is not unitless - for example, degree. For such cases, a 
+dimensionsless unit can be defined. The usability is restricted as there may be only one kind of such "unit"; 
+it is possible however to define a degree and a radian unit as it is the same as having both meter and foot defined. 
+
+```json
+"deg": {
+    "Dimension": [0,0,0,0,0,0,0],
+    "Value": 1,
+    "Symbol": "°"},
+"rad": {
+    "Dimension": [0,0,0,0,0,0,0],
+    "Value": 1,
+    "Factor": 57.2975}
+```
+
+
 ## Arithmetics
 
 `Physical` objects can be added, subtracted, multiplied, divided, compared etc. like scalars, assuming they are compatible. `Physical` objects are compatible if their `Dimensions` properties are equal. If compatible, arithmetics is basically same as scalar arithmetics with the exception that operations between SI and non-SI units are possible.  
-All operations result in a new `Physical` instance since these are immutable. This also means, none of the incremental operations are available.
-If an operation yields a dimensionsless result, a float is returned. 
+All operations result in a new `Physical` instance. Hence none of the incremental operations are available and trying to use them will raise a ValueError.
+
+If an operation yields a dimensionsless result, a float is returned, which then can not be reused in calculations involving `Physical` objects, except for the case its value is zero.
 
 #### Negation
 
@@ -324,9 +342,18 @@ ValueError: No units found for the dimensions Dimensions(kg=0.0, m=0.66666666666
 ## Representing a Physical object
 
 Printing a `Physical` object returns just a string. Great, but it is not really easy to reuse the value from that point.
-The `PhysRep` class is used to represent a `Physical` object's value as float and unit as string. `Physical` is a callable so accessing the `PhysRep` of a `Physical` is simple.
+The `PhysRep` class is used to represent a `Physical` object's value as float and unit as string.
 
-Calling the physical object without a unit name provided works only if there is a preferred unit set.
+````python
+>>> print(rep)
+12000.0 kg/m³
+>>> rep.__repr__()
+"PhysRep(value=12000.0, unit='kg/m³')"
+````
+
+`Physical` is a callable so accessing the `PhysRep` of a `Physical` is simple - and there is a way back.
+Calling the physical object without a unit name provided: if there is a preferred unit set for that dimensionality, that will be used. If there is nothing set, the base units will be used. 
+Point is: set the preferred units to be used.
 
 ```python
 >>> p = 12 * si.m
@@ -335,11 +362,19 @@ Calling the physical object without a unit name provided works only if there is 
 12000.0
 >>> rep.unit
 'mm'
->>> p = 12 * si.t_m3
+```
+
+```python
+>>> p = 12 * si.t_m3  # no preferred unit for this dimensionality
+>>> print(p)
+12000 kg/m³
 >>> rep = p()
-Traceback (most recent call last):
-...
-ValueError: No preferred unit found for the dimensions Dimensions(kg=1, m=-3, s=0, A=0, cd=0, K=0, mol=0), can't provide PhysRep.
+>>> print(rep)
+12000.0 kg/m³
+>>> rep.value
+12000.0
+>>> rep.unit
+'kg/m³'
 ```
 
 Providing a compatible unit that is defined works as expected.

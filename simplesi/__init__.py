@@ -53,9 +53,9 @@ class Physical:
         if conv_factor <= 0:
             raise ValueError("Conversion factor must be positive, you have {}.".format(conv_factor))
 
-        # use a scalar if you have no dimensions
-        if dimensions.dimensionsless:
-            raise ValueError("Dimensions must be non-zero. Use a scalar instead.")
+        # # use a scalar if you have no dimensions
+        # if dimensions.dimensionsless:
+        #     raise ValueError("Dimensions must be non-zero. Use a scalar instead.")
 
         self.value = value
         self.dimensions = dimensions
@@ -67,7 +67,8 @@ class Physical:
         if unit is None:
             unit = self.get_preferred_units()
             if unit is None:
-                raise ValueError("No preferred unit found for the dimensions {}, can't provide PhysRep.".format(self.dimensions))
+                _, unit = split_str(str(self))
+                # raise ValueError("No preferred unit found for the dimensions {}, can't provide PhysRep.".format(self.dimensions))
         return self._repr(unit)
 
     @classmethod
@@ -440,7 +441,7 @@ class Physical:
 
     def __iadd__(self, other):
         raise ValueError(
-            "Cannot incrementally add Physical instances because they are immutable."
+            "Cannot incrementally add Physical instances."
             + " Use 'a = a + b', to make the operation explicit."
         )
 
@@ -490,7 +491,7 @@ class Physical:
 
     def __isub__(self, other):
         raise ValueError(
-            "Cannot incrementally subtract Physical instances because they are immutable."
+            "Cannot incrementally subtract Physical instances."
             + " Use 'a = a - b', to make the operation explicit."
         )
 
@@ -519,7 +520,7 @@ class Physical:
 
     def __imul__(self, other):
         raise ValueError(
-            "Cannot incrementally multiply Physical instances because they are immutable."
+            "Cannot incrementally multiply Physical instances."
             + " Use 'a = a * b' to make the operation explicit."
         )
 
@@ -572,7 +573,7 @@ class Physical:
 
     def __itruediv__(self, other):
         raise ValueError(
-            "Cannot incrementally divide Physical instances because they are immutable."
+            "Cannot incrementally divide Physical instances."
             + " Use 'a = a / b' to make the operation explicit."
         )
 
@@ -645,6 +646,13 @@ class PhysRep:
     def __init__(self, value: float, unit: str):
         self.value = value
         self.unit = unit
+
+    def __str__(self):
+        val = round(self.value, environment.settings.get('significant_digits'))
+        return '{} {}'.format(val, self.unit)
+
+    def __repr__(self):
+        return "PhysRep(value={}, unit='{}')".format(self.value, self.unit)
 
     @classmethod
     def split_str(cls, in_string: str) -> PhysRep:
