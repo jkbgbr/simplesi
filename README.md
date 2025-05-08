@@ -326,9 +326,9 @@ ValueError: No units found for the dimensions Dimensions(kg=0.0, m=0.66666666666
 Printing a `Physical` object returns just a string. Great, but it is not really easy to reuse the value from that point.
 The `PhysRep` class is used to represent a `Physical` object's value as float and unit as string. `Physical` is a callable so accessing the `PhysRep` of a `Physical` is simple.
 
+Calling the physical object without a unit name provided works only if there is a preferred unit set.
 
 ```python
-# calling the physical object without a unit name provided works only if there is a preferred unit set
 >>> p = 12 * si.m
 >>> rep = p()
 >>> rep.value
@@ -342,7 +342,7 @@ Traceback (most recent call last):
 ValueError: No preferred unit found for the dimensions Dimensions(kg=1, m=-3, s=0, A=0, cd=0, K=0, mol=0), can't provide PhysRep.
 ```
 
-Providing a compatible unit that is defined works as expected:
+Providing a compatible unit that is defined works as expected.
 
 ```python
 >>> p = 12 * si.m
@@ -358,7 +358,7 @@ Providing a compatible unit that is defined works as expected:
 'cm'
 ```
 
-Trying to represent in an incompatible unit will raise a ValueError but lists the compatible units:
+Trying to represent in an incompatible unit will raise a ValueError but lists the compatible units.
 
 ```python
 >>> p = 12 * si.s
@@ -367,7 +367,6 @@ Traceback (most recent call last):
 ...
 ValueError: Conversion not possible. Possible values to use are: "day", "fortnight", "ftn", "hour", "minute", "s", "week"
 ```
-
 
 From the `PhysRep` the `Physical` object can be recreated.
 
