@@ -94,12 +94,12 @@ The simplest way to use the package is to import it and call the environment wit
 >>> si.environment(env_name='structural')
 ```
 
-This will load units defined in the environment file `structural.json` from the `environments` subdirectory, which is the default place the unit definitions.
+This will load units defined in the environment file `structural.json` from the `environments` subdirectory, which is the default place the unit definitions. Importing from another directory is possible - see [Environments](#environments) for details.
 
 At this point the units defined in `structural.json` are loaded in the `si` namespace and are available for use.
 In an IDE the units are probably not recognized and thus marked unknown as they are not directly defined in the code.
 
-From here on, defining a variable with a unit is as simple as
+Defining a variable with a unit is as simple as
 
 ```python
 >>> a = 2.45 * si.m
@@ -121,175 +121,10 @@ Dimensions(kg=0, m=1, s=0, A=0, cd=0, K=0, mol=0)
 
 The `Physical` object is callable and returns a `PhysRep` object. See [Representing a Physical object](#representing-a-physical-object) for more details.
 
-Importing the package will create an `Environment` object with some default settings that define the default behavior of the `Physical` objects. These are:
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-### Printing
-
-The aim is to reduce boilerplate by defining some key behavior properties, thus reducing the amount of typing.
-
-If for a `Physical` a preferred unit is set, it will be used to display the number with the set number of significant digits.
-
-```python
->>> print(1.34 * si.m)
-1340 mm  # the default unit for length is [mm]
-```
-
-```python
->>> print(0.134435 * si.m)
-134.44 m  # the default number of significant digits is 3
-```
-
-A list of available units is shown when the `to()` method is called empty or with an incompatible unit.
-Note: for this example the setting `to_fails` is set 'print'. See the section [Exception handing](#exception-handing) for more details.
-```python
->>> a = 2.45 * si.kN_m
->>> print(a.to())
-Conversion not possible. Possible values to use are: "kN_m", "N/m", "kN/m", "N_m"
->>> print(a.to('mm'))
-Conversion not possible. Possible values to use are: "kN_m", "N/m", "kN/m", "N_m"
-```
-
-Otherwise a conversion simply returns the value in the requested unit. Both the symbol and the unit name can be used to define the unit to convert to.
-```python
->>> a = 1234.56 * si.m
->>> print(a.to('km'))
-1.23 km  # remember the significant digits?
->>> print(a.to('mm'))
-1234560 mm
->>> b = 2.45 * si.kN_m
->>> print(b.to('N/m'))
-2450 N/m
->>> print(b.to('N_m'))
-2450 N/m
-```
-
-If no preferred unit is set for a `Physical` object, depending on the setting 'print_unit' it will use the smallest or the largest compatible unit.
-```python
->>> si.environment.settings['print_unit'] = 'largest'
->>> print(2.45 * si.kN_m)
-2.45 kN/m  # the default setting is to use the 'largest' unit (providing the smallest value)
-```
-
-Using the setting 'smallest' will use the smallest compatible unit.
-```python
->>> si.environment.settings['print_unit'] = 'smallest'
->>> print(2.45 * si.kN_m)
-2450 N/m
-```
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-### Exception handing
-One can choose to print the exception or raise it. This is useful for interactive use cases, where one may want to see the error message, but in an app it is better to raise an exception.
-By default, the exception is printed. 
-
-```python
->>> si.environment.settings['to_fails'] = 'raise'
->>> a = 1234.56 * si.N_m
->>> print(a.to('m'))
-Traceback (most recent call last):
-...
-ValueError: Conversion not possible. Possible values to use are: "N/m", "N_m", "kN/m", "kN_m"
-```
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-### Significant digits
-Finally, the number of significant digits can be set. This is useful for printing the results in a more readable way. The default is 3 significant digits.
-
-```python
->>> print(0.134435 * si.m)
-134.44 mm
->>> si.environment.settings['significant_digits'] = 5
->>> print(0.0013441256745 * si.m)
-1.3441 mm
-```
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-## Environments
-
-Environments are meant to separate "families" of units.
-
-When defining an SI unit, the bare minimum to define is a unit name, a value and a dimension.
-- name is the one to be used when defining `Physical` objects, e.g. `si.km
-- value is the conversion factor to the base SI unit`, e.g. 1 km = 1000 m means value = 1000
-- dimension is a 7-element list defining the exponents for the `Physical` object's Dimension property.
-
-The base SI units are as follows:
-
-```python
-base_units = {
-    "kg": Physical(1, Dimensions(1, 0, 0, 0, 0, 0, 0)),
-    "m": Physical(1, Dimensions(0, 1, 0, 0, 0, 0, 0)),
-    "s": Physical(1, Dimensions(0, 0, 1, 0, 0, 0, 0)),
-    "A": Physical(1, Dimensions(0, 0, 0, 1, 0, 0, 0)),
-    "cd": Physical(1, Dimensions(0, 0, 0, 0, 1, 0, 0)),
-    "K": Physical(1, Dimensions(0, 0, 0, 0, 0, 1, 0)),
-    "mol": Physical(1, Dimensions(0, 0, 0, 0, 0, 0, 1)),
-}
-```
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-### Default environment
-
-The default settings are probably best for structural engineers writing an app (yours truly). When simply importing the package and setting the environment name via `si.environment()`, only the base SI units are available and following settings are applied:
-
-```python
-preferred_units = {
-    'mm': Dimensions(0, 1, 0, 0, 0, 0, 0),
-    's': Dimensions(0, 0, 1, 0, 0, 0, 0),
-    'kg': Dimensions(1, 0, 0, 0, 0, 0, 0),
-    'kN': Dimensions(1, 1, -2, 0, 0, 0, 0),
-    'kNm': Dimensions(1, 2, -2, 0, 0, 0, 0),
-    'MPa': Dimensions(1, -1, -2, 0, 0, 0, 0),
-}
-
-environment_settings = {
-    'to_fails': 'raise',  # raise, print
-    'significant_digits': 3,
-    'print_unit': 'smallest',  # smallest, largest
-}
-```
-
-When calling `si.environment()` the following arguments are available:
-
-- `env_name`: the name of the environment to load. An 'env_name.json' file must exist in the default environmants directory or the one provided in `env_path`.
-- `env_path`: a pathlib.Path object defining the path to the environment file. If not provided, the default path is used.
-- `env_dict`: a dictionary defining the environment if for some reason it makes more sense to provide it directly rather than in a file.
-- `replace`: see Loading multiple environments
-- `top_level`: if True, the environment is loaded to `__builtins__` and units are available instead of e.g. `si.m` as `m`. If False, the environment is loaded to the `simplesi` namespace and are available via e.g. `si.m`.
-- `preferred_units`: the dictionary defining the preferred units for printing.
-- `settings`: the dictionary defining the environment settings. The default settings are used if not provided.
-
-Getting the environment from files is possible, but currently there is nothing implemented to do the same for settings and preferred units.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-### Loading multiple environments
-
-If you can't avoid using e.g. US customary units and SI units in the same project, you can load multiple environments. Which allows for fun definitions like
-
-```python
-m = 1 * si.mile
-```
-
-Loading the second environment is simple and any number of environments can be loaded.
-
-```python
->>> si.environment(env_name='structural')
->>> si.environment(env_name='US_customary', replace=False)  # loads the second environment and doesn't replace the first one
->>> si.environment(env_name='US_customary', replace=True)  # loads the second environment and replaces any previously loaded environment
-```
-
-When loading multiple environments, the settings are not affected.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 ## Arithmetics
 
 `Physical` objects can be added, subtracted, multiplied, divided, compared etc. like scalars, assuming they are compatible. `Physical` objects are compatible if their `Dimensions` properties are equal. If compatible, arithmetics is basically same as scalar arithmetics with the exception that operations between SI and non-SI units are possible.  
-All operations result in a new `Physical` instance since these are immutable. This also means, none of the incremepntal operations are available.
+All operations result in a new `Physical` instance since these are immutable. This also means, none of the incremental operations are available.
 
 #### Negation
 
@@ -456,7 +291,7 @@ ValueError: No units found for the dimensions Dimensions(kg=0.0, m=0.66666666666
 
 ## Representing a Physical object
 
-Printing a `Physical` object is just a string. Great, it is not really easy to reuse the value from that point.
+Printing a `Physical` object returns just a string. Great, it is not really easy to reuse the value from that point.
 The `PhysRep` class is used to represent a `Physical` objects value as float and unit as string. The `Physical` is a callable so accessing the `PhysRep` of a `Physical` is simple.
 
 ```python
@@ -515,6 +350,168 @@ ValueError: Can only __gt__ between Physical instances, these are <class 'int'> 
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Environments
+
+Environments are meant to separate "families" of units.
+
+When defining an SI unit, the bare minimum to define is a unit name, a value and a dimension.
+- name is the one to be used when defining `Physical` objects, e.g. `si.km
+- value is the conversion factor to the base SI unit`, e.g. 1 km = 1000 m means value = 1000
+- dimension is a 7-element list defining the exponents for the `Physical` object's Dimension property.
+
+The base SI units are as follows:
+
+```python
+base_units = {
+    "kg": Physical(1, Dimensions(1, 0, 0, 0, 0, 0, 0)),
+    "m": Physical(1, Dimensions(0, 1, 0, 0, 0, 0, 0)),
+    "s": Physical(1, Dimensions(0, 0, 1, 0, 0, 0, 0)),
+    "A": Physical(1, Dimensions(0, 0, 0, 1, 0, 0, 0)),
+    "cd": Physical(1, Dimensions(0, 0, 0, 0, 1, 0, 0)),
+    "K": Physical(1, Dimensions(0, 0, 0, 0, 0, 1, 0)),
+    "mol": Physical(1, Dimensions(0, 0, 0, 0, 0, 0, 1)),
+}
+```
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Default environment
+
+The default settings are probably best for structural engineers writing an app (yours truly). When simply importing the package and setting the environment name via `si.environment()`, only the base SI units are available and following settings are applied:
+
+```python
+preferred_units = {
+    'mm': Dimensions(0, 1, 0, 0, 0, 0, 0),
+    's': Dimensions(0, 0, 1, 0, 0, 0, 0),
+    'kg': Dimensions(1, 0, 0, 0, 0, 0, 0),
+    'kN': Dimensions(1, 1, -2, 0, 0, 0, 0),
+    'kNm': Dimensions(1, 2, -2, 0, 0, 0, 0),
+    'MPa': Dimensions(1, -1, -2, 0, 0, 0, 0),
+}
+
+environment_settings = {
+    'to_fails': 'raise',  # raise, print
+    'significant_digits': 3,
+    'print_unit': 'smallest',  # smallest, largest
+}
+```
+
+When calling `si.environment()` the following arguments are available:
+
+- `env_name`: the name of the environment to load. An 'env_name.json' file must exist in the default environmants directory or the one provided in `env_path`.
+- `env_path`: a pathlib.Path object defining the path to the environment file. If not provided, the default path is used.
+- `env_dict`: a dictionary defining the environment if for some reason it makes more sense to provide it directly rather than in a file.
+- `replace`: see [Loading multiple environments](#loading-multiple-environments) for details.
+- `top_level`: if True, the environment is loaded to `__builtins__` and units are available instead of e.g. `si.m` as `m`. If False, the environment is loaded to the `simplesi` namespace and are available via e.g. `si.m`.
+- `preferred_units`: the dictionary defining the preferred units for printing. See [Printing](#printing) for details.
+- `settings`: the dictionary defining the environment settings. The default settings are used if not provided.
+
+Getting the environment from files is possible, but currently there is nothing implemented to do the same for settings and preferred units.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Loading multiple environments
+
+If you can't avoid using e.g. US customary units and SI units in the same project, you can load multiple environments. Which allows for fun definitions like
+
+```python
+m = 1 * si.mile
+```
+
+Loading the second environment is simple and any number of environments can be loaded.
+
+```python
+>>> si.environment(env_name='structural')
+>>> si.environment(env_name='US_customary', replace=False)  # loads the second environment and doesn't replace the first one
+>>> si.environment(env_name='US_customary', replace=True)  # loads the second environment and replaces any previously loaded environment
+```
+
+When loading multiple environments, the settings are not affected.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Printing
+
+The aim is to reduce boilerplate by defining some key behavior properties, thus reducing the amount of typing.
+
+If for a `Physical` a preferred unit is set, it will be used to display the number with the set number of significant digits.
+
+```python
+>>> print(1.34 * si.m)
+1340 mm  # the default unit for length is [mm]
+```
+
+```python
+>>> print(0.134435 * si.m)
+134.44 m  # the default number of significant digits is 3
+```
+
+A list of available units is shown when the `to()` method is called empty or with an incompatible unit.
+Note: for this example the setting `to_fails` is set 'print'. See the section [Exception handing](#exception-handing) for more details.
+```python
+>>> a = 2.45 * si.kN_m
+>>> print(a.to())
+Conversion not possible. Possible values to use are: "kN_m", "N/m", "kN/m", "N_m"
+>>> print(a.to('mm'))
+Conversion not possible. Possible values to use are: "kN_m", "N/m", "kN/m", "N_m"
+```
+
+Otherwise a conversion simply returns the value in the requested unit. Both the symbol and the unit name can be used to define the unit to convert to.
+```python
+>>> a = 1234.56 * si.m
+>>> print(a.to('km'))
+1.23 km  # remember the significant digits?
+>>> print(a.to('mm'))
+1234560 mm
+>>> b = 2.45 * si.kN_m
+>>> print(b.to('N/m'))
+2450 N/m
+>>> print(b.to('N_m'))
+2450 N/m
+```
+
+If no preferred unit is set for a `Physical` object, depending on the setting 'print_unit' it will use the smallest or the largest compatible unit.
+```python
+>>> si.environment.settings['print_unit'] = 'largest'
+>>> print(2.45 * si.kN_m)
+2.45 kN/m  # the default setting is to use the 'largest' unit (providing the smallest value)
+```
+
+Using the setting 'smallest' will use the smallest compatible unit.
+```python
+>>> si.environment.settings['print_unit'] = 'smallest'
+>>> print(2.45 * si.kN_m)
+2450 N/m
+```
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Exception handing
+One can choose to print the exception or raise it. This is useful for interactive use cases, where one may want to see the error message, but in an app it is better to raise an exception.
+By default, the exception is printed. 
+
+```python
+>>> si.environment.settings['to_fails'] = 'raise'
+>>> a = 1234.56 * si.N_m
+>>> print(a.to('m'))
+Traceback (most recent call last):
+...
+ValueError: Conversion not possible. Possible values to use are: "N/m", "N_m", "kN/m", "kN_m"
+```
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Significant digits
+Finally, the number of significant digits can be set. This is useful for printing the results in a more readable way. The default is 3 significant digits.
+
+```python
+>>> print(0.134435 * si.m)
+134.44 mm
+>>> si.environment.settings['significant_digits'] = 5
+>>> print(0.0013441256745 * si.m)
+1.3441 mm
+```
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 
 ## Other cool stuff
 
