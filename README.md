@@ -105,6 +105,28 @@ Defining a variable with a unit is as simple as
 >>> a = 2.45 * si.m
 ```
 
+The whole purpose of the package is to enable simple units-aware variable definition, seamless conversion and simple use in apps.
+
+```python
+>>> h = 2 * si.m  # height
+>>> w = 350 * si.mm  # width
+>>> q = 1.5 * si.kN_m2  # uniform load
+>>> A = h * w  # area
+>>> F = A * q  # total force
+>>> print(F)  # total force in kN
+1.05 kN
+>>> print(F.to('N'))  # total force in N
+1050 N
+>>> rep = F('N')  # representation of the force in N
+>>> print(rep.value, rep.unit)
+1050.0 N
+>>> F.to('lbf')  # coversion to lbf - will fail as the unit is not defined
+Conversion not possible. Possible values to use are: "N", "kN"
+>>> si.environment(env_name='US_customary', replace=False)  # extending the environment with US customary units
+>>> print(F.to('lbf'))
+236.06 lbf
+```
+
 Values defined with a unit are `Physical` objects. These have three attributes:
 - `value` - the value of the object, e.g. 2.45
 - `dimensions` - a 7-element namedtuple defining the dimension of the unit. See [dimensional analysis](https://en.wikipedia.org/wiki/Dimensional_analysis) for the theory.
@@ -356,8 +378,8 @@ ValueError: Can only __gt__ between Physical instances, these are <class 'int'> 
 Environments are meant to separate "families" of units.
 
 When defining an SI unit, the bare minimum to define is a unit name, a value and a dimension.
-- name is the one to be used when defining `Physical` objects, e.g. `si.km
-- value is the conversion factor to the base SI unit`, e.g. 1 km = 1000 m means value = 1000
+- name is the one to be used when defining `Physical` objects, e.g. `si.km`
+- value is the conversion factor to the base SI unit, e.g. 1 km = 1000 m means value = 1000
 - dimension is a 7-element list defining the exponents for the `Physical` object's Dimension property.
 
 The base SI units are as follows:
@@ -377,7 +399,9 @@ base_units = {
 
 ### Default environment
 
-The default settings are probably best for structural engineers writing an app (yours truly). When simply importing the package and setting the environment name via `si.environment()`, only the base SI units are available and following settings are applied:
+The default settings are probably best for structural engineers writing an app (yours truly). 
+When simply importing the package and setting the environment name via `si.environment()`, only the base SI units 
+are available and following settings are applied:
 
 ```python
 preferred_units = {
@@ -399,12 +423,12 @@ environment_settings = {
 When calling `si.environment()` the following arguments are available:
 
 - `env_name`: the name of the environment to load. An 'env_name.json' file must exist in the default environmants directory or the one provided in `env_path`.
-- `env_path`: a pathlib.Path object defining the path to the environment file. If not provided, the default path is used.
+- `env_path`: a `pathlib.Path` object defining the path to the environment file. If not provided, the default path is used.
 - `env_dict`: a dictionary defining the environment if for some reason it makes more sense to provide it directly rather than in a file.
 - `replace`: see [Loading multiple environments](#loading-multiple-environments) for details.
 - `top_level`: if True, the environment is loaded to `__builtins__` and units are available instead of e.g. `si.m` as `m`. If False, the environment is loaded to the `simplesi` namespace and are available via e.g. `si.m`.
 - `preferred_units`: the dictionary defining the preferred units for printing. See [Printing](#printing) for details.
-- `settings`: the dictionary defining the environment settings. The default settings are used if not provided.
+- `settings`: the dictionary defining the environment settings. The default settings are used if not provided. See [Printing](#printing), [Exception handling](#exception-handing) and [Significant digits](#significant-digits) for details.
 
 Getting the environment from files is possible, but currently there is nothing implemented to do the same for settings and preferred units.
 
@@ -516,7 +540,7 @@ Finally, the number of significant digits can be set. This is useful for printin
 ## Other cool stuff
 
 `Physical` objects 
-- evaluate to True
+- evaluate to `True`
 - are hashable
 - can be rounded
 

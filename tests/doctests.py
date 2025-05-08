@@ -8,6 +8,28 @@
 >>> print(1.34 * si.m)
 1340 mm
 
+
+
+# usage
+>>> h = 2 * si.m  # height
+>>> w = 350 * si.mm  # width
+>>> q = 1.5 * si.kN_m2  # uniform load
+>>> A = h * w  # area
+>>> F = A * q  # total force
+>>> print(F)  # total force in kN
+1.05 kN
+>>> print(F.to('N'))  # total force in N
+1050 N
+>>> rep = F('N')  # representation of the force in N
+>>> print(rep.value, rep.unit)
+1050.0 N
+>>> F.to('lbf')  # coversion to lbf - will fail as the unit is not defined
+Conversion not possible. Possible values to use are: "N", "kN"
+>>> si.environment(env_name='US_customary', replace=False)  # extending the environment with US customary units
+>>> print(F.to('lbf'))
+236.06 lbf
+
+
 # significant digits
 
 >>> print(0.134435 * si.m)
