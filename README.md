@@ -126,7 +126,7 @@ Values defined with a unit are `Physical` objects. These have three attributes:
 - `dimensions` - a 7-element tuple defining the dimension of the unit.
 - `conv_factor` - a (linear) conversion factor to allow for non-SI units. The conversion factor means: what number of base SI-units are in this unit. For example 1 ft = 0.3048 m -> conv_factor = 0.3048.
 
-See [dimensional analysis](https://en.wikipedia.org/wiki/Dimensional_analysis) for the full theory.
+See [dimensional analysis](https://en.wikipedia.org/wiki/Dimensional_analysis) for the full theory how this works.
 
 tldr: the seven base dimensions span a 7D linear space; the base units are the orthogonal base vectors. 
 Units derived directly from the base units are scaled versions of the base units; the scaling factor is the `value` x `conv_factor`, `Dimensions` is unchanged. Geometrically, these vectors are collinear.
