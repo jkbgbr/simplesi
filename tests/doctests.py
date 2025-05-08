@@ -44,7 +44,11 @@ Dimensions(kg=0, m=1, s=0, A=0, cd=0, K=0, mol=0)
 Dimensions(kg=0, m=1, s=0, A=0, cd=0, K=0, mol=0)
 >>> print(b.conv_factor)
 0.3048
-
+>>> c = 1 * si.mm
+>>> print((c**2).value)
+1e-06
+>>> print((c**2).dimensions)
+Dimensions(kg=0, m=2, s=0, A=0, cd=0, K=0, mol=0)
 
 
 # significant digits
