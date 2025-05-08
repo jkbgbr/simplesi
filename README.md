@@ -99,12 +99,6 @@ This will load units defined in the environment file `structural.json` from the 
 At this point the units defined in `structural.json` are loaded in the `si` namespace and are available for use.
 In an IDE the units are probably not recognized and thus marked unknown as they are not directly defined in the code.
 
-Defining a variable with a unit is as simple as
-
-```python
->>> a = 2.45 * si.m
-```
-
 The whole purpose of the package is to enable simple units-aware variable definition, seamless conversion and simple use in apps.
 
 ```python
@@ -128,17 +122,31 @@ Conversion not possible. Possible values to use are: "N", "kN"
 ```
 
 Values defined with a unit are `Physical` objects. These have three attributes:
-- `value` - the value of the object, e.g. 2.45
-- `dimensions` - a 7-element namedtuple defining the dimension of the unit. See [dimensional analysis](https://en.wikipedia.org/wiki/Dimensional_analysis) for the theory.
-- `conv_factor` - a (linear) conversion factor to allow for non-SI units. The conversion factor means: what number of base SI-units are in this unit. For example 1 ft = 0.3048 m -> conv_factor = 0.3048
+- `value` - the value of the object, e.g. 2.45; this is the value in the base SI unit.
+- `dimensions` - a 7-element tuple defining the dimension of the unit.
+- `conv_factor` - a (linear) conversion factor to allow for non-SI units. The conversion factor means: what number of base SI-units are in this unit. For example 1 ft = 0.3048 m -> conv_factor = 0.3048.
+
+See [dimensional analysis](https://en.wikipedia.org/wiki/Dimensional_analysis) for the full theory.
+
+tldr: the seven base dimensions span a 7D linear space; the base units are the orthogonal base vectors. 
+Units derived directly from the base units are scaled versions of the base units; the scaling factor is the `value` x `conv_factor`, `Dimensions` is unchanged. Geometrically, these vectors are collinear.
+Derived units are (linear) combinations of the base units, and are independent - in geometrical sense they are at some angle from each other.
 
 ```python
+>>> a = 2.45 * si.m
 >>> print(a.value)
 2.45
 >>> print(a.dimensions)
 Dimensions(kg=0, m=1, s=0, A=0, cd=0, K=0, mol=0)
 >>> print(a.conv_factor)
-1
+1.0
+>>> b = 2.3 * si.ft
+>>> print(b.value)
+0.70104
+>>> print(b.dimensions)
+Dimensions(kg=0, m=1, s=0, A=0, cd=0, K=0, mol=0)
+>>> print(b.conv_factor)
+0.3048
 ```
 
 The `Physical` object is callable and returns a `PhysRep` object. See [Representing a Physical object](#representing-a-physical-object) for more details.
@@ -581,6 +589,7 @@ True
 False
 ```
 
+
 ### The Environment object
 
 The environment object is a callable instance of the Environment class that gets created when the package is imported and can be accessed via `si.environment`. 
@@ -596,7 +605,8 @@ Preferences and settings can be updated using the `apply_preferences()` and `app
 
 ## Contributing
 
-Contributions are welcome! Fork it, fix it, PR it.
+Though the package seems to cover most posssible use cases, I did test it rather for the simplest ones and I suspect there may be some bugs and errors lurking here and there.
+You are welcome to report them so the package can mature - contributions are welcome!
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

@@ -30,6 +30,23 @@ Conversion not possible. Possible values to use are: "N", "kN"
 236.06 lbf
 
 
+>>> a = 2.45 * si.m
+>>> print(a.value)
+2.45
+>>> print(a.dimensions)
+Dimensions(kg=0, m=1, s=0, A=0, cd=0, K=0, mol=0)
+>>> print(a.conv_factor)
+1.0
+>>> b = 2.3 * si.ft
+>>> print(b.value)
+0.70104
+>>> print(b.dimensions)
+Dimensions(kg=0, m=1, s=0, A=0, cd=0, K=0, mol=0)
+>>> print(b.conv_factor)
+0.3048
+
+
+
 # significant digits
 
 >>> print(0.134435 * si.m)
