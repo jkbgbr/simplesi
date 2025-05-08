@@ -25,21 +25,22 @@ class Physical:
     An SI class for representing structural physical quantities.
     """
 
-    __slots__ = ("value", "dimensions", "conv_factor")
+    __slots__ = ("value", "dimensions", "conv_factor", "symbol")
 
     def __init__(
             self,
             value: float,
             dimensions: Dimensions,
             conv_factor: float = 1.0,
+            symbol: str = None,
     ):
         """
-
 
         :param value: How many pieces of this unit. Non-SI units are converted to the SI unit of the same dimensionality when instantiated.
         e.g. 1 ft = 0.3048 m -> value = n x 0.3048
         :param dimensions: dimensionality
         :param conv_factor: number of base SI units in this unit. e.g. 1 ft = 0.3048 m -> conv_factor = 0.3048
+        :param symbol: the symbol of the unit for pretty printing, e.g. cubic meter: 'm³'
         """
 
         # being strict about the input makes life easier later
@@ -59,6 +60,7 @@ class Physical:
         self.value = value
         self.dimensions = dimensions
         self.conv_factor = conv_factor
+        self.symbol = symbol
 
     def __call__(self, unit: str) -> PhysRep:
         """Returns the value in the given unit as a PhysRep instance"""
@@ -622,7 +624,8 @@ class PhysRep:
     >>> rep.unit
     'mm'
 
-    >>> rep = p._repr('cm')
+    # or, since the Physical is callable simply
+    >>> rep = p('cm')
     >>> rep.value
     1200.0
     >>> rep.unit
