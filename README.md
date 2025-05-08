@@ -109,6 +109,17 @@ Values defined with a unit are `Physical` objects. These have three attributes:
 - `dimensions` - a 7-element namedtuple defining the dimension of the unit. See [dimensional analysis](https://en.wikipedia.org/wiki/Dimensional_analysis) for the theory.
 - `conv_factor` - a (linear) conversion factor to allow for non-SI units. The conversion factor means: what number of base SI-units are in this unit. For example 1 ft = 0.3048 m -> conv_factor = 0.3048
 
+```python
+>>> print(a.value)
+2.45
+>>> print(a.dimensions)
+Dimensions(kg=0, m=1, s=0, A=0, cd=0, K=0, mol=0)
+>>> print(a.conv_factor)
+1
+```
+
+The `Physical` object is callable and returns a `PhysRep` object. See [Representing a Physical object](#representing-a-physical-object) for more details.
+
 Importing the package will create an `Environment` object with some default settings that define the default behavior of the `Physical` objects. These are:
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -130,7 +141,7 @@ If for a `Physical` a preferred unit is set, it will be used to display the numb
 ```
 
 A list of available units is shown when the `to()` method is called empty or with an incompatible unit.
-Note: for this example the setting `to_fails` is set 'print'. See the section [Exception handing](https://github.com/jkbgbr/simplesi#exception-handing) for more details.
+Note: for this example the setting `to_fails` is set 'print'. See the section [Exception handing](#exception-handing) for more details.
 ```python
 >>> a = 2.45 * si.kN_m
 >>> print(a.to())
@@ -224,7 +235,6 @@ base_units = {
 The default settings are probably best for structural engineers writing an app (yours truly). When simply importing the package and setting the environment name via `si.environment()`, only the base SI units are available and following settings are applied:
 
 ```python
-
 preferred_units = {
     'mm': Dimensions(0, 1, 0, 0, 0, 0, 0),
     's': Dimensions(0, 0, 1, 0, 0, 0, 0),
@@ -239,7 +249,6 @@ environment_settings = {
     'significant_digits': 3,
     'print_unit': 'smallest',  # smallest, largest
 }
-
 ```
 
 When calling `si.environment()` the following arguments are available:
@@ -251,6 +260,8 @@ When calling `si.environment()` the following arguments are available:
 - `top_level`: if True, the environment is loaded to `__builtins__` and units are available instead of e.g. `si.m` as `m`. If False, the environment is loaded to the `simplesi` namespace and are available via e.g. `si.m`.
 - `preferred_units`: the dictionary defining the preferred units for printing.
 - `settings`: the dictionary defining the environment settings. The default settings are used if not provided.
+
+Getting the environment from files is possible, but currently there is nothing implemented to do the same for settings and preferred units.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -444,17 +455,17 @@ ValueError: No units found for the dimensions Dimensions(kg=0.0, m=0.66666666666
 
 ## Representing a Physical object
 
-Once printed, a `Physical` object is represented as a string. Great, but from this point on it is not really easy to reuse the value.
-The `PhysRep` class is used to represent a `Physical` objects value as float and unit as string. It can be accessed from the `Physical` via the `_prep()` method and has some helper functions that my be handy.
+Printing a `Physical` object is just a string. Great, it is not really easy to reuse the value from that point.
+The `PhysRep` class is used to represent a `Physical` objects value as float and unit as string. The `Physical` is a callable so accessing the `PhysRep` of a `Physical` is simple.
 
 ```python
 >>> p = 12 * si.m
->>> rep = p._repr('mm')
+>>> rep = p('mm')
 >>> rep.value
 12000.0
 >>> rep.unit
 'mm'
->>> rep = p._repr('cm')
+>>> rep = p('cm')
 >>> rep.value
 1200.0
 >>> rep.unit
@@ -465,13 +476,23 @@ From the `PhysRep` the `Physical` object can be recreated.
 
 ```python
 >>> p = 12 * si.m
->>> rep = p._repr('mm')
+>>> rep = p('mm')
 >>> p2 = rep.physical
 >>> print(p2)
 12000 mm
 >>> print(type(p2))
 <class 'simplesi.Physical'>
 ```
+
+The `Physical`object is callable and returns a `PhysRep`!
+
+```python
+>>> p = 12 * si.m
+>>> rep = p('cm')
+>>> print(rep.value, rep.unit)
+1200.0 cm
+```
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Rich comparison
@@ -528,6 +549,35 @@ Rounding is essentially like the built-in round() function but instead of return
 241 kN
 ```
 
+## Some additional details from the deep
+
+### The Physical object
+
+Defining a `Physical` requres at least a value and a dimension. If no `conv_factor` is provided, it is set to 1.0. 
+It is the `conv_factor` what makes a `Physical` SI or non-SI: a value other than 1.0 means the unit is non-SI.
+An optional `symbol` can be provided, which is used for pretty printing. If not provided, the unit name is used.
+
+```python
+>>> a = 1 * si.m3
+>>> print(a.is_SI)
+True
+>>> print(a.to('m3'))
+1 m³
+>>> b = 1 * si.ft
+>>> print(b.is_SI)
+False
+```
+
+### The Environment object
+
+The environment object is a callable instance of the Environment class that gets created when the package is imported and can be accessed via `si.environment`. 
+It holds the units available to create `Physical` objects, the settings and the preferred units etc. 
+When unit definitions are provided, they are checked formally for correctness - not necessarily a bulletproof solution, but probably good enough.
+Preferences and settings can be updated using the `apply_preferences()` and `apply_settings()` methods. 
+
+```python
+
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- CONTRIBUTING -->
@@ -535,7 +585,7 @@ Rounding is essentially like the built-in round() function but instead of return
 
 ## Contributing
 
-Contributions are welcome!
+Contributions are welcome! Fork it, fix it, PR it.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

@@ -195,24 +195,35 @@ ValueError: No units found for the dimensions Dimensions(kg=0.0, m=0.66666666666
 
 # physrep
 >>> p = 12 * si.m
->>> rep = p._repr('mm')
+>>> rep = p('mm')
 >>> rep.value
 12000.0
 >>> rep.unit
 'mm'
->>> rep = p._repr('cm')
+>>> rep = p('cm')
 >>> rep.value
 1200.0
 >>> rep.unit
 'cm'
 
 >>> p = 12 * si.m
->>> rep = p._repr('mm')
+>>> rep = p('mm')
 >>> p2 = rep.physical
 >>> print(p2)
 12000 mm
 >>> print(type(p2))
 <class 'simplesi.Physical'>
+>>> print(p2.value)
+12.0
+>>> print(p2.dimensions)
+Dimensions(kg=0, m=1, s=0, A=0, cd=0, K=0, mol=0)
+>>> print(p2.conv_factor)
+1
+
+>>> p = 12 * si.m
+>>> rep = p('cm')
+>>> print(rep.value, rep.unit)
+1200.0 cm
 
 
 # rich comparison
@@ -235,5 +246,16 @@ ValueError: Can only compare between Physical instances of equal dimension or ze
 Traceback (most recent call last):
 ...
 ValueError: Can only __gt__ between Physical instances, these are <class 'int'> = 3 and <class 'simplesi.Physical'> = 2 kN
+
+
+# deep
+>>> a = 1 * si.m3
+>>> print(a.is_SI)
+True
+>>> print(a.to('m3'))
+1 m³
+>>> b = 1 * si.ft
+>>> print(b.is_SI)
+False
 
 """
