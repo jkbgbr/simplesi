@@ -237,6 +237,22 @@ Traceback (most recent call last):
 ValueError: No units found for the dimensions Dimensions(kg=0.0, m=0.6666666666666666, s=0.0, A=0.0, cd=0.0, K=0.0, mol=0.0).
 
 # physrep
+
+# calling the physical object without a unit name provided works only if there is a preferred unit set
+>>> p = 12 * si.m
+>>> rep = p()
+>>> rep.value
+12000.0
+>>> rep.unit
+'mm'
+
+>>> p = 12 * si.t_m3
+>>> rep = p()
+Traceback (most recent call last):
+...
+ValueError: No preferred unit found for the dimensions Dimensions(kg=1, m=-3, s=0, A=0, cd=0, K=0, mol=0), can't provide PhysRep.
+
+
 >>> p = 12 * si.m
 >>> rep = p('mm')
 >>> rep.value
@@ -248,6 +264,13 @@ ValueError: No units found for the dimensions Dimensions(kg=0.0, m=0.66666666666
 1200.0
 >>> rep.unit
 'cm'
+
+>>> p = 12 * si.s
+>>> rep = p('years')
+Traceback (most recent call last):
+...
+ValueError: Conversion not possible. Possible values to use are: "day", "fortnight", "ftn", "hour", "minute", "s", "week"
+
 
 >>> p = 12 * si.m
 >>> rep = p('mm')

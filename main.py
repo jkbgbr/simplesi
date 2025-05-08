@@ -12,6 +12,12 @@ print(a)
 si.environment.settings['significant_digits'] = 5
 print(a)
 
+
+print(a())
+
+
+exit()
+
 print(a.to('m'))
 # a.to('m')
 print(a.to('N_m'))

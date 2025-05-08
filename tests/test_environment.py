@@ -316,6 +316,27 @@ class TestRepresentation(unittest.TestCase):
         some_distance = p('cm')
         self.assertEqual(some_distance.value, 1.2)
 
+    def test_repr_preferred(self):
+        preferred_units = {"mm": Dimensions(0, 1, 0, 0, 0, 0, 0)}
+        si.environment.apply_preferences(preferred_units)
+
+        # there is a preferred unit set
+        physical = 1200 * si.mm
+        as_mm = physical()
+        self.assertEqual(as_mm.value, 1200)
+        self.assertEqual(as_mm.unit, 'mm')
+        # unit directly provided
+        as_cm = physical('cm')
+        self.assertEqual(as_cm.value, 120)
+        self.assertEqual(as_cm.unit, 'cm')
+        # no preferred unit set
+        second = 25 * si.s
+        with self.assertRaises(ValueError):  # no preferred unit set!
+            as_minute = second()
+        # no unit found - the provided unit is not defined so it is not possible to convert to it.
+        with self.assertRaises(AttributeError):
+            as_cm = physical('whatever')
+
 
 if __name__ == '__main__':
     unittest.main()

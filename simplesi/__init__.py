@@ -62,8 +62,12 @@ class Physical:
         self.conv_factor = conv_factor
         self.symbol = symbol
 
-    def __call__(self, unit: str) -> PhysRep:
+    def __call__(self, unit: str = None) -> PhysRep:
         """Returns the value in the given unit as a PhysRep instance"""
+        if unit is None:
+            unit = self.get_preferred_units()
+            if unit is None:
+                raise ValueError("No preferred unit found for the dimensions {}, can't provide PhysRep.".format(self.dimensions))
         return self._repr(unit)
 
     @classmethod
@@ -90,12 +94,16 @@ class Physical:
         # returning the "longest" number
         return sorted([_ret1, _ret2], key=lambda x: len(x))[-1]
 
+    def get_preferred_units(self):
+        unit = {k for k, v in environment.preferred_units.items() if v == self.dimensions}
+        unit = unit.pop() if unit else None
+        return unit
+
     def __str__(self):
         """A pretty print of the Physical instance"""
 
         # checking if there is a preferred unit for the dimensions
-        unit = {k for k, v in environment.preferred_units.items() if v == self.dimensions}
-        unit = unit.pop() if unit else None
+        unit = self.get_preferred_units()
 
         # if there is no preferred unit, use the smallest or largest available from the environment
         if unit is None:
