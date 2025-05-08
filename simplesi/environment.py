@@ -217,7 +217,7 @@ class Environment:
         if settings is not None:
             self.settings = settings
 
-        if preferred_units is not None:
+        if preferred_units:
 
             if not set(type(x) for x in preferred_units.values()):
                 raise ValueError('Values in the dict `preferred_units` must all be of the same type!')
