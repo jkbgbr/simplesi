@@ -678,7 +678,7 @@ When checking the environment definition, the following checks are performed:
 - symbol must be a string,
 - value must be an int or a float,
 - conv_factor must be an int or a float,
-- dimensions must be a 7-element iterable, at least one element must be non-zero.
+- dimensions must be a 7-element iterable.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
