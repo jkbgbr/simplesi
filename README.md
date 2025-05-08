@@ -566,8 +566,6 @@ It holds the units available to create `Physical` objects, the settings and the 
 When unit definitions are provided, they are checked formally for correctness - not necessarily a bulletproof solution, but probably good enough.
 Preferences and settings can be updated using the `apply_preferences()` and `apply_settings()` methods. 
 
-```python
-
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
