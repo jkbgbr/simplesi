@@ -474,7 +474,8 @@ base_units = {
 
 The default settings are probably best for structural engineers writing an app (yours truly). 
 When simply importing the package and setting the environment name via `si.environment()`, only the base SI units 
-are available and following settings are applied:
+are available and following settings are applied.
+The values of `preferred_units` must be all iterables of the same type, they don't have to be `Dimensions`. 
 
 ```python
 preferred_units = {

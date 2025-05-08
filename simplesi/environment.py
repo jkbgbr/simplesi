@@ -218,7 +218,19 @@ class Environment:
             self.settings = settings
 
         if preferred_units is not None:
-            self.preferred_units = preferred_units
+
+            if not set(type(x) for x in preferred_units.values()):
+                raise ValueError('Values in the dict `preferred_units` must all be of the same type!')
+
+            # Dimension may come as dimensions.Dimension object or any iterable
+            if all(isinstance(value, Dimensions) for value in preferred_units.values()):
+                self.preferred_units = preferred_units
+
+            else:
+                try:
+                    self.preferred_units = {k: Dimensions(*v) for k, v in preferred_units.items()}
+                except:
+                    raise
 
     def _read_from_file(self, _name: str, _path: pathlib.Path = None):
         """
