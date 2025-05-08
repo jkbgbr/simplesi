@@ -484,15 +484,6 @@ From the `PhysRep` the `Physical` object can be recreated.
 <class 'simplesi.Physical'>
 ```
 
-The `Physical`object is callable and returns a `PhysRep`!
-
-```python
->>> p = 12 * si.m
->>> rep = p('cm')
->>> print(rep.value, rep.unit)
-1200.0 cm
-```
-
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Rich comparison
