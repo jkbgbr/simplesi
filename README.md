@@ -130,7 +130,7 @@ See [dimensional analysis](https://en.wikipedia.org/wiki/Dimensional_analysis) f
 
 tldr: the seven base dimensions span a 7D linear space; the base units are the orthogonal base vectors. 
 Units derived directly from the base units are scaled versions of the base units; the scaling factor is the `value` x `conv_factor`, `Dimensions` is unchanged. Geometrically, these vectors are collinear.
-Derived units are (linear) combinations of the base units, and are independent - in geometrical sense they are at some angle from each other.
+Derived units are (linear) combinations of the base units, and are independent - in geometrical sense they are at some angle from each other. 
 
 ```python
 >>> a = 2.45 * si.m
@@ -147,6 +147,11 @@ Dimensions(kg=0, m=1, s=0, A=0, cd=0, K=0, mol=0)
 Dimensions(kg=0, m=1, s=0, A=0, cd=0, K=0, mol=0)
 >>> print(b.conv_factor)
 0.3048
+>>> c = 1 * si.mm
+>>> print((c**2).value)
+1e-06
+>>> print((c**2).dimensions)
+Dimensions(kg=0, m=2, s=0, A=0, cd=0, K=0, mol=0)
 ```
 
 The `Physical` object is callable and returns a `PhysRep` object. See [Representing a Physical object](#representing-a-physical-object) for more details.
