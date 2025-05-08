@@ -128,10 +128,6 @@ Values defined with a unit are `Physical` objects. These have three attributes:
 
 See [dimensional analysis](https://en.wikipedia.org/wiki/Dimensional_analysis) for the full theory how this works.
 
-tldr: the seven base dimensions span a 7D linear space; the base units are the orthogonal base vectors. 
-Units derived directly from the base units are scaled versions of the base units; the scaling factor is the `value` x `conv_factor`, `Dimensions` is unchanged. Geometrically, these vectors are collinear.
-Derived units are (linear) combinations of the base units, and are independent - in geometrical sense they are at some angle from each other. 
-
 ```python
 >>> a = 2.45 * si.m
 >>> print(a.value)
