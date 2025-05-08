@@ -67,8 +67,9 @@ Compared to forallpeople:
 - modified, maybe more intuitive behavior of printing
 - user-defined environment behaviour
   - exception handling: print or raise
-  - number of significant digits for print can be set
+  - number of printed significant digits for print can be set
   - user-defined preferred units can be defined for printing to reduce boilerplate code
+- Added a representation class for easier handling the value and unit when e.g. printing or generating a document.
 - [Fractions](https://docs.python.org/3/library/fractions.html) are not used anymore, which resulted in the massive speedup but makes using fractional dimensions - well, in some cases impossible as fractional dimensions are now subject to float precision issues.
 
 Compared to [pint](https://github.com/hgrecco/pint) - just kidding, not a fair comparison.
