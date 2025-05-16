@@ -1,0 +1,236 @@
+{    
+    "g_mol": {
+        "Dimension": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            -1
+        ],
+        "value": 0.001,
+        "Symbol": "g_mol"
+    },
+    "L": {
+        "Dimension": [
+            0,
+            3,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "Value": 0.001,
+        "Symbol": "L"
+    },
+    "mL": {
+        "Dimension": [
+            0,
+            3,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "Value": 1e-06,
+        "Symbol": "mL"
+    },
+    "uL": {
+        "Dimension": [
+            0,
+            3,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "Value": 1e-09,
+        "Symbol": "uL"
+    },
+    "nL": {
+        "Dimension": [
+            0,
+            3,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "Value": 1e-12,
+        "Symbol": "nL"
+    },
+    "M": {
+        "Dimension": [
+            0,
+            -3,
+            0,
+            0,
+            0,
+            0,
+            1
+        ],
+        "Value": 1.0,
+        "Symbol": "M"
+    },
+    "mM": {
+        "Dimension": [
+            0,
+            -3,
+            0,
+            0,
+            0,
+            0,
+            1
+        ],
+        "Value": 0.001,
+        "Symbol": "mM"
+    },
+    "uM": {
+        "Dimension": [
+            0,
+            -3,
+            0,
+            0,
+            0,
+            0,
+            1
+        ],
+        "Value": 1e-06,
+        "Symbol": "uM"
+    },
+    "nM": {
+        "Dimension": [
+            0,
+            -3,
+            0,
+            0,
+            0,
+            0,
+            1
+        ],
+        "Value": 1e-09,
+        "Symbol": "nM"
+    },
+    "fmol": {
+        "Dimension": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+        ],
+        "Value": 1e-15,
+        "Symbol": "fmol"
+    },
+    "pmol": {
+        "Dimension": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+        ],
+        "Value": 1e-12,
+        "Symbol": "pmol"
+    },
+    "nmol": {
+        "Dimension": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+        ],
+        "Value": 1e-09,
+        "Symbol": "nmol"
+    },
+    "umol": {
+        "Dimension": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+        ],
+        "Value": 1e-06,
+        "Symbol": "umol"
+    },
+    "g": {
+        "Dimension": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "Value": 0.001,
+        "Symbol": "g"
+    },
+    "mg": {
+        "Dimension": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "Value": 1e-06,
+        "Symbol": "mg"
+    },
+    "ng": {
+        "Dimension": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "Value": 1e-09,
+        "Symbol": "ng"
+    },
+    "g_L": {
+        "Dimension": [
+            1,
+            -3,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "Value": 1.0,
+        "Symbol": "g_L"
+    },
+    "ng_uL": {
+        "Dimension": [
+            1,
+            -3,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "Value": 0.001,
+        "Symbol": "ng_uL"
+    }
+}
