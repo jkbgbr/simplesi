@@ -1,4 +1,17 @@
-{
+{    
+    "g_mol": {
+        "Dimension": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            -1
+        ],
+        "value": 0.001,
+        "Symbol": "g_mol"
+    },
     "L": {
         "Dimension": [
             0,
