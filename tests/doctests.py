@@ -5,7 +5,23 @@
 
 >>> import simplesi as si
 >>> si.environment(env_name='structural')
->>> print(1.34 * si.m)
+>>> print(1.34 * si.deg)
+1.34 °
+
+
+>>> import math
+>>> a = 30 * si.deg
+>>> print(a.symbol)
+
+>>> print(a.sin)
+0.5
+>>> print((4 * si.deg).sqrt())
+2.0
+
+
+>>> import simplesi as si
+>>> si.environment(env_name='structural')
+>>> print(1.340 * si.m)
 1340 mm
 
 

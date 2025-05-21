@@ -611,6 +611,30 @@ class Physical:
         """
         return self ** (1 / n)
 
+    def _trigfcn(self, fcn: str):
+        """Tries to import fcn from the math module"""
+        import importlib
+        math_module = importlib.import_module('math')
+        fcn = getattr(math, fcn)
+        if fcn is None:
+            raise ValueError("{!r} not found in the math module".format(fcn))
+
+        print(self.symbol)
+        if self.symbol == 'rad':
+            return fcn(self.value)
+        elif self.symbol == '°':
+            return fcn(math.radians(self.value))
+        else:
+            raise ValueError('Use radian or degree, not {}'.format(self.symbol))
+
+    @property
+    def sin(self):
+        return self._trigfcn('sin')
+
+    @property
+    def cos(self):
+        return self._trigfcn('cos')
+
 
 class PhysRep:
     """
