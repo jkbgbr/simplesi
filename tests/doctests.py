@@ -1,4 +1,3 @@
-
 """
 
 # defining
@@ -9,21 +8,19 @@
 1.34 °
 
 
+>>> import pprint
+
 >>> import math
 >>> a = 30 * si.deg
->>> print(a.symbol)
-
->>> print(a.sin)
-0.5
+>>> print(abs(a.sin - 0.5)<1e-5)
+True
 >>> print((4 * si.deg).sqrt())
 2.0
-
 
 >>> import simplesi as si
 >>> si.environment(env_name='structural')
 >>> print(1.340 * si.m)
 1340 mm
-
 
 
 # usage
@@ -200,7 +197,7 @@ ValueError: Cannot incrementally add Physical instances. Use 'a = a + b', to mak
 >>> print((a * b).to('m2'))
 0.305 m²
 >>> a * (1 * si.K)
-Physical(value=1, dimensions=Dimensions(kg=0, m=1, s=0, A=0, cd=0, K=1, mol=0), conv_factor=1.0)
+Physical(value=1, dimensions=Dimensions(kg=0, m=1, s=0, A=0, cd=0, K=1, mol=0), conv_factor=1.0, symbol=None)
 
 >>> a = 3 * si.s
 >>> b = 3 * si.Hz

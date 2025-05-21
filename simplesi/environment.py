@@ -198,7 +198,6 @@ class Environment:
         self._units = {}
         from simplesi import Physical
         for unit, definitions in self.environment.items():
-
             # Physical holds:
             # - the value of the unit. The value of non-SI units is the value in SI units.
             # - the conversion factor for non_SI units. For SI units this is 1.
@@ -206,7 +205,8 @@ class Environment:
 
             self._units[unit] = Physical(value=definitions.get('Value') * definitions.get('Factor'),
                                          conv_factor=definitions.get('Factor'),
-                                         dimensions=definitions["Dimension"]
+                                         dimensions=definitions.get("Dimension"),
+                                         symbol=definitions.get("Symbol"),
                                          )
 
         # push

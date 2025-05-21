@@ -109,8 +109,9 @@ class Physical:
         # if there is no preferred unit, use the smallest or largest available from the environment
         if unit is None:
             # possible units, ascending order
-            unit = tuple(k for k, v in sorted(self.all_units.items(), key=lambda x: x[1].get('Value') * x[1].get('Factor')) if
-                         v.get('Dimension') == self.dimensions)
+            unit = tuple(
+                k for k, v in sorted(self.all_units.items(), key=lambda x: x[1].get('Value') * x[1].get('Factor')) if
+                v.get('Dimension') == self.dimensions)
 
             if not unit:
                 raise ValueError('No units found for the dimensions {}.'.format(self.dimensions))
@@ -130,9 +131,10 @@ class Physical:
         """
         Returns a traditional Python string representation of the Physical instance.
         """
-        return "Physical(value={}, dimensions={}, conv_factor={})".format(self.value,
-                                                                          self.dimensions,
-                                                                          self.conv_factor)
+        return "Physical(value={}, dimensions={}, conv_factor={}, symbol={})".format(self.value,
+                                                                                     self.dimensions,
+                                                                                     self.conv_factor,
+                                                                                     self.symbol)
 
     @property
     def is_SI(self):
@@ -253,7 +255,8 @@ class Physical:
 
                 # this should not be possible for many reasons but still
                 if len(available) > 1:
-                    raise ValueError('More than one unit found for the given dimensions. This means, symbols and keys in the environment are used multiple times.')
+                    raise ValueError(
+                        'More than one unit found for the given dimensions. This means, symbols and keys in the environment are used multiple times.')
 
                 # finally, the unit is found and we are sure there is only one
                 # but maybe we found it by the symbol -> let's find the unit
@@ -315,7 +318,7 @@ class Physical:
         if n is None:
             n = environment.settings.get('significant_digits')
 
-        return Physical(round(self.value, n), self.dimensions, self.conv_factor)
+        return Physical(round(self.value, n), self.dimensions, self.conv_factor, self.symbol)
 
     def __contains__(self, other):
         return False
@@ -427,6 +430,7 @@ class Physical:
                 new_value,
                 self.dimensions,
                 new_factor,
+                self.symbol
             )
 
         # dimensions are not compatible
@@ -463,6 +467,7 @@ class Physical:
                 new_value,
                 self.dimensions,
                 new_factor,
+                self.symbol,
             )
 
         else:
@@ -480,6 +485,7 @@ class Physical:
                     -self.value,
                     self.dimensions,
                     self.conv_factor,
+                    self.symbol,
                 )
             else:
                 raise ValueError('Can subtract a Physical instance only from zero.')
@@ -503,6 +509,7 @@ class Physical:
                 self.value * other,
                 self.dimensions,
                 self.conv_factor,
+                self.symbol,
             )
 
         # compare only between Physical instances
@@ -538,6 +545,7 @@ class Physical:
                 self.value / other,
                 self.dimensions,
                 self.conv_factor,
+                self.symbol
             )
 
         # compare only between Physical instances
@@ -564,6 +572,7 @@ class Physical:
                 other / self.value,
                 Dimensions(*[-x for x in self.dimensions]),
                 self.conv_factor,
+                self.symbol,
             )
 
         else:
@@ -619,13 +628,12 @@ class Physical:
         if fcn is None:
             raise ValueError("{!r} not found in the math module".format(fcn))
 
-        print(self.symbol)
         if self.symbol == 'rad':
             return fcn(self.value)
         elif self.symbol == '°':
             return fcn(math.radians(self.value))
         else:
-            raise ValueError('Use radian or degree, not {}'.format(self.symbol))
+            raise ValueError('Use radian or degree, not "{}"'.format(self.symbol))
 
     @property
     def sin(self):
